@@ -14,12 +14,16 @@ project "Game"
 --	pchheader "pch.h"
 --	pchsource "source/pch.cpp"
 
+	-- Helios-Engine
+	links "Engine"
+	includedirs "%{wks.location}/projects/shared/"
+	includedirs "%{wks.location}/projects/Helios-Engine/Engine/source/"
+	
 	-- Libraries
 --	LibHeliosEngine{}
 
 	includedirs {
-		"source",
-		"../../shared",
+		"source/",
 	}
 
 	files {

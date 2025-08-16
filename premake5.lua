@@ -62,6 +62,14 @@ workspace "Helios-Project"
 	filter {}
 
 
+
+	-------------------------------
+	-- [ LIBRARIES (UTIL-FUNC) ] --
+	-------------------------------
+	
+	include("premake5_libs.lua")
+
+
 	-------------------------------
 	-- [ PROJECT CONFIGURATION ] --
 	-------------------------------

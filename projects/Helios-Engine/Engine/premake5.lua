@@ -19,7 +19,7 @@ project "Engine"
 --	VendorEnTT{}
 --	VendorGlfw{}
 --	VendorGlm{}
---	VendorSpdlog{}
+	VendorSpdlog{}
 
 
 	includedirs {
@@ -36,8 +36,8 @@ project "Engine"
 		"source/Helios/Engine/**.h",
 		"source/Helios/Engine/**.cpp",
 		-- assets
-		"assets/**.vert",
-		"assets/**.frag",
+--		"assets/**.vert",
+--		"assets/**.frag",
 	}
 
 
@@ -64,7 +64,7 @@ project "Engine"
 		}
 
 --		VendorDirectX{}
---		VendorVulkan{}
+		VendorVulkan{}
 --		VendorOpenGL{}
 
 
@@ -88,7 +88,7 @@ project "Engine"
 			"source/Platform/Renderer/OpenGL/**.cpp",
 		}
 
---		VendorVulkan{}
+		VendorVulkan{}
 --		VendorOpenGL{}
 
 
@@ -115,7 +115,7 @@ project "Engine"
 		}
 
 --		VendorMetal{}
---		VendorVulkan{}
+		VendorVulkan{}
 --		VendorOpenGL{}
 
 
