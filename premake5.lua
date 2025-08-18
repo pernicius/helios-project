@@ -32,6 +32,9 @@ workspace "Helios-Project"
 	filter { "system:windows", "action:vs*" }
 		flags { "MultiProcessorCompile", "NoMinimalRebuild" }
 		systemversion "latest"
+		-- required by spdlog
+		buildoptions "/utf-8"
+		
 
 
 	-------------------------------------
@@ -91,8 +94,8 @@ workspace "Helios-Project"
 		dir_group = "Shared"
 		include("projects/shared/")
 
-	group "vendor"
-		dir_group = "vendor/"
+	group "Vendor"
+		dir_group = "Vendor/"
 		include("vendor/")
 
 --	group "Misc"
