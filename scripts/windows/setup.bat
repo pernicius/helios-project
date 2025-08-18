@@ -98,14 +98,7 @@ goto _error_exit
 
 :_git_end
 echo --------------------------------------------------------------------------------
-echo.
-echo.
-echo.
-echo.
-echo.
-echo.
-echo ===== Done!
-pause
+call generate.bat
 exit 0
 :_error_exit
 echo --------------------------------------------------------------------------------
