@@ -1,10 +1,10 @@
 # The Helios Project (C++)
-Dieses Projekt ist eine längerfristige Beschäftigung. Endziel ist eine möglichst performant 3D-Engine und einige Tools um deren Assets zu Verwalten/Erstellen.
+This project is a long-term endeavor. The ultimate goal is to create a high-performance 3D engine and some tools for managing and creating its assets.
 
 ***
 
 ## Getting Started
-Ich persönlich favorisiere Visual Studio, andere Entwicklungsumgebungen sind offiziel ungetestet. Auch wenn das Projekt andere Betriebssysteme unterstützen soll liegt der primäre Focus momentan bei Windows.
+Personally, I prefer Visual Studio; other development environments are officially untested. Although the project aims to support other operating systems, the primary focus at the moment is on Windows.
 
 <ins>**1. Download:**</ins>
 
