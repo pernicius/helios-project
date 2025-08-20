@@ -15,13 +15,13 @@ Start by cloning the repository with:<br />
 
 - Windows / Visual Studio
 
-    1. Start the 'scripts/windows/setup.bat' batch file. Which will then download and install all the required prerequisites for the projekt if they are not present yet.
+    1. Start the `scripts/windows/setup.bat` batch file. Which will then download and install all the required prerequisites for the projekt if they are not present yet.
         - **Premake:** Will be downloaded. [Premake] is the main workspace generator for this project.
         - **Vulkan SDK:** If not present the script will download it and execute the installer.
         - **Git Submodules:** all submodules will be pulled.
-        - Start of the [generate.bat] is done automatically.
-    2. Start the 'scripts/windows/generate.bat' batch file. Which will then generate a Visual Studio solution file.
+        - Start of the generate.bat is done automatically.
+    2. Start the `scripts/windows/generate.bat` batch file. Which will then generate a Visual Studio solution file.
     
-	If changes are made, or if you want to regenerate the project files, rerun the 'scripts/windows/generate.bat' batch file.
+	If changes are made, or if you want to regenerate the project files, rerun the `scripts/windows/generate.bat` batch file.
 
 ***
