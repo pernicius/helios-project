@@ -98,9 +98,9 @@ workspace "Helios-Project"
 		dir_group = "Vendor/"
 		include("vendor/")
 
---	group "Misc"
---		dir_group = "Misc/"
---		include("Docu/")
+	group "Misc"
+		dir_group = "Misc/"
+		include("docu/")
 --		include("Tools/")
 
 	group ""
