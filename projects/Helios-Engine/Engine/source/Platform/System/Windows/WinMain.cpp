@@ -1,5 +1,7 @@
+#include "pch.h"
+#include "Platform/System/Windows/WinMain.h"
+
 #include "Helios/Engine/Core/Application.h"
-#include "WinMain.h"
 
 
 #ifdef BUILD_DEBUG

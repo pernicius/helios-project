@@ -10,6 +10,10 @@
 // Probably supported in the feature:
 //   TARGET_PLATFORM_LINUX
 //   TARGET_PLATFORM_MACOS
+// 
+// Not supported but detected:
+//   TARGET_PLATFORM_IOS
+//   TARGET_PLATFORM_ANDROID
 // ============================================================================
 
 

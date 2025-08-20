@@ -1,7 +1,7 @@
 -----------------------
 -- [ PROJECT CONFIG] --
 -----------------------
-project "Engine"
+project "Helios-Engine"
 	architecture  "x86_64"
 	language      "C++"
 	cppdialect    "C++20"
@@ -12,26 +12,24 @@ project "Engine"
 	targetdir (dir_bin   .. dir_group .. dir_config)
 	objdir    (dir_build .. dir_group .. dir_config .. dir_project)
 
---	pchheader "pch.h"
---	pchsource "source/pch.cpp"
-
-	-- Libraries
---	VendorEnTT{}
---	VendorGlfw{}
---	VendorGlm{}
-	VendorSpdlog{}
-
+	pchheader "pch.h"
+	pchsource "source/pch.cpp"
 
 	includedirs {
-		"source",
-		"../../shared",
+		"source/",
+		"../../shared/",
 	}
 
+	-- Libraries
+	VendorSpdlog{}
+	VendorGlfw{}
+--	VendorEnTT{}
+--	VendorGlm{}
 
 	files {
 		-- precompiled header
---		"source/pch.h",
---		"source/pch.cpp",
+		"source/pch.h",
+		"source/pch.cpp",
 		-- project itself
 		"source/Helios/Engine/**.h",
 		"source/Helios/Engine/**.cpp",
@@ -39,8 +37,7 @@ project "Engine"
 --		"assets/**.vert",
 --		"assets/**.frag",
 	}
-
-
+		
 	filter "platforms:Windows"
 
 		files {
@@ -67,8 +64,6 @@ project "Engine"
 		VendorVulkan{}
 --		VendorOpenGL{}
 
-
-
 	filter "platforms:Linux"
 
 		files {
@@ -90,7 +85,6 @@ project "Engine"
 
 		VendorVulkan{}
 --		VendorOpenGL{}
-
 
 	filter "platforms:MacOS"
 
@@ -118,15 +112,12 @@ project "Engine"
 		VendorVulkan{}
 --		VendorOpenGL{}
 
-
 	filter {}
-
 
 --	prebuildmessage "Updating version information..."
 --	prebuildcommands {
 --		"\"%{wks.location}Tools/build_inc/_bin/build_inc_" .. os.host() .. "\" -bfile \"%{prj.location}Source/Config/Version.h\" -bdef VERSION_BUILD"
 --	}
-
 
 --	postbuildmessage "Copying assets to the target folder..."
 --	postbuildcommands {

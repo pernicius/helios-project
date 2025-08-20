@@ -1,7 +1,7 @@
 -----------------------
 -- [ PROJECT CONFIG] --
 -----------------------
-project "Networking"
+project "Helios-Networking"
 	architecture  "x86_64"
 	language      "C++"
 	cppdialect    "C++20"
@@ -12,8 +12,13 @@ project "Networking"
 	targetdir (dir_bin   .. dir_group .. dir_config)
 	objdir    (dir_build .. dir_group .. dir_config .. dir_project)
 
---	pchheader "pch.h"
---	pchsource "source/pch.cpp"
+	pchheader "pch.h"
+	pchsource "source/pch.cpp"
+
+	includedirs {
+		"source",
+		"../../shared",
+	}
 
 	-- Libraries
 --	VendorEnTT{}
@@ -21,22 +26,14 @@ project "Networking"
 --	VendorGlm{}
 --	VendorSpdlog{}
 
-
-	includedirs {
-		"source",
-		"../../shared",
-	}
-
-
 	files {
 		-- precompiled header
---		"source/pch.h",
---		"source/pch.cpp",
+		"source/pch.h",
+		"source/pch.cpp",
 		-- project itself
 		"source/Helios/Networking/**.h",
 		"source/Helios/Networking/**.cpp",
 	}
-
 
 	filter "platforms:Windows"
 
@@ -64,12 +61,10 @@ project "Networking"
 
 	filter {}
 
-
 --	prebuildmessage "Updating version information..."
 --	prebuildcommands {
 --		"\"%{wks.location}Tools/build_inc/_bin/build_inc_" .. os.host() .. "\" -bfile \"%{prj.location}Source/Config/Version.h\" -bdef VERSION_BUILD"
 --	}
-
 
 --	postbuildmessage "Copying assets to the target folder..."
 --	postbuildcommands {

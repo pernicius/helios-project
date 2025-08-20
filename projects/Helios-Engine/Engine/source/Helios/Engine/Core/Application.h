@@ -1,16 +1,99 @@
 #pragma once
 
+//#include "Helios/Engine/Core/Layer.h"
+//#include "Helios/Engine/Core/Window.h"
+
+//#include "Helios/Engine/Events/Event.h"
+//#include "Helios/Engine/Events/ApplicationEvent.h"
+
+//#include "Helios/Engine/ImGui/ImGuiLayer.h"
+
 namespace Helios { // start of namespace
 
 
 	int AppMain(int argc, char** argv);
 
 
-	class Application {
+	class Application
+	{
 	public:
-//		Application() = delete;
+		struct CommandLineArgs
+		{
+			int Count = 0;
+			char** Args = nullptr;
+
+			const char* operator[](int index) const
+			{
+				LOG_CORE_ASSERT(index < Count, "");
+				return Args[index];
+			}
+
+			bool Check(std::string arg);
+			std::string Get(std::string arg, std::string default_value = "");
+		};
+
+		enum Hints
+		{
+			HINT_USE_CWD     = (1 << 0), // use the current work dir as base path
+			HINT_USE_EXEPATH = (1 << 1), // use path of executeable as base path
+		};
+
+		struct Specification
+		{
+			// Name/Title of Application
+			std::string Name;
+			// Version of Application
+			uint32_t Version;
+			// Base path for FileIO
+			std::string WorkingDirectory;
+			// Command Line Arguments
+			CommandLineArgs CmdLineArgs;
+			// Basic configuration hints
+			unsigned int hints = 0;
+			// Name of the logfile
+			std::string logfile = "HeliosEngine.log";
+			// Name of the configfile
+			std::string configfile = "HeliosEngine.cfg";
+		};
+
+	public:
+		Application() = delete;
+		Application(const Specification& specification);
+		virtual ~Application();
+
+		static Application& Get() { return *s_Instance; }
+		const Specification& GetSpecification() const { return m_Specification; }
+		void Close();
+
+//		void OnEvent(Event& e);
+
+//		void PushLayer(Layer* layer);
+//		void PushOverlay(Layer* layer);
+
+//		Window& GetWindow() { return *m_Window; }
+
 	private:
+		void Run();
+//		bool OnWindowClose(WindowCloseEvent& e);
+//		bool OnWindowResize(WindowResizeEvent& e);
+//		bool OnFramebufferResize(FramebufferResizeEvent& e);
+
+	private:
+		Specification m_Specification;
+//		Scope<Window> m_Window;
+		//		ImGuiLayer* m_ImGuiLayer;
+		bool m_Running = true;
+		bool m_Minimized = false;
+//		LayerStack m_LayerStack;
+
+	private:
+		static Application* s_Instance;
+		friend int AppMain(int argc, char** argv);
 	};
+
+
+	// Needs to be defined/implemented in Client/Application
+	Application* CreateApplication(Application::CommandLineArgs args);
 
 
 } // end of namespace Helios

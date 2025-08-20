@@ -11,15 +11,11 @@ project "Launcher"
 	targetdir (dir_bin   .. dir_group .. dir_config)
 	objdir    (dir_build .. dir_group .. dir_config .. dir_project)
 
---	pchheader "pch.h"
---	pchsource "source/pch.cpp"
-
-	-- Libraries
---	LibHeliosEngine{}
+	pchheader "pch.h"
+	pchsource "source/pch.cpp"
 
 	includedirs {
-		"source",
-		"../../shared",
+		"source/",
 	}
 
 	files {
@@ -28,6 +24,9 @@ project "Launcher"
 		"**.hpp",
 		"**.cpp"
 	}
+
+	-- Libraries
+	LibHeliosEngine{}
 
 	filter "configurations:Debug"
 
@@ -48,12 +47,10 @@ project "Launcher"
 
 	filter {}
 
-
 --	prebuildmessage "Updating version information..."
 --	prebuildcommands {
 --		"\"%{wks.location}Tools/build_inc/_bin/build_inc_" .. os.host() .. "\" -bfile \"%{prj.location}Source/Config/Version.h\" -bdef VERSION_BUILD"
 --	}
---
 --
 --	postbuildmessage "Copying assets to the target folder..."
 --	postbuildcommands {
