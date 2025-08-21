@@ -194,7 +194,6 @@ namespace Helios { // start of namespace
 	}
 
 
-/*
 	void Application::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
@@ -202,14 +201,13 @@ namespace Helios { // start of namespace
 		dispatcher.Dispatch<WindowResizeEvent>(HE_BIND_EVENT_FN(Application::OnWindowResize));
 		dispatcher.Dispatch<FramebufferResizeEvent>(HE_BIND_EVENT_FN(Application::OnFramebufferResize));
 
-		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
-		{
-			if (e.Handled)
-				break;
-			(*it)->OnEvent(e);
-		}
+//		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
+//		{
+//			if (e.Handled)
+//				break;
+//			(*it)->OnEvent(e);
+//		}
 	}
-*/
 
 	void Application::Run()
 	{
@@ -287,7 +285,6 @@ namespace Helios { // start of namespace
 	}
 
 
-/*
 	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
 		m_Running = false;
@@ -304,7 +301,7 @@ namespace Helios { // start of namespace
 		}
 
 		m_Minimized = false;
-		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+//		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
 
 		return false;
 	}
@@ -319,11 +316,10 @@ namespace Helios { // start of namespace
 		}
 
 		m_Minimized = false;
-		Renderer::OnFramebufferResize(e.GetWidth(), e.GetHeight());
+//		Renderer::OnFramebufferResize(e.GetWidth(), e.GetHeight());
 
 		return false;
 	}
-*/
 
 
 } // end of namespace Helios

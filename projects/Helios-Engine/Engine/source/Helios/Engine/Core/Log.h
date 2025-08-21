@@ -5,7 +5,6 @@
 //#	include <spdlog/fmt/ostr.h>
 #pragma warning(pop)
 
-#include "Helios/Engine/Core/ScopeRef.h"
 #include "Helios/Engine/Debug/DebugBreak.h"
 
 
@@ -34,13 +33,13 @@ namespace Helios {
 
 
 // log levels
-#define LOG_LEVEL_TRACE 0
-#define LOG_LEVEL_DEBUG 1
-#define LOG_LEVEL_INFO  2
-#define LOG_LEVEL_WARN  3
-#define LOG_LEVEL_ERROR 4
-#define LOG_LEVEL_FATAL 5
-#define LOG_LEVEL_OFF   6
+constexpr auto LOG_LEVEL_TRACE = 0;
+constexpr auto LOG_LEVEL_DEBUG = 1;
+constexpr auto LOG_LEVEL_INFO  = 2;
+constexpr auto LOG_LEVEL_WARN  = 3;
+constexpr auto LOG_LEVEL_ERROR = 4;
+constexpr auto LOG_LEVEL_FATAL = 5;
+constexpr auto LOG_LEVEL_OFF   = 6;
 
 // minimal log level
 #if !defined(LOG_LEVEL)
@@ -80,6 +79,7 @@ namespace Helios {
 #define LOG_RENDER_ERROR(...) (LOG_LEVEL <= LOG_LEVEL_ERROR) ? ::Helios::Log::GetRenderLogger()->error(__VA_ARGS__)    : (void)0
 #define LOG_RENDER_FATAL(...) (LOG_LEVEL <= LOG_LEVEL_FATAL) ? ::Helios::Log::GetRenderLogger()->critical(__VA_ARGS__) : (void)0
 
+
 // ASSERT macros
 #if HE_LOG_ASSERTS_ENABLED
 #	define LOG_CORE_ASSERT(x, ...)   { if(!(x)) { LOG_CORE_FATAL(  "Assertion failed: {0}", __VA_ARGS__); DebugBreak(); } }
@@ -92,6 +92,7 @@ namespace Helios {
 #	define LOG_RENDER_ASSERT(x, ...)
 #	define LOG_ASSERT(x, ...)
 #endif
+
 
 // EXCEPTION macros (exceptions are always logged as fatal errors)
 #define LOG_CORE_EXCEPT(x)   { LOG_CORE_FATAL(  "Core-Exception: {}",     x); throw std::runtime_error(x); }

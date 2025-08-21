@@ -3,8 +3,8 @@
 //#include "Helios/Engine/Core/Layer.h"
 //#include "Helios/Engine/Core/Window.h"
 
-//#include "Helios/Engine/Events/Event.h"
-//#include "Helios/Engine/Events/ApplicationEvent.h"
+#include "Helios/Engine/Events/Event.h"
+#include "Helios/Engine/Events/ApplicationEvent.h"
 
 //#include "Helios/Engine/ImGui/ImGuiLayer.h"
 
@@ -65,7 +65,7 @@ namespace Helios { // start of namespace
 		const Specification& GetSpecification() const { return m_Specification; }
 		void Close();
 
-//		void OnEvent(Event& e);
+		void OnEvent(Event& e);
 
 //		void PushLayer(Layer* layer);
 //		void PushOverlay(Layer* layer);
@@ -74,9 +74,9 @@ namespace Helios { // start of namespace
 
 	private:
 		void Run();
-//		bool OnWindowClose(WindowCloseEvent& e);
-//		bool OnWindowResize(WindowResizeEvent& e);
-//		bool OnFramebufferResize(FramebufferResizeEvent& e);
+		bool OnWindowClose(WindowCloseEvent& e);
+		bool OnWindowResize(WindowResizeEvent& e);
+		bool OnFramebufferResize(FramebufferResizeEvent& e);
 
 	private:
 		Specification m_Specification;
