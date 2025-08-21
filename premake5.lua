@@ -17,7 +17,6 @@ workspace "Helios-Project"
 	
 	startproject "Engine"
 
-
 	--------------------------------
 	-- [ PLATFORM CONFIGURATION ] --
 	--------------------------------
@@ -82,25 +81,26 @@ workspace "Helios-Project"
 	dir_config  = "%{string.lower(cfg.platform)}-%{string.lower(cfg.buildcfg)}/"
 	dir_project = "%{string.lower(prj.name)}"
 
-	group "Helios-Engine"
+	group "Helios/Engine"
 		dir_group = "Helios-Engine/"
 		include("projects/Helios-Engine/")
 
-	group "Helios-App"
-		dir_group = "Helios-App/"
+	group "Helios/Apps"
+		dir_group = "Helios-Apps/"
 		include("projects/Helios-App/")
 
-	group "Shared"
-		dir_group = "Shared"
+	group "Helios/Shared"
+		dir_group = "Helios-Shared"
 		include("projects/shared/")
 
-	group "Vendor"
-		dir_group = "Vendor/"
+	group "Helios/Vendor"
+		dir_group = "Helios-Vendor/"
 		include("vendor/")
 
 	group "Misc"
 		dir_group = "Misc/"
 		include("docu/")
+		include "premake5_files.lua"
 --		include("Tools/")
 
 	group ""
