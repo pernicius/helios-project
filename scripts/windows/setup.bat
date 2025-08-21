@@ -50,6 +50,8 @@ mkdir %DSTPATH% >NUL 2>&1
 REM see also:
 REM https://vulkan.lunarg.com/doc/sdk
 
+if not %VULKAN_SDK% == "" goto _vulkan_skip
+
 echo ===== Download Vulkan SDK (~250MB)
 if not exist %DSTPATH%\vulkan-sdk-install.exe (
 	echo Note: This will take a while
@@ -72,7 +74,9 @@ echo ERROR: Error during installation!
 goto _error_exit
 
 
-
+goto _vulkan_end
+:_vulkan_skip
+echo ===== Download/Install Vulkan SDK skipped!
 :_vulkan_end
 echo --------------------------------------------------------------------------------
 
