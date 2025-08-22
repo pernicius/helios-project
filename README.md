@@ -1,6 +1,9 @@
 # The Helios Project (C++)
 This project is a long-term endeavor. The ultimate goal is to create a high-performance 3D engine and some tools for managing and creating its assets.
 
+> [!CAUTION]
+> At the moment the project is under heavy development and it possible that it will in no way work/compile.
+
 ***
 
 ## Getting Started
@@ -33,3 +36,32 @@ Personally, I prefer Visual Studio; other development environments are officiall
     *TODO: will be supported in the future*
 
 ***
+
+# Development Status
+
+## Work In Progress
+
+  - [ ] Renderer Class<br />
+    Probably based on [NVRHI](https://github.com/NVIDIA-RTX/NVRHI) to support Vulkan, DirectX11 and DirectX12<br />
+	Alternatively i'll have a look into [SDL3](https://github.com/libsdl-org/SDL) which also supports OpenGL and Metal
+  - [ ] Shader Compiler
+  - [ ] Assets Class
+ 
+ ## Platforms
+
+  - [ ] Linux (not now but soon)
+  - [ ] MacOS (not by me but the build/code is prepared)
+
+## Render API's
+
+ - [ ] OpenGL (really? if so it's a fallback if Vulkan doesn't work)
+ - [ ] Vulkan (main target)
+ - [ ] Metal (Apple only)
+ - [ ] DirectX (after Vulkan; will be the main target for Windows)
+
+ ## Later
+
+  - [ ] App/Game Template
+  - [ ] Custom window caption
+ 
+ And much more...
