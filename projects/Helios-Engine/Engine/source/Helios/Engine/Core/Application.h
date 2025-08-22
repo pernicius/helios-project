@@ -1,6 +1,6 @@
 #pragma once
 
-//#include "Helios/Engine/Core/Layer.h"
+#include "Helios/Engine/Core/Layer.h"
 #include "Helios/Engine/Core/Window.h"
 
 #include "Helios/Engine/Events/Event.h"
@@ -8,7 +8,7 @@
 
 //#include "Helios/Engine/ImGui/ImGuiLayer.h"
 
-namespace Helios { // start of namespace
+namespace Helios::Engine { // start of namespace
 
 
 	int AppMain(int argc, char** argv);
@@ -67,8 +67,8 @@ namespace Helios { // start of namespace
 
 		void OnEvent(Event& e);
 
-//		void PushLayer(Layer* layer);
-//		void PushOverlay(Layer* layer);
+		void PushLayer(Layer* layer);
+		void PushOverlay(Layer* layer);
 
 		Window& GetWindow() { return *m_Window; }
 
@@ -83,7 +83,7 @@ namespace Helios { // start of namespace
 		Scope<Window> m_Window;
 		bool m_Running = true;
 		bool m_Minimized = false;
-//		LayerStack m_LayerStack;
+		LayerStack m_LayerStack;
 //		ImGuiLayer* m_ImGuiLayer;
 
 	private:
@@ -96,4 +96,4 @@ namespace Helios { // start of namespace
 	Application* CreateApplication(Application::CommandLineArgs args);
 
 
-} // end of namespace Helios
+} // end of namespace Helios::Engine

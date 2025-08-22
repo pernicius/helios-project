@@ -3,4 +3,4 @@
 #include "Helios/Engine/Core/Application.h"
 
 
-extern Helios::Application* Helios::CreateApplication(Application::CommandLineArgs args);
+extern Helios::Engine::Application* Helios::Engine::CreateApplication(Application::CommandLineArgs args);

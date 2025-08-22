@@ -9,7 +9,7 @@
 
 #include <GLFW/glfw3.h>
 
-namespace Helios {
+namespace Helios::Engine {
 
 
 	static void GLFWErrorCallback(int error, const char* description)
@@ -308,4 +308,4 @@ namespace Helios {
 	}
 
 
-} // namespace Helios
+} // namespace Helios::Engine

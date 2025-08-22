@@ -3,7 +3,7 @@
 #include "Helios/Engine/Events/Event.h"
 #include "Helios/Engine/Core/InputCodes.h"
 
-namespace Helios {
+namespace Helios::Engine {
 
 
 	class MouseMovedEvent : public Event
@@ -102,4 +102,4 @@ namespace Helios {
 	};
 
 
-} // namespace Helios
+} // namespace Helios::Engine

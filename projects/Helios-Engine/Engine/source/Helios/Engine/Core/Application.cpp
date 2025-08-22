@@ -3,8 +3,8 @@
 
 //#include "Helios/Engine/Core/Config.h"
 #include "Helios/Engine/Core/EntryPoint.h"
-//#include "Helios/Engine/Core/Timer.h"
-//#include "Helios/Engine/Core/Timestep.h"
+#include "Helios/Engine/Core/Timer.h"
+#include "Helios/Engine/Core/Timestep.h"
 //#include "Helios/Engine/Core/Assets.h"
 //#include "Helios/Engine/Renderer/Renderer.h"
 
@@ -12,7 +12,7 @@
 
 #include <cstdlib>
 
-namespace Helios { // start of namespace
+namespace Helios::Engine { // start of namespace
 
 
 	// ----------------------------------------------------------------------------------------------------
@@ -160,7 +160,6 @@ namespace Helios { // start of namespace
 	}
 
 
-/*
 	void Application::PushLayer(Layer* layer)
 	{
 		m_LayerStack.PushLayer(layer);
@@ -171,10 +170,8 @@ namespace Helios { // start of namespace
 		WindowResizeEvent event(size_x, size_y);
 		OnEvent(event);
 	}
-*/
 
 
-/*
 	void Application::PushOverlay(Layer* layer)
 	{
 		m_LayerStack.PushOverlay(layer);
@@ -185,7 +182,6 @@ namespace Helios { // start of namespace
 		WindowResizeEvent event(size_x, size_y);
 		OnEvent(event);
 	}
-*/
 
 
 	void Application::Close()
@@ -201,23 +197,23 @@ namespace Helios { // start of namespace
 		dispatcher.Dispatch<WindowResizeEvent>(HE_BIND_EVENT_FN(Application::OnWindowResize));
 		dispatcher.Dispatch<FramebufferResizeEvent>(HE_BIND_EVENT_FN(Application::OnFramebufferResize));
 
-//		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
-//		{
-//			if (e.Handled)
-//				break;
-//			(*it)->OnEvent(e);
-//		}
+		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
+		{
+			if (e.Handled)
+				break;
+			(*it)->OnEvent(e);
+		}
 	}
 
 	void Application::Run()
 	{
-//		Timer RunLoopTimer;
+		Timer RunLoopTimer;
 		while (m_Running)
 		{
-//			Timestep timestep = RunLoopTimer.Elapsed();
-//			RunLoopTimer.Reset();
+			Timestep timestep = RunLoopTimer.Elapsed();
+			RunLoopTimer.Reset();
 
-#if 0
+#if 1
 			{ // tempoary for debuging
 				static int fps = 0;
 				static int fps_cnt = 0;
@@ -262,8 +258,8 @@ namespace Helios { // start of namespace
 			if (!m_Minimized)
 			{
 				// Update all layers before rendering
-//				for (Layer* layer : m_LayerStack)
-//					layer->OnUpdate(timestep);
+				for (Layer* layer : m_LayerStack)
+					layer->OnUpdate(timestep);
 
 				// Render
 //				Renderer::Get()->Render();
@@ -322,4 +318,4 @@ namespace Helios { // start of namespace
 	}
 
 
-} // end of namespace Helios
+} // end of namespace Helios::Engine

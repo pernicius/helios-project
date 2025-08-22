@@ -2,14 +2,14 @@
 #include "App.h"
 
 
-Helios::Application* Helios::CreateApplication(Helios::Application::CommandLineArgs args)
+Helios::Engine::Application* Helios::Engine::CreateApplication(Helios::Engine::Application::CommandLineArgs args)
 {
-	Helios::Application::Specification spec{};
+	Helios::Engine::Application::Specification spec{};
 	{
 		spec.Name = "Helios-Game";
 		spec.Version = App::APP_VERSION;
 		spec.CmdLineArgs = args;
-		spec.hints |= Helios::Application::Hints::HINT_USE_EXEPATH;
+		spec.hints |= Helios::Engine::Application::Hints::HINT_USE_EXEPATH;
 		spec.logfile = "Helios-Game.log";
 		spec.configfile = "Helios-Game.cfg";
 	};
@@ -18,8 +18,8 @@ Helios::Application* Helios::CreateApplication(Helios::Application::CommandLineA
 }
 
 
-App::App(const Helios::Application::Specification& spec)
-	: Helios::Application(spec)
+App::App(const Helios::Engine::Application::Specification& spec)
+	: Helios::Engine::Application(spec)
 {
 //	PushLayer(new SandboxLayer3D());
 	//	PushOverlay(new ClientUILayer());

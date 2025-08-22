@@ -1,4 +1,5 @@
 #pragma once
+#define DebugBreak debug_break
 // source: https://github.com/scottt/debugbreak
 
 

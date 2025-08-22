@@ -2,7 +2,7 @@
 
 #include "Helios/Engine/Events/Event.h"
 
-namespace Helios {
+namespace Helios::Engine {
 
 
 	class FramebufferResizeEvent : public Event
@@ -93,4 +93,4 @@ namespace Helios {
 	};
 
 
-} // namespace Helios
+} // namespace Helios::Engine

@@ -8,7 +8,7 @@
 #	include <spdlog/sinks/basic_file_sink.h>
 #pragma warning(pop)
 
-namespace Helios {
+namespace Helios::Engine {
 
 
 	Ref<spdlog::logger> Log::s_CoreLogger;
@@ -63,4 +63,4 @@ namespace Helios {
 	}
 
 
-} // namespace Helios
+} // namespace Helios::Engine

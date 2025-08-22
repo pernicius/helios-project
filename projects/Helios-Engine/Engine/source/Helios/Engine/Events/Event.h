@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Helios {
+namespace Helios::Engine {
 
 
 	enum class EventType
@@ -84,7 +84,7 @@ namespace Helios {
 	}
 
 
-} // namespace Helios
+} // namespace Helios::Engine
 
 
 #define HE_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }

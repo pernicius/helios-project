@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace Helios {
+namespace Helios::Engine {
 	enum VersionType
 	{
 		Unknown = 0,
@@ -20,10 +20,10 @@ namespace Helios {
 //  - 10 bits: minor version
 //  - 12 bits: patch number
 #ifdef BUILD_DEBUG
-#	define HE_MAKE_VERSION(major, minor, patch) ((((uint32_t)(Helios::VersionType::Debug)) << 29U) |\
+#	define HE_MAKE_VERSION(major, minor, patch) ((((uint32_t)(Helios::Engine::VersionType::Debug)) << 29U) |\
 		(((uint32_t)(major)) << 22U) | (((uint32_t)(minor)) << 12U) | ((uint32_t)(patch)))
 #else
-#	define HE_MAKE_VERSION(major, minor, patch) ((((uint32_t)(Helios::VersionType::Release)) << 29U) |\
+#	define HE_MAKE_VERSION(major, minor, patch) ((((uint32_t)(Helios::Engine::VersionType::Release)) << 29U) |\
 		(((uint32_t)(major)) << 22U) | (((uint32_t)(minor)) << 12U) | ((uint32_t)(patch)))
 #endif
 
@@ -35,8 +35,8 @@ namespace Helios {
 
 
 #define HE_VERSION_TYPE_STRING(version) (\
-	(HE_VERSION_TYPE(version) == Helios::VersionType::Debug) ? "Debug" : \
-	(HE_VERSION_TYPE(version) == Helios::VersionType::Release) ? "Release" : \
+	(HE_VERSION_TYPE(version) == Helios::Engine::VersionType::Debug)   ? "Debug" : \
+	(HE_VERSION_TYPE(version) == Helios::Engine::VersionType::Release) ? "Release" : \
 	"Unknown")
 
 

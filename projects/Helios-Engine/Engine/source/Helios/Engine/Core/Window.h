@@ -5,7 +5,7 @@
 
 #include <GLFW/glfw3.h>
 
-namespace Helios {
+namespace Helios::Engine {
 
 
 	class Window
@@ -63,4 +63,4 @@ namespace Helios {
 	};
 
 
-} // namespace Helios
+} // namespace Helios::Engine

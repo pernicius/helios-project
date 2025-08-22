@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Helios { // start of namespace
+namespace Helios::Engine { // start of namespace
 
 
 	// unique pointers (type)
@@ -26,4 +26,4 @@ namespace Helios { // start of namespace
 
 
 
-} // end of namespace Helios
+} // end of namespace Helios::Engine
