@@ -1,7 +1,7 @@
 #pragma once
 
 //#include "Helios/Engine/Core/Layer.h"
-//#include "Helios/Engine/Core/Window.h"
+#include "Helios/Engine/Core/Window.h"
 
 #include "Helios/Engine/Events/Event.h"
 #include "Helios/Engine/Events/ApplicationEvent.h"
@@ -70,7 +70,7 @@ namespace Helios { // start of namespace
 //		void PushLayer(Layer* layer);
 //		void PushOverlay(Layer* layer);
 
-//		Window& GetWindow() { return *m_Window; }
+		Window& GetWindow() { return *m_Window; }
 
 	private:
 		void Run();
@@ -80,11 +80,11 @@ namespace Helios { // start of namespace
 
 	private:
 		Specification m_Specification;
-//		Scope<Window> m_Window;
-		//		ImGuiLayer* m_ImGuiLayer;
+		Scope<Window> m_Window;
 		bool m_Running = true;
 		bool m_Minimized = false;
 //		LayerStack m_LayerStack;
+//		ImGuiLayer* m_ImGuiLayer;
 
 	private:
 		static Application* s_Instance;

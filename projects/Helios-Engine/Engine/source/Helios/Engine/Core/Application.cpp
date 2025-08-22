@@ -138,14 +138,14 @@ namespace Helios { // start of namespace
 
 		// Init Window/renderer
 //		Renderer::Setup();
-//		m_Window = Window::Create(Window::Specification(m_Specification.Name));
-//		m_Window->SetEventCallback(HE_BIND_EVENT_FN(Application::OnEvent));
+		m_Window = Window::Create(Window::Specification(m_Specification.Name));
+		m_Window->SetEventCallback(HE_BIND_EVENT_FN(Application::OnEvent));
 //		Renderer::Init();
 
-		//		static std::string inipath = m_Specification.WorkingDirectory;
-		//		inipath += "/imgui.ini";
-		//		m_ImGuiLayer = new ImGuiLayer(inipath);
-		//		PushOverlay(m_ImGuiLayer);
+//		static std::string inipath = m_Specification.WorkingDirectory;
+//		inipath += "/imgui.ini";
+//		m_ImGuiLayer = new ImGuiLayer(inipath);
+//		PushOverlay(m_ImGuiLayer);
 	}
 
 
@@ -280,7 +280,7 @@ namespace Helios { // start of namespace
 			}
 
 			// Poll events and so on
-//			m_Window->OnUpdate();
+			m_Window->OnUpdate();
 		}
 	}
 

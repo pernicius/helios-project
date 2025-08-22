@@ -3,7 +3,7 @@ function LibHeliosEngine()
 --	VendorEnTT{}
 --	LibLuaHelper{}
 --	VendorGlad{}
---	VendorGlfw{}
+	VendorGlfw{}
 --	VendorGlm{}
 --	VendorImgui{}
 --	VendorLua{}
