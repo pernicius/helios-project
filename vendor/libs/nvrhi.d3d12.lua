@@ -1,0 +1,89 @@
+-----------------------
+-- [ PROJECT CONFIG] --
+-----------------------
+project "nvrhi.d3d12"
+	kind          "StaticLib"
+	architecture  "x86_64"
+	language      "C++"
+	cppdialect    "C++17"
+	staticruntime "On"
+	targetname    "nvrhi_d3d12"
+	
+	dir_project = "%{string.lower(prj.name)}"
+	targetdir (dir_bin   .. dir_group .. dir_config .. dir_project)
+	objdir    (dir_build .. dir_group .. dir_config .. dir_project)
+
+	-- move project in the correct dir
+	basedir("nvrhi")
+	
+	includedirs {
+		"nvrhi/include",
+		"nvrhi/src"
+	}
+	
+	files {
+		-- include
+		"nvrhi/include/nvrhi/d3d12.h",
+		-- src
+		"nvrhi/src/common/dxgi-format.h",
+		"nvrhi/src/common/dxgi-format.cpp",
+		"nvrhi/src/common/versioning.h",
+		"nvrhi/src/d3d12/d3d12-buffer.cpp",
+		"nvrhi/src/d3d12/d3d12-commandlist.cpp",
+		"nvrhi/src/d3d12/d3d12-compute.cpp",
+		"nvrhi/src/d3d12/d3d12-constants.cpp",
+		"nvrhi/src/d3d12/d3d12-backend.h",
+		"nvrhi/src/d3d12/d3d12-descriptor-heap.cpp",
+		"nvrhi/src/d3d12/d3d12-device.cpp",
+		"nvrhi/src/d3d12/d3d12-graphics.cpp",
+		"nvrhi/src/d3d12/d3d12-meshlets.cpp",
+		"nvrhi/src/d3d12/d3d12-queries.cpp",
+		"nvrhi/src/d3d12/d3d12-raytracing.cpp",
+		"nvrhi/src/d3d12/d3d12-resource-bindings.cpp",
+		"nvrhi/src/d3d12/d3d12-shader.cpp",
+		"nvrhi/src/d3d12/d3d12-state-tracking.cpp",
+		"nvrhi/src/d3d12/d3d12-texture.cpp",
+		"nvrhi/src/d3d12/d3d12-upload.cpp",
+	}
+
+	filter "system:windows"
+		systemversion "latest"
+		staticruntime "On"
+
+		files {
+		}
+
+		defines {
+		}
+
+		links {
+			"d3d12",
+		}
+
+	filter "system:linux"
+		pic "On"
+		systemversion "latest"
+		staticruntime "On"
+
+		files {
+		}
+
+		defines {
+		}
+
+	filter "system:macosx"
+		staticruntime "On"
+
+		files {
+		}
+
+		defines {
+		}
+
+	filter "configurations:Debug"
+		runtime "Debug"
+		symbols "On"
+		
+	filter "configurations:Release"
+		runtime "Release"
+		optimize "On"

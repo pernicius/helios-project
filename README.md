@@ -41,9 +41,9 @@ Personally, I prefer Visual Studio; other development environments are officiall
 
 ## Work In Progress
 
-  - [ ] Renderer Class<br />
-    Probably based on [NVRHI](https://github.com/NVIDIA-RTX/NVRHI) to support Vulkan, DirectX11 and DirectX12<br />
-	Alternatively i'll have a look into [SDL3](https://github.com/libsdl-org/SDL) which also supports OpenGL and Metal
+  - [ ] Renderer Classes<br />
+    Based on [NVRHI](https://github.com/NVIDIA-RTX/NVRHI) to support Vulkan, DirectX11 and DirectX12<br />
+	~~Alternatively i'll have a look into [SDL3](https://github.com/libsdl-org/SDL) which also supports OpenGL and Metal~~
   - [ ] Shader Compiler
   - [ ] Assets Class
  
@@ -54,10 +54,10 @@ Personally, I prefer Visual Studio; other development environments are officiall
 
 ## Render API's
 
- - [ ] OpenGL (really? if so it's a fallback if Vulkan doesn't work)
- - [ ] Vulkan (main target)
- - [ ] Metal (Apple only)
- - [ ] DirectX (after Vulkan; will be the main target for Windows)
+ - [ ] Vulkan (target for all platforms)
+ - [ ] DirectX (target for Windows only)
+ - [ ] Metal (eventually? if so, much later! target for Apple only)
+ - [ ] OpenGL (eventually? if so, much later! fallback target if Vulkan doesn't work/exists)
 
  ## Later
 
