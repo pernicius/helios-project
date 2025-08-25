@@ -5,7 +5,7 @@ project "nvrhi.vulkan"
 	kind          "StaticLib"
 	architecture  "x86_64"
 	language      "C++"
-	cppdialect    "C++17"
+	cppdialect    "C++20"
 	staticruntime "On"
 	targetname    "nvrhi_vulkan"
 	
@@ -18,7 +18,9 @@ project "nvrhi.vulkan"
 	
 	includedirs {
 		"nvrhi/include",
-		"nvrhi/src"
+		"nvrhi/src",
+		-- Vulkan-Headers
+		"nvrhi/thirdparty/Vulkan-Headers/include",
 	}
 	
 	files {

@@ -4,3 +4,9 @@
 [submodule "vendor/libs/glfw"]
 	path = vendor/libs/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "vendor/libs/nvrhi"]
+	path = vendor/libs/nvrhi
+	url = https://github.com/NVIDIA-RTX/NVRHI.git
+[submodule "vendor/headers/glm"]
+	path = vendor/headers/glm
+	url = https://github.com/g-truc/glm.git

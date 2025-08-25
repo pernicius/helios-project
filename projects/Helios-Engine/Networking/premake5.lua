@@ -60,13 +60,3 @@ project "Helios-Networking"
 		}
 
 	filter {}
-
---	prebuildmessage "Updating version information..."
---	prebuildcommands {
---		"\"%{wks.location}Tools/build_inc/_bin/build_inc_" .. os.host() .. "\" -bfile \"%{prj.location}Source/Config/Version.h\" -bdef VERSION_BUILD"
---	}
-
---	postbuildmessage "Copying assets to the target folder..."
---	postbuildcommands {
---		"{COPYDIR} \"%{prj.location}assets\" \"" .. dir_bin .. dir_group .. dir_config .. "Assets\""
---	}

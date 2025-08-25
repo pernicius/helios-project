@@ -18,7 +18,7 @@ project "nvrhi.validation"
 	
 	includedirs {
 		"nvrhi/include",
-		"nvrhi/src"
+		"nvrhi/src",
 	}
 	
 	files {

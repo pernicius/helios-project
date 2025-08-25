@@ -4,17 +4,15 @@ function LibHeliosEngine()
 --	LibLuaHelper{}
 --	VendorGlad{}
 	VendorGlfw{}
---	VendorGlm{}
+	VendorGlm{}
 --	VendorImgui{}
 --	VendorLua{}
 	VendorSpdlog{}
 --	VendorStb{}
 
 	-- renderer support
-	VendorDirectX{}
-	VendorMetal{}
 	VendorVulkan{}
-	VendorOpenGL{}
+	VendorNVRHI{}
 
 	-- the engine itself
 	includedirs "%{wks.location}/projects/Helios-Engine/Engine/source/"
@@ -22,38 +20,43 @@ function LibHeliosEngine()
 	links "Helios-Engine"
 end
 
+
 -------------------------------------------------------------------------------
 --  External Dependancies
 -------------------------------------------------------------------------------
 
 
-function VendorVulkan()
-	if os.getenv("VULKAN_SDK") then
-		includedirs "%VULKAN_SDK%/Include"
-		libdirs "%VULKAN_SDK%/Lib"
-		links "vulkan-1"
-	end
+function VendorGlfw()
+	includedirs "%{wks.location}/vendor/libs/glfw/include"
+	defines "GLFW_INCLUDE_NONE"
+	links "vendor.glfw"
 end
 
 
-function VendorOpenGL()
-	-- TODO...
-	-- TODO...
-	-- TODO...
+function VendorGlm()
+	includedirs "%{wks.location}/vendor/headers/glm/include"
 end
 
 
-function VendorDirectX()
-	-- TODO...
-	-- TODO...
-	-- TODO...
-end
+function VendorNVRHI()
+	links "nvrhi.common"
+	includedirs "%{wks.location}/vendor/libs/nvrhi/include"
 
+	filter "configurations:Debug"
+		links "nvrhi.validation"
+	
+	filter "platforms:Windows"
+		links "nvrhi.d3d11"
+		links "nvrhi.d3d12"
+		links "nvrhi.vulkan"
 
-function VendorMetal()
-	-- TODO...
-	-- TODO...
-	-- TODO...
+	filter "platforms:Linux"
+		links "nvrhi.vulkan"
+
+	filter "platforms:MacOS"
+		links "nvrhi.vulkan"
+
+	filter {}
 end
 
 
@@ -62,8 +65,10 @@ function VendorSpdlog()
 end
 
 
-function VendorGlfw()
-	includedirs "%{wks.location}/vendor/libs/glfw/include"
-	defines "GLFW_INCLUDE_NONE"
-	links "vendor.glfw"
+function VendorVulkan()
+	if os.getenv("VULKAN_SDK") then
+		includedirs "%VULKAN_SDK%/Include"
+		libdirs "%VULKAN_SDK%/Lib"
+		links "vulkan-1"
+	end
 end

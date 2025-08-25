@@ -18,7 +18,7 @@ project "nvrhi.d3d11"
 	
 	includedirs {
 		"nvrhi/include",
-		"nvrhi/src"
+		"nvrhi/src",
 	}
 	
 	files {

@@ -18,7 +18,7 @@ project "nvrhi.common"
 	
 	includedirs {
 		"nvrhi/include",
-		"nvrhi/src"
+		"nvrhi/src",
 	}
 	
 	files {

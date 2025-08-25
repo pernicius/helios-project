@@ -18,7 +18,10 @@ project "nvrhi.d3d12"
 	
 	includedirs {
 		"nvrhi/include",
-		"nvrhi/src"
+		"nvrhi/src",
+		-- DirectX-Headers
+		"nvrhi/thirdparty/DirectX-Headers/include",
+		"nvrhi/thirdparty/DirectX-Headers/include/directx",
 	}
 	
 	files {
@@ -44,6 +47,9 @@ project "nvrhi.d3d12"
 		"nvrhi/src/d3d12/d3d12-state-tracking.cpp",
 		"nvrhi/src/d3d12/d3d12-texture.cpp",
 		"nvrhi/src/d3d12/d3d12-upload.cpp",
+		-- DirectX-Headers
+		"nvrhi/thirdparty/DirectX-Headers/src/d3dx12_property_format_table.cpp",
+		"nvrhi/thirdparty/DirectX-Headers/src/dxguids.cpp",
 	}
 
 	filter "system:windows"

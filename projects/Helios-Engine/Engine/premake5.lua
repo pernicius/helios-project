@@ -24,7 +24,9 @@ project "Helios-Engine"
 	VendorSpdlog{}
 	VendorGlfw{}
 --	VendorEnTT{}
---	VendorGlm{}
+	VendorGlm{}
+		VendorVulkan{}
+	VendorNVRHI()
 
 	files {
 		-- precompiled header
@@ -46,9 +48,8 @@ project "Helios-Engine"
 		}
 
 		defines {
---			"BUILDWITH_RENDERER_DIRECTX",
 			"BUILDWITH_RENDERER_VULKAN",
---			"BUILDWITH_RENDERER_OPENGL",
+			"BUILDWITH_RENDERER_DIRECTX",
 		}
 
 		files {
@@ -60,10 +61,6 @@ project "Helios-Engine"
 			"source/Platform/Renderer/OpenGL/**.cpp",
 		}
 
---		VendorDirectX{}
-		VendorVulkan{}
---		VendorOpenGL{}
-
 	filter "platforms:Linux"
 
 		files {
@@ -73,7 +70,6 @@ project "Helios-Engine"
 		
 		defines {
 			"BUILDWITH_RENDERER_VULKAN",
-			"BUILDWITH_RENDERER_OPENGL",
 		}
 
 		files {
@@ -83,9 +79,6 @@ project "Helios-Engine"
 			"source/Platform/Renderer/OpenGL/**.cpp",
 		}
 
-		VendorVulkan{}
---		VendorOpenGL{}
-
 	filter "platforms:MacOS"
 
 		files {
@@ -94,9 +87,7 @@ project "Helios-Engine"
 		}
 		
 		defines {
-			"BUILDWITH_RENDERER_METAL",
 			"BUILDWITH_RENDERER_VULKAN",
-			"BUILDWITH_RENDERER_OPENGL",
 		}
 
 		files {
@@ -108,18 +99,4 @@ project "Helios-Engine"
 			"source/Platform/Renderer/OpenGL/**.cpp",
 		}
 
---		VendorMetal{}
-		VendorVulkan{}
---		VendorOpenGL{}
-
 	filter {}
-
---	prebuildmessage "Updating version information..."
---	prebuildcommands {
---		"\"%{wks.location}Tools/build_inc/_bin/build_inc_" .. os.host() .. "\" -bfile \"%{prj.location}Source/Config/Version.h\" -bdef VERSION_BUILD"
---	}
-
---	postbuildmessage "Copying assets to the target folder..."
---	postbuildcommands {
---		"{COPYDIR} \"%{prj.location}assets\" \"" .. dir_bin .. dir_group .. dir_config .. "Assets\""
---	}
