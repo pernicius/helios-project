@@ -5,7 +5,7 @@ project "nvrhi.validation"
 	kind          "StaticLib"
 	architecture  "x86_64"
 	language      "C++"
-	cppdialect    "C++17"
+	cppdialect    "C++20"
 	staticruntime "On"
 	targetname    "nvrhi_validation"
 	
