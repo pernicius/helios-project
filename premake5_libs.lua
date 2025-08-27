@@ -27,9 +27,13 @@ end
 
 
 function VendorGlfw()
-	includedirs "%{wks.location}/vendor/libs/glfw/include"
-	defines "GLFW_INCLUDE_NONE"
 	links "vendor.glfw"
+	includedirs "%{wks.location}/vendor/libs/glfw/include"
+	-- Do not include any OpenGL headers
+	defines "GLFW_INCLUDE_NONE"
+	filter "platforms:Windows"
+		defines "GLFW_EXPOSE_NATIVE_WIN32"
+	filter {}
 end
 
 
