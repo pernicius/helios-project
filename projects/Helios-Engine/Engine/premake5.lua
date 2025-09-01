@@ -48,8 +48,9 @@ project "Helios-Engine"
 		}
 
 		defines {
-			"BUILDWITH_RENDERER_VULKAN",
-			"BUILDWITH_RENDERER_DIRECTX",
+			"HE_RENDERER_VULKAN",
+			"HE_RENDERER_DX11",
+			"HE_RENDERER_DX12",
 		}
 
 		files {
@@ -69,7 +70,7 @@ project "Helios-Engine"
 		}
 		
 		defines {
-			"BUILDWITH_RENDERER_VULKAN",
+			"HE_RENDERER_VULKAN",
 		}
 
 		files {
@@ -87,7 +88,7 @@ project "Helios-Engine"
 		}
 		
 		defines {
-			"BUILDWITH_RENDERER_VULKAN",
+			"HE_RENDERER_VULKAN",
 		}
 
 		files {

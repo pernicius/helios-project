@@ -9,7 +9,7 @@ namespace Helios::Engine {
 		None = 0,
 
 		// EventCategory::EventCategoryApplication
-		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
+		WindowClose, WindowResize, WindowMoved, // WindowFocus, WindowLostFocus,
 		FramebufferResize,
 		AppTick, AppUpdate, AppRender,
 		

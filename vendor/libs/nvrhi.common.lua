@@ -44,9 +44,6 @@ project "nvrhi.common"
 		"NVRHI_D3D11_WITH_NVAPI=0",
 	}
 
-
-
-
 	filter "system:windows"
 		systemversion "latest"
 		staticruntime "On"

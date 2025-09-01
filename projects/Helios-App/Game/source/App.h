@@ -13,5 +13,4 @@ public:
 
 	App(const Helios::Engine::Application::Specification& spec);
 	~App();
-
 };

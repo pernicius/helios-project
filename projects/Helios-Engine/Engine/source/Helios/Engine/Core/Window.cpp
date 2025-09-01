@@ -9,13 +9,12 @@
 
 #include <GLFW/glfw3.h>
 
+#ifdef TARGET_PLATFORM_WINDOWS
+#	include <ShellScalingApi.h>
+#	pragma comment(lib, "shcore.lib")
+#endif
+
 namespace Helios::Engine {
-
-
-	static void GLFWErrorCallback(int error, const char* description)
-	{
-		LOG_GLFW_ERROR("({0}): {1}", error, description);
-	}
 
 
 	Scope<Window> Window::Create(const Specification& spec)
@@ -28,18 +27,6 @@ namespace Helios::Engine {
 
 	Window::Window(const Specification& spec)
 	{
-		Init(spec);
-	}
-
-
-	Window::~Window()
-	{
-		Shutdown();
-	}
-
-
-	void Window::Init(const Specification& spec)
-	{
 		m_Data.Title = spec.Title;
 		m_Data.Width = spec.Width;
 		m_Data.Height = spec.Height;
@@ -48,46 +35,57 @@ namespace Helios::Engine {
 		{
 			LOG_GLFW_DEBUG("GLFW Version: {0}", glfwGetVersionString());
 
+#			if 0 // TARGET_PLATFORM_WINDOWS
+				if (!spec.enablePerMonitorDPI)
+				{
+					// glfwInit enables the maximum supported level of DPI awareness unconditionally.
+					// If the app doesn't need it, we have to call this function before glfwInit to override that behavior.
+					SetProcessDpiAwareness(PROCESS_DPI_UNAWARE);
+				}
+#			endif
+
 			int success = glfwInit();
 			LOG_GLFW_ASSERT(success, "Could not initialize GLFW!");
-
-			glfwSetErrorCallback(GLFWErrorCallback);
 		}
 
+		glfwDefaultWindowHints();
+
 		// OpenGL: Tell GLFW to create a debug mode context
-#		if defined(BUILD_DEBUG) && defined(BUILDWITH_RENDERER_OPENGL)
-		if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
-			glfwWindowHint(GLFW_CONTEXT_DEBUG, GLFW_TRUE);
-		LOG_GLFW_DEBUG("GLFW using debug mode context for OpenGL (hint)");
+#		if defined(BUILD_DEBUG) && defined(HE_RENDERER_OPENGL)
+			if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
+				glfwWindowHint(GLFW_CONTEXT_DEBUG, GLFW_TRUE);
+			LOG_GLFW_DEBUG("GLFW using debug mode context for OpenGL (hint)");
 #		endif
 
 		// Vulkan: Tell GLFW to not create an OpenGL context
-#		if defined(BUILDWITH_RENDERER_VULKAN)
-//		if (Renderer::GetAPI() == RendererAPI::API::Vulkan)
-			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+#		if defined(HE_RENDERER_VULKAN)
+//			if (Renderer::GetAPI() == RendererAPI::API::Vulkan)
+				glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 #		endif
 
-//		{ // debug
-//			int count_mon;
-//			GLFWmonitor** monitors = glfwGetMonitors(&count_mon);
-//			if (!monitors)
-//				LOG_GLFW_ERROR("Can't retrieve montors!");
-//			for (int x = 0; x < count_mon; ++x)
-//			{
-//				LOG_CORE_DEBUG("Monitor found: ({0}):\"{1}\"", x, glfwGetMonitorName(monitors[x]));
-//				int count_modes;
-//				const GLFWvidmode* modes = glfwGetVideoModes(monitors[x], &count_modes);
-//				if (!modes)
-//					LOG_GLFW_ERROR("Can't retrieve video modes!");
-//				for (int y = 0; y < count_modes; ++y)
-//				{
-//					LOG_CORE_DEBUG("  Video mode({0}): {1}x{2} {3}bit {4}Hz",
-//						y, modes[y].width, modes[y].height, modes[y].redBits + modes[y].greenBits + modes[y].blueBits, modes[y].refreshRate);
-//				}
-//			}
-//		} // debug
+#if 0
+		{ // debug
+			int count_mon;
+			GLFWmonitor** monitors = glfwGetMonitors(&count_mon);
+			if (!monitors)
+				LOG_GLFW_ERROR("Can't retrieve montors!");
+			for (int x = 0; x < count_mon; ++x)
+			{
+				LOG_CORE_DEBUG("Monitor found: ({}):\"{}\"", x, glfwGetMonitorName(monitors[x]));
+				int count_modes;
+				const GLFWvidmode* modes = glfwGetVideoModes(monitors[x], &count_modes);
+				if (!modes)
+					LOG_GLFW_ERROR("Can't retrieve video modes!");
+				for (int y = 0; y < count_modes; ++y)
+				{
+					if (modes[y].redBits + modes[y].greenBits + modes[y].blueBits == 24)
+						LOG_CORE_DEBUG("  Video mode({}): {}x{} {}Hz", y, modes[y].width, modes[y].height, modes[y].refreshRate);
+				}
+			}
+		} // debug
+#endif
 
-				// Setup the window
+		// Setup the window
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 		m_Window = glfwCreateWindow((int)spec.Width, (int)spec.Height, m_Data.Title.c_str(), nullptr, nullptr);
 		// glfwSetWindowIcon(GLFWwindow* window, int count, const GLFWimage* images);
@@ -104,6 +102,12 @@ namespace Helios::Engine {
 
 		// Set GLFW callbacks
 		InitCallbacks();
+	}
+
+
+	Window::~Window()
+	{
+		Shutdown();
 	}
 
 
@@ -128,7 +132,7 @@ namespace Helios::Engine {
 
 	void Window::SetVSync(bool enabled)
 	{
-#ifdef BUILDWITH_RENDERER_OPENGL
+#ifdef HE_RENDERER_OPENGL
 //		if (Renderer::GetAPI() == RendererAPI::API::OpenGL)
 		{
 			if (enabled)

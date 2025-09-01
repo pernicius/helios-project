@@ -25,5 +25,4 @@ namespace Helios::Engine { // start of namespace
 	}
 
 
-
-} // end of namespace Helios::Engine
+} // namespace Helios::Engine

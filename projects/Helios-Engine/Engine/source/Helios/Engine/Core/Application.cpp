@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Application.h"
 
-//#include "Helios/Engine/Core/Config.h"
+#include "Helios/Engine/Core/Config.h"
 #include "Helios/Engine/Core/EntryPoint.h"
 #include "Helios/Engine/Core/Timer.h"
 #include "Helios/Engine/Core/Timestep.h"
@@ -12,7 +12,7 @@
 
 #include <cstdlib>
 
-namespace Helios::Engine { // start of namespace
+namespace Helios::Engine {
 
 
 	// ----------------------------------------------------------------------------------------------------
@@ -73,7 +73,7 @@ namespace Helios::Engine { // start of namespace
 	Application* Application::s_Instance = nullptr;
 
 
-	Application::Application(const Application::Specification& specification)
+	Application::Application(const Specification& specification)
 		: m_Specification(specification)
 	{
 		// Init working directory
@@ -124,21 +124,33 @@ namespace Helios::Engine { // start of namespace
 		LOG_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
-		// Log CmdArgs
+		// Log and "parse" CmdArgs
 		if (m_Specification.CmdLineArgs.Count > 1)
 		{
-			for (auto x = 1; x < m_Specification.CmdLineArgs.Count; x++)
-				LOG_CORE_INFO("CmdArg[{}] = \"{}\"", x, m_Specification.CmdLineArgs[x]);;
+			for (auto x = 1; x < m_Specification.CmdLineArgs.Count; x++) {
+				LOG_CORE_INFO("CmdArg[{}] = \"{}\"", x, m_Specification.CmdLineArgs[x]);
+
+#				ifdef HE_RENDERER_VULKAN
+					if (m_Specification.CmdLineArgs[x] == "--vulkan") Config::Override("HE_Renderer", "Vulkan");
+#				endif
+#				ifdef HE_RENDERER_DX12
+					if (m_Specification.CmdLineArgs[x] == "--dx12")   Config::Override("HE_Renderer", "DirectX12");
+#				endif
+#				ifdef HE_RENDERER_DX11
+					if (m_Specification.CmdLineArgs[x] == "--dx11")   Config::Override("HE_Renderer", "DirectX11");
+#				endif
+			}
 		}
 
-		// Load config
-//		Config::Init(m_Specification.configfile, m_Specification.WorkingDirectory);
+		// Read config
+		Config::Read(m_Specification.configfile, m_Specification.WorkingDirectory);
 
 //		Assets::Init(m_Specification.WorkingDirectory);
 
-		// Init Window/renderer
+		// Init window/renderer
 //		Renderer::Setup();
-		m_Window = Window::Create(Window::Specification(m_Specification.Name));
+RendererSpec spec;
+		m_Window = Window::Create(spec);
 		m_Window->SetEventCallback(HE_BIND_EVENT_FN(Application::OnEvent));
 //		Renderer::Init();
 
@@ -153,7 +165,7 @@ namespace Helios::Engine { // start of namespace
 	{
 		LOG_CORE_INFO("App Shutdown.");
 
-//		Config::Save();
+		Config::Save();
 //		Renderer::Shutdown();
 
 		s_Instance = nullptr;
@@ -213,7 +225,7 @@ namespace Helios::Engine { // start of namespace
 			Timestep timestep = RunLoopTimer.Elapsed();
 			RunLoopTimer.Reset();
 
-#if 1
+#if 0
 			{ // tempoary for debuging
 				static int fps = 0;
 				static int fps_cnt = 0;
@@ -318,4 +330,4 @@ namespace Helios::Engine { // start of namespace
 	}
 
 
-} // end of namespace Helios::Engine
+} // namespace Helios::Engine

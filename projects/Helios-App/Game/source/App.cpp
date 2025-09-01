@@ -6,12 +6,12 @@ Helios::Engine::Application* Helios::Engine::CreateApplication(Helios::Engine::A
 {
 	Helios::Engine::Application::Specification spec{};
 	{
-		spec.Name = "Helios-Game";
+		spec.Name = "HeliosGame";
 		spec.Version = App::APP_VERSION;
 		spec.CmdLineArgs = args;
 		spec.hints |= Helios::Engine::Application::Hints::HINT_USE_EXEPATH;
-		spec.logfile = "Helios-Game.log";
-		spec.configfile = "Helios-Game.cfg";
+		spec.logfile = "Game.log";
+		spec.configfile = "Game.cfg";
 	};
 
 	return new App(spec);
@@ -22,9 +22,9 @@ App::App(const Helios::Engine::Application::Specification& spec)
 	: Helios::Engine::Application(spec)
 {
 //	PushLayer(new SandboxLayer3D());
-	//	PushOverlay(new ClientUILayer());
+//	PushOverlay(new ClientUILayer());
 
-	//	m_modelTest = Helios::Model::Create();
+//	m_modelTest = Helios::Model::Create();
 }
 
 

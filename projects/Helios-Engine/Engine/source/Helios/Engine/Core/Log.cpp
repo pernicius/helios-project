@@ -8,6 +8,8 @@
 #	include <spdlog/sinks/basic_file_sink.h>
 #pragma warning(pop)
 
+#include <GLFW/glfw3.h>
+
 namespace Helios::Engine {
 
 
@@ -15,6 +17,12 @@ namespace Helios::Engine {
 	Ref<spdlog::logger> Log::s_GLFWLogger;
 	Ref<spdlog::logger> Log::s_AppLogger;
 	Ref<spdlog::logger> Log::s_RenderLogger;
+
+
+	void GLFW_error_callback(int code, const char* description)
+	{
+		LOG_GLFW_ERROR("ErrorCallback({}) {}", code, description);
+	}
 
 
 	void Log::Init(const std::string& filename, const std::string& path)
@@ -46,6 +54,8 @@ namespace Helios::Engine {
 		s_GLFWLogger->set_level(spdlog::level::trace);
 		s_GLFWLogger->flush_on(spdlog::level::trace);
 		LOG_GLFW_DEBUG("Log initialized");
+
+		glfwSetErrorCallback(GLFW_error_callback);
 
 		// Logger for the Renderer
 		s_RenderLogger = std::make_shared<spdlog::logger>("REND", begin(logSinks), end(logSinks));

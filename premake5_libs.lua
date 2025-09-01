@@ -50,8 +50,9 @@ function VendorNVRHI()
 		links "nvrhi.validation"
 	
 	filter "platforms:Windows"
-		links "nvrhi.d3d11"
-		links "nvrhi.d3d12"
+		links { "nvrhi.d3d11", "d3d11" }
+		links { "nvrhi.d3d12", "d3d12" }
+		links { "dxgi", "dxguid" }
 		links "nvrhi.vulkan"
 
 	filter "platforms:Linux"

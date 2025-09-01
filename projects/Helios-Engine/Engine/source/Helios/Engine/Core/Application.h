@@ -1,14 +1,17 @@
 #pragma once
 
 #include "Helios/Engine/Core/Layer.h"
-#include "Helios/Engine/Core/Window.h"
+//#include "Helios/Engine/Core/Window.h"
+#include "Helios/Engine/Renderer/Window.h"
 
 #include "Helios/Engine/Events/Event.h"
 #include "Helios/Engine/Events/ApplicationEvent.h"
 
+//#include "Helios/Engine/Renderer/RendererSpec.h"
+
 //#include "Helios/Engine/ImGui/ImGuiLayer.h"
 
-namespace Helios::Engine { // start of namespace
+namespace Helios::Engine {
 
 
 	int AppMain(int argc, char** argv);
@@ -85,6 +88,7 @@ namespace Helios::Engine { // start of namespace
 		bool m_Minimized = false;
 		LayerStack m_LayerStack;
 //		ImGuiLayer* m_ImGuiLayer;
+		
 
 	private:
 		static Application* s_Instance;
@@ -96,4 +100,4 @@ namespace Helios::Engine { // start of namespace
 	Application* CreateApplication(Application::CommandLineArgs args);
 
 
-} // end of namespace Helios::Engine
+} // namespace Helios::Engine

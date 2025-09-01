@@ -1,8 +1,8 @@
 #pragma once
 
+namespace Helios::Engine {
+	
 
-namespace Helios
-{
 	using MouseCode = uint16_t;
 	namespace Mouse
 	{

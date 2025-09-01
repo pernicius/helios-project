@@ -2,6 +2,7 @@
 
 #include "Helios/Engine/Events/Event.h"
 //#include "Helios/Engine/Renderer/GraphicsContext.h"
+//#include "Helios/Engine/Renderer/RendererSpec.h"
 
 #include <GLFW/glfw3.h>
 
@@ -13,20 +14,15 @@ namespace Helios::Engine {
 	public:
 		struct Specification
 		{
-			std::string Title;
-			uint32_t Width;
-			uint32_t Height;
+			std::string Title = "HeliosEngine - Default Title";
 
-			Specification(const std::string& title = "HeliosEngine - Default Title", uint32_t width = 800, uint32_t height = 600)
-				: Title(title), Width(width), Height(height) {}
+			uint32_t Width = 800;
+			uint32_t Height = 600;
 		};
-
-
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;
 
 		static Scope<Window> Create(const Specification& spec = Specification());
-
 		Window(const Specification& spec);
 		~Window();
 
@@ -43,7 +39,7 @@ namespace Helios::Engine {
 		void* GetNativeWindow() const { return m_Window; }
 
 	private:
-		void Init(const Specification& spec);
+
 		void InitCallbacks();
 		void Shutdown();
 
