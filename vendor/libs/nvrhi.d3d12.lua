@@ -16,6 +16,8 @@ project "nvrhi.d3d12"
 	-- move project in the correct dir
 	basedir("nvrhi")
 	
+	links { "d3d12", "dxgi", "dxguid" }
+
 	includedirs {
 		"nvrhi/include",
 		"nvrhi/src",
@@ -62,9 +64,9 @@ project "nvrhi.d3d12"
 		defines {
 		}
 
-		links {
-			"d3d12",
-		}
+--		links {
+--			"d3d12",
+--		}
 
 	filter "system:linux"
 		pic "On"

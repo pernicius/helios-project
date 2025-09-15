@@ -11,7 +11,6 @@ function LibHeliosEngine()
 --	VendorStb{}
 
 	-- renderer support
-	VendorVulkan{}
 	VendorNVRHI{}
 
 	-- the engine itself
@@ -46,13 +45,21 @@ function VendorNVRHI()
 	links "nvrhi.common"
 	includedirs "%{wks.location}/vendor/libs/nvrhi/include"
 
+	if os.getenv("VULKAN_SDK") then
+		includedirs "%VULKAN_SDK%/Include"
+--		libdirs "%VULKAN_SDK%/Lib"
+--		links "vulkan-1"
+	else
+		includedirs "%{wks.location}/vendor/libs/nvrhi/thirdparty/Vulkan-Headers/include"
+	end
+
 	filter "configurations:Debug"
 		links "nvrhi.validation"
 	
 	filter "platforms:Windows"
-		links { "nvrhi.d3d11", "d3d11" }
-		links { "nvrhi.d3d12", "d3d12" }
-		links { "dxgi", "dxguid" }
+--		links { "d3d11", "d3d12", "dxgi", "dxguid" }
+		links "nvrhi.d3d12"
+		links "nvrhi.d3d11"
 		links "nvrhi.vulkan"
 
 	filter "platforms:Linux"
@@ -67,13 +74,4 @@ end
 
 function VendorSpdlog()
 	includedirs "%{wks.location}/vendor/headers/spdlog/include/"
-end
-
-
-function VendorVulkan()
-	if os.getenv("VULKAN_SDK") then
-		includedirs "%VULKAN_SDK%/Include"
-		libdirs "%VULKAN_SDK%/Lib"
-		links "vulkan-1"
-	end
 end

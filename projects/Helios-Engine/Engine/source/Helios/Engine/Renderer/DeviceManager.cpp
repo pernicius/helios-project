@@ -4,40 +4,53 @@
 namespace Helios::Engine {
 
 
-	std::vector<DeviceManager::API> DeviceManager::GetSupportedAPI()
+	Renderer::Specification DeviceManager::s_Spec{};
+	nvrhi::GraphicsAPI s_api;
+
+	Ref<Window> DeviceManager::s_MainWindow = nullptr;
+
+
+	std::vector<nvrhi::GraphicsAPI> DeviceManager::GetSupportedAPI()
 	{
-		std::vector<API> result;
+		std::vector<nvrhi::GraphicsAPI> result;
 
 #		ifdef HE_RENDERER_VULKAN
-			result.push_back(API::Vulkan);
+			result.push_back(nvrhi::GraphicsAPI::VULKAN);
 #		endif
 #		ifdef HE_RENDERER_DX11
-			result.push_back(API::DirectX11);
+			result.push_back(nvrhi::GraphicsAPI::D3D11);
 #		endif
 #		ifdef HE_RENDERER_DX12
-			result.push_back(API::DirectX12);
+			result.push_back(nvrhi::GraphicsAPI::D3D12);
 #		endif
 
 		return result;
 	}
 
 
-	bool DeviceManager::GetSupportedAPI(API api)
+	bool DeviceManager::CheckAPISupport(const nvrhi::GraphicsAPI api)
 	{
 #		ifdef HE_RENDERER_VULKAN
-			if (api == API::Vulkan)
+			if (api == nvrhi::GraphicsAPI::VULKAN)
 				return true;
 #		endif
 #		ifdef HE_RENDERER_DX11
-			if (api == API::DirectX11)
+			if (api == nvrhi::GraphicsAPI::D3D11)
 				return true;
 #		endif
 #		ifdef HE_RENDERER_DX12
-			if (api == API::DirectX12)
+			if (api == nvrhi::GraphicsAPI::D3D12)
 				return true;
 #		endif
 
 		return false;
+	}
+
+
+	Ref<Window> DeviceManager::CreateMainWindow()
+	{
+		s_MainWindow = Window::Create(s_Spec);
+		return s_MainWindow;
 	}
 
 

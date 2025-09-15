@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Helios/Engine/Renderer/RendererSpec.h"
+#include "Helios/Engine/Renderer/Renderer.h"
 #include "Helios/Engine/Events/Event.h"
 
 namespace Helios::Engine {
@@ -10,33 +10,31 @@ namespace Helios::Engine {
 	{
 	public:
 
-		static Scope<Window> Create(RendererSpec& spec);
-		Window(RendererSpec& spec);
+		static Ref<Window> Create(Renderer::Specification& spec);
+		Window() = delete;
+		Window(Renderer::Specification& spec);
 		~Window();
 
-		void OnUpdate();
+		void* GetNativeWindow() const { return m_Window; }
 
-//		unsigned int GetWidth() { return m_Data.Width; }
-//		unsigned int GetHeight() { return m_Data.Height; }
+		void Show();
+
+		void OnUpdate();
 
 		using EventCallbackFn = std::function<void(Event&)>;
 		void SetEventCallback(const EventCallbackFn& callback) { m_Data.EventCallback = callback; }
 
-//		void SetVSync(bool enabled);
-//		bool IsVSync() const;
-
-		void* GetNativeWindow() const { return m_Window; }
-
 	private:
-
 		void InitCallbacks();
 
 	private:
+		Renderer::Specification& m_Spec;
 		GLFWwindow* m_Window;
 
 		struct WindowData
 		{
 			EventCallbackFn EventCallback;
+			int test;
 		};
 		WindowData m_Data;
 	};

@@ -56,16 +56,13 @@
 #	include <DXGI.h>
 #	include <d3d11.h>
 #endif
-
 #ifdef HE_RENDERER_DX12
 #	include <DXGI.h>
 #	include <d3d12.h>
 #endif
-
 #ifdef HE_RENDERER_VULKAN
 #	include <nvrhi/vulkan.h>
 #endif
-
 #include <nvrhi/nvrhi.h>
 
 #include <GLFW/glfw3.h>

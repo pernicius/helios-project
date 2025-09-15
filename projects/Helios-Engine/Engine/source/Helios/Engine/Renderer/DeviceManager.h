@@ -1,31 +1,36 @@
 #pragma once
 
+#include "Helios/Engine/Renderer/Renderer.h"
+#include "Helios/Engine/Renderer/Window.h"
+
 namespace Helios::Engine {
 
 
 	class DeviceManager
 	{
 	public:
+		static std::vector<nvrhi::GraphicsAPI> GetSupportedAPI();
+		static bool CheckAPISupport(const nvrhi::GraphicsAPI api);
+		static nvrhi::GraphicsAPI GetAPI() { return s_api; }
 
-		enum class API {
-			DirectX11,
-			DirectX12,
-			Vulkan,
-		};
+		static void SetSpecification(Renderer::Specification spec) { s_Spec = spec; }
+		static Renderer::Specification& GetSpecification() { return s_Spec; }
 
-		static std::vector<API> GetSupportedAPI();
-		static bool GetSupportedAPI(API api);
-
-		API GetAPI() const { return m_api; };
-
-		static bool Create(API api);
+		static Ref<Window> CreateMainWindow();
+		static Ref<Window> GetMainWindow() { return s_MainWindow; }
 
 	private:
-		bool Create_VK();
-		bool Create_DX11();
-		bool Create_DX12();
+		DeviceManager() = delete;
+		~DeviceManager() = delete;
 
-		API m_api;
+//		bool CreateRenderer_VK();
+//		bool CreateRenderer_DX11();
+//		bool CreateRenderer_DX12();
+
+		static Renderer::Specification s_Spec;
+		static nvrhi::GraphicsAPI s_api;
+
+		static Ref<Window> s_MainWindow;
 	};
 
 

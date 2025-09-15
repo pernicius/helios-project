@@ -5,18 +5,15 @@
 
 
 #ifdef BUILD_DEBUG
-
-// ConsoleApp for stdout debuging
-int main(int argc, char** argv)
-
+#	pragma message ("INFO: Compiling stdc main() for console debugging output!")
+	// ConsoleApp for stdout debuging
+	int main(int argc, char** argv)
 #else
-
-// WindowedApp
-int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow)
-
+#	pragma message ("INFO: Compiling windows WinMain() for non-debugging release!")
+	// WindowedApp
+	int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow)
 #endif
-
-{
-	// Call the engines main() function
-	return Helios::Engine::AppMain(__argc, __argv);
-}
+	{
+		// Call the engines main() function
+		return Helios::Engine::AppMain(__argc, __argv);
+	}

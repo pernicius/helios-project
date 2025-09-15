@@ -25,7 +25,6 @@ project "Helios-Engine"
 	VendorGlfw{}
 --	VendorEnTT{}
 	VendorGlm{}
-		VendorVulkan{}
 	VendorNVRHI()
 
 	files {

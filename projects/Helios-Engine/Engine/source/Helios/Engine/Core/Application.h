@@ -2,7 +2,7 @@
 
 #include "Helios/Engine/Core/Layer.h"
 //#include "Helios/Engine/Core/Window.h"
-#include "Helios/Engine/Renderer/Window.h"
+//#include "Helios/Engine/Renderer/Window.h"
 
 #include "Helios/Engine/Events/Event.h"
 #include "Helios/Engine/Events/ApplicationEvent.h"
@@ -53,9 +53,9 @@ namespace Helios::Engine {
 			CommandLineArgs CmdLineArgs;
 			// Basic configuration hints
 			unsigned int hints = 0;
-			// Name of the logfile
+			// Filename of the logfile
 			std::string logfile = "HeliosEngine.log";
-			// Name of the configfile
+			// Filename of the configfile
 			std::string configfile = "HeliosEngine.cfg";
 		};
 
@@ -65,15 +65,14 @@ namespace Helios::Engine {
 		virtual ~Application();
 
 		static Application& Get() { return *s_Instance; }
-		const Specification& GetSpecification() const { return m_Specification; }
+		const Specification& GetSpecification() const { return m_Spec; }
+		void CreateAppWindow();
 		void Close();
 
 		void OnEvent(Event& e);
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
-
-		Window& GetWindow() { return *m_Window; }
 
 	private:
 		void Run();
@@ -82,12 +81,10 @@ namespace Helios::Engine {
 		bool OnFramebufferResize(FramebufferResizeEvent& e);
 
 	private:
-		Specification m_Specification;
-		Scope<Window> m_Window;
+		Specification m_Spec;
 		bool m_Running = true;
 		bool m_Minimized = false;
 		LayerStack m_LayerStack;
-//		ImGuiLayer* m_ImGuiLayer;
 		
 
 	private:

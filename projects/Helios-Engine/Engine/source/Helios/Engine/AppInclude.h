@@ -23,6 +23,9 @@
 //#include <Helios/Engine/Events/KeyEvent.h>
 //#include <Helios/Engine/Events/MouseEvent.h>
 
+// Renderer
+#include <Helios/Engine/Renderer/DeviceManager.h>
+
 // Renderer (core)
 //#include <Helios/Engine/Renderer/Renderer.h>
 //#include <Helios/Engine/Renderer/Renderer2D.h>

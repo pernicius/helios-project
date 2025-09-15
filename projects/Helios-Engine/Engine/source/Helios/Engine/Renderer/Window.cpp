@@ -13,18 +13,19 @@
 namespace Helios::Engine {
 
 
-	Scope<Window> Window::Create(RendererSpec& spec)
+	Ref<Window> Window::Create(Renderer::Specification& spec)
 	{
 		LOG_CORE_DEBUG("Creating main window...");
-		return CreateScope<Window>(spec);
+		return CreateRef<Window>(spec);
 	}
 	static uint8_t s_GLFWWindowCount = 0;
 
 
-	Window::Window(RendererSpec& spec)
+	Window::Window(Renderer::Specification& spec)
+		: m_Spec(spec)
 	{
 #		ifdef TARGET_PLATFORM_WINDOWS
-			if (!spec.Window.enablePerMonitorDPI)
+			if (!m_Spec.Window.enablePerMonitorDPI)
 			{
 				// glfwInit enables the maximum supported level of DPI awareness unconditionally.
 				// If the app doesn't need it, we have to call this function before glfwInit to override that behavior.
@@ -79,7 +80,7 @@ namespace Helios::Engine {
 		bool foundFormat = false;
 		for (const auto& info : formatInfo)
 		{
-			if (info.format == spec.Device.swapChainFormat)
+			if (info.format == m_Spec.Device.swapChainFormat)
 			{
 				glfwWindowHint(GLFW_RED_BITS, info.redBits);
 				glfwWindowHint(GLFW_GREEN_BITS, info.greenBits);
@@ -93,57 +94,40 @@ namespace Helios::Engine {
 		}
 		LOG_GLFW_ASSERT(foundFormat, "Could not find a matching format!");
 
-		glfwWindowHint(GLFW_SAMPLES, spec.Device.swapChainSampleCount);
-		glfwWindowHint(GLFW_REFRESH_RATE, spec.Device.refreshRate);
-		glfwWindowHint(GLFW_SCALE_TO_MONITOR, spec.Window.resizeWindowWithDisplayScale);
+		glfwWindowHint(GLFW_SAMPLES, m_Spec.Device.swapChainSampleCount);
+		glfwWindowHint(GLFW_REFRESH_RATE, m_Spec.Device.refreshRate);
+		glfwWindowHint(GLFW_SCALE_TO_MONITOR, m_Spec.Window.resizeWindowWithDisplayScale);
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Ignored for fullscreen
 
-		if (spec.Window.startBorderless)
+		if (m_Spec.Window.startBorderless)
 			glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // Borderless window
-		if (spec.Window.allowResizing)
+		if (m_Spec.Window.allowResizing)
 			glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
 		// finally create the window
-		m_Window = glfwCreateWindow(spec.Device.backBufferWidth, spec.Device.backBufferHeight,
-			spec.Window.windowTitle.c_str(),
-			spec.Window.startFullscreen ? glfwGetPrimaryMonitor() : nullptr,
+		m_Window = glfwCreateWindow(m_Spec.Device.backBufferWidth, m_Spec.Device.backBufferHeight,
+			m_Spec.Window.windowTitle.c_str(),
+			m_Spec.Window.startFullscreen ? glfwGetPrimaryMonitor() : nullptr,
 			nullptr);
 		LOG_GLFW_ASSERT(m_Window, "Could not create the window!");
 		s_GLFWWindowCount++;
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 
-		if (spec.Window.startFullscreen) {
+		if (m_Spec.Window.startFullscreen) {
 			glfwSetWindowMonitor(m_Window, glfwGetPrimaryMonitor(), 0, 0,
-				spec.Device.backBufferWidth, spec.Device.backBufferHeight, spec.Device.refreshRate);
+				m_Spec.Device.backBufferWidth, m_Spec.Device.backBufferHeight, m_Spec.Device.refreshRate);
 		} else {
 			int fbWidth = 0, fbHeight = 0;
 			glfwGetFramebufferSize(m_Window, &fbWidth, &fbHeight);
-			spec.Device.backBufferWidth = fbWidth;
-			spec.Device.backBufferHeight = fbHeight;
+			m_Spec.Device.backBufferWidth = fbWidth;
+			m_Spec.Device.backBufferHeight = fbHeight;
 		}
 
-		if (spec.Window.windowPosX != -1 && spec.Window.windowPosY != -1)
-			glfwSetWindowPos(m_Window, spec.Window.windowPosX, spec.Window.windowPosY);
+		if (m_Spec.Window.posX != -1 && m_Spec.Window.posY != -1)
+			glfwSetWindowPos(m_Window, m_Spec.Window.posX, m_Spec.Window.posY);
 
 		InitCallbacks();
-
-//		CreateDevice()
-//		CreateSwapChain()
-
-		glfwShowWindow(m_Window);
-
-		if (spec.Window.startMaximized)
-			glfwMaximizeWindow(m_Window);
-
-		// reset the back buffer size state to enforce a resize event
-		spec.Device.backBufferWidth = 0;
-		spec.Device.backBufferHeight = 0;
-//		UpdateWindowSize();
-
-		// TODO...
-		// TODO...
-		// TODO...
 	}
 
 	Window::~Window()
@@ -156,6 +140,20 @@ namespace Helios::Engine {
 		if (s_GLFWWindowCount == 0)
 			glfwTerminate();
 	}
+
+
+	void Window::Show()
+	{
+		glfwShowWindow(m_Window);
+
+		if (m_Spec.Window.startMaximized)
+			glfwMaximizeWindow(m_Window);
+
+		// reset the back buffer size state to enforce a resize event
+//		m_Spec.Device.backBufferWidth = 0;
+//		m_Spec.Device.backBufferHeight = 0;
+//		UpdateWindowSize();
+}
 
 
 	void Window::OnUpdate()
@@ -194,44 +192,14 @@ namespace Helios::Engine {
 			});
 
 //		glfwSetWindowRefreshCallback(m_Window, [](GLFWwindow* window)
-//			{
-//				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-//				xxxxxxxxxxxxxxxxEvent event();
-//				if (data.EventCallback)
-//					data.EventCallback(event);
-//			});
 
 //		glfwSetWindowFocusCallback(m_Window, [](GLFWwindow* window, int focused)
-//			{
-//				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-//				xxxxxxxxxxxxxxxxEvent event(focused);
-//				if (data.EventCallback)
-//					data.EventCallback(event);
-//			});
 
 //		glfwSetWindowIconifyCallback(m_Window, [](GLFWwindow* window, int iconified)
-//			{
-//				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-//				xxxxxxxxxxxxxxxxEvent event(iconified);
-//				if (data.EventCallback)
-//					data.EventCallback(event);
-//			});
 
 //		glfwSetWindowMaximizeCallback(m_Window, [](GLFWwindow* window, int maximized)
-//			{
-//				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-//				xxxxxxxxxxxxxxxxEvent event(maximized);
-//				if (data.EventCallback)
-//					data.EventCallback(event);
-//			});
 
 //		glfwSetWindowContentScaleCallback(m_Window, [](GLFWwindow* window, float xscale, float yscale)
-//			{
-//				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-//				xxxxxxxxxxxxxxxxEvent event(xscale, yscale);
-//				if (data.EventCallback)
-//					data.EventCallback(event);
-//			});
 
 		glfwSetFramebufferSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
 			{
@@ -277,12 +245,6 @@ namespace Helios::Engine {
 			});
 
 //		glfwSetCursorEnterCallback(m_Window, [](GLFWwindow* window, int entered)
-//			{
-//				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-//				xxxxxxxxxxxxxxxxEvent event(width, height);
-//				if (data.EventCallback)
-//					data.EventCallback(event);
-//			});
 
 		glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xoffset, double yoffset)
 			{
@@ -335,20 +297,8 @@ namespace Helios::Engine {
 			});
 
 //		glfwSetCharModsCallback(m_Window, [](GLFWwindow* window, unsigned int codepoint, int mods)
-//			{
-//				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-//				xxxxxxxxxxxxxxxxEvent event(width, height);
-//				if (data.EventCallback)
-//					data.EventCallback(event);
-//			});
 
 //		glfwSetDropCallback(m_Window, [](GLFWwindow* window, int path_count, const char* paths[])
-//			{
-//				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-//				xxxxxxxxxxxxxxxxEvent event(width, height);
-//				if (data.EventCallback)
-//					data.EventCallback(event);
-//			});
 	}
 
 

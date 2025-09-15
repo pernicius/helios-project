@@ -6,9 +6,8 @@
 #include "Helios/Engine/Core/Timer.h"
 #include "Helios/Engine/Core/Timestep.h"
 //#include "Helios/Engine/Core/Assets.h"
-//#include "Helios/Engine/Renderer/Renderer.h"
 
-#include <GLFW/glfw3.h>
+#include "Helios/Engine/Renderer/DeviceManager.h"
 
 #include <cstdlib>
 
@@ -18,6 +17,13 @@ namespace Helios::Engine {
 	// ----------------------------------------------------------------------------------------------------
 
 
+	/**
+	 * Helios Engines main() function.
+	 * 
+	 * \param[in] argc argument count
+	 * \param[in] argv argument pointers
+	 * \returns EXIT_SUCCESS
+	 */
 	int AppMain(int argc, char** argv)
 	{
 		auto app = CreateApplication({ argc, argv });
@@ -73,22 +79,27 @@ namespace Helios::Engine {
 	Application* Application::s_Instance = nullptr;
 
 
-	Application::Application(const Specification& specification)
-		: m_Specification(specification)
+	/**
+	 * TODO... (doxybrief)
+	 * 
+	 * \param[in] specification
+	 */
+	Application::Application(const Specification& spec)
+		: m_Spec(spec)
 	{
 		// Init working directory
-		if (!m_Specification.WorkingDirectory.empty())
-			std::filesystem::current_path(m_Specification.WorkingDirectory);
-		if (m_Specification.hints & Hints::HINT_USE_CWD)
-			m_Specification.WorkingDirectory = std::filesystem::current_path().string();
-		if (m_Specification.hints & Hints::HINT_USE_EXEPATH)
+		if (!m_Spec.WorkingDirectory.empty())
+			std::filesystem::current_path(m_Spec.WorkingDirectory);
+		if (m_Spec.hints & Hints::HINT_USE_CWD)
+			m_Spec.WorkingDirectory = std::filesystem::current_path().string();
+		if (m_Spec.hints & Hints::HINT_USE_EXEPATH)
 		{
-			m_Specification.WorkingDirectory = Util::GetExecutablePath();
-			std::filesystem::current_path(m_Specification.WorkingDirectory);
+			m_Spec.WorkingDirectory = Util::GetExecutablePath();
+			std::filesystem::current_path(m_Spec.WorkingDirectory);
 		}
 
 		// Init logging
-		Log::Init(m_Specification.logfile, m_Specification.WorkingDirectory);
+		Log::Init(m_Spec.logfile, m_Spec.WorkingDirectory);
 		LOG_CORE_INFO("Logging started.");
 
 		// Log versions
@@ -98,10 +109,10 @@ namespace Helios::Engine {
 			HE_VERSION_PATCH(HE_VERSION),
 			HE_VERSION_TYPE_STRING(HE_VERSION));
 		LOG_CORE_INFO("Application-Version: {}.{}.{} ({})",
-			HE_VERSION_MAJOR(m_Specification.Version),
-			HE_VERSION_MINOR(m_Specification.Version),
-			HE_VERSION_PATCH(m_Specification.Version),
-			HE_VERSION_TYPE_STRING(m_Specification.Version));
+			HE_VERSION_MAJOR(m_Spec.Version),
+			HE_VERSION_MINOR(m_Spec.Version),
+			HE_VERSION_PATCH(m_Spec.Version),
+			HE_VERSION_TYPE_STRING(m_Spec.Version));
 		LOG_CORE_DEBUG("Lib \"GLFW\": {}.{}.{}",
 			GLFW_VERSION_MAJOR,
 			GLFW_VERSION_MINOR,
@@ -118,46 +129,35 @@ namespace Helios::Engine {
 //			GLM_VERSION_MAJOR,
 //			GLM_VERSION_MINOR,
 //			GLM_VERSION_PATCH);
-		LOG_CORE_DEBUG("Working path: {}", m_Specification.WorkingDirectory);
+		LOG_CORE_DEBUG("Working path: {}", m_Spec.WorkingDirectory);
 
 		// Check singleton
 		LOG_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
+		// Read config
+		Config::Read(m_Spec.configfile, m_Spec.WorkingDirectory);
+
 		// Log and "parse" CmdArgs
-		if (m_Specification.CmdLineArgs.Count > 1)
+		if (m_Spec.CmdLineArgs.Count > 1)
 		{
-			for (auto x = 1; x < m_Specification.CmdLineArgs.Count; x++) {
-				LOG_CORE_INFO("CmdArg[{}] = \"{}\"", x, m_Specification.CmdLineArgs[x]);
+			for (auto x = 1; x < m_Spec.CmdLineArgs.Count; x++) {
+				LOG_CORE_INFO("CmdArg[{}] = \"{}\"", x, m_Spec.CmdLineArgs[x]);
 
 #				ifdef HE_RENDERER_VULKAN
-					if (m_Specification.CmdLineArgs[x] == "--vulkan") Config::Override("HE_Renderer", "Vulkan");
+					if (m_Spec.CmdLineArgs[x] == "--vulkan")
+						Config::Override("RendererAPI", "Vulkan");
 #				endif
 #				ifdef HE_RENDERER_DX12
-					if (m_Specification.CmdLineArgs[x] == "--dx12")   Config::Override("HE_Renderer", "DirectX12");
+					if (m_Spec.CmdLineArgs[x] == "--dx12")
+						Config::Override("RendererAPI", "DirectX12");
 #				endif
 #				ifdef HE_RENDERER_DX11
-					if (m_Specification.CmdLineArgs[x] == "--dx11")   Config::Override("HE_Renderer", "DirectX11");
+					if (m_Spec.CmdLineArgs[x] == "--dx11")
+						Config::Override("RendererAPI", "DirectX11");
 #				endif
 			}
 		}
-
-		// Read config
-		Config::Read(m_Specification.configfile, m_Specification.WorkingDirectory);
-
-//		Assets::Init(m_Specification.WorkingDirectory);
-
-		// Init window/renderer
-//		Renderer::Setup();
-RendererSpec spec;
-		m_Window = Window::Create(spec);
-		m_Window->SetEventCallback(HE_BIND_EVENT_FN(Application::OnEvent));
-//		Renderer::Init();
-
-//		static std::string inipath = m_Specification.WorkingDirectory;
-//		inipath += "/imgui.ini";
-//		m_ImGuiLayer = new ImGuiLayer(inipath);
-//		PushOverlay(m_ImGuiLayer);
 	}
 
 
@@ -178,7 +178,7 @@ RendererSpec spec;
 		layer->OnAttach();
 
 		int size_x, size_y;
-		glfwGetWindowSize((GLFWwindow*)m_Window->GetNativeWindow(), &size_x, &size_y);
+		glfwGetWindowSize((GLFWwindow*)DeviceManager::GetMainWindow()->GetNativeWindow(), &size_x, &size_y);
 		WindowResizeEvent event(size_x, size_y);
 		OnEvent(event);
 	}
@@ -190,9 +190,23 @@ RendererSpec spec;
 		layer->OnAttach();
 
 		int size_x, size_y;
-		glfwGetWindowSize((GLFWwindow*)m_Window->GetNativeWindow(), &size_x, &size_y);
+		glfwGetWindowSize((GLFWwindow*)DeviceManager::GetMainWindow()->GetNativeWindow(), &size_x, &size_y);
 		WindowResizeEvent event(size_x, size_y);
 		OnEvent(event);
+	}
+
+
+	void Application::CreateAppWindow()
+	{
+		auto wnd = DeviceManager::CreateMainWindow();
+		wnd->SetEventCallback(HE_BIND_EVENT_FN(OnEvent));
+		wnd->Show();
+
+//		CreateDevice()
+//		CreateSwapChain()
+		// TODO...
+		// TODO...
+		// TODO...
 	}
 
 
@@ -216,6 +230,7 @@ RendererSpec spec;
 			(*it)->OnEvent(e);
 		}
 	}
+
 
 	void Application::Run()
 	{
@@ -288,7 +303,7 @@ RendererSpec spec;
 			}
 
 			// Poll events and so on
-			m_Window->OnUpdate();
+			DeviceManager::GetMainWindow()->OnUpdate();
 		}
 	}
 
