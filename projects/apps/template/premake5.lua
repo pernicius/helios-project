@@ -1,6 +1,6 @@
------------------------
--- [ PROJECT CONFIG] --
------------------------
+----------------------
+-- [PROJECT CONFIG] --
+----------------------
 project "Template"
 	language      "C++"
 	cppdialect    "C++20"

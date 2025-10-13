@@ -1,48 +1,52 @@
+-------------------------
+-- [DEPENDANCY HELPER] --
+-------------------------
+function Lib_HeliosShared()
+	includedirs "%{wks.location}/projects/engine/shared/src/"
+
+	filter "kind:*App"
+		links "Shared-Source"
+	filter {}
+end
+
+
 ----------------------
 -- [PROJECT CONFIG] --
 ----------------------
-project "Sandbox"
+project "Shared-Source"
 	language      "C++"
 	cppdialect    "C++20"
 	staticruntime "On"
+	kind          "StaticLib"
 
 	dir_project = "%{string.lower(prj.name)}"
 	targetdir (dir_bin   .. dir_group .. dir_config .. dir_project)
 	objdir    (dir_build .. dir_group .. dir_config .. dir_project)
 
-	pchheader "pch.h"
-	pchsource "pch.cpp"
+--	pchheader "pch.h"
+--	pchsource "pch.cpp"
 
 	includedirs {
+		"%{prj.location}",
 		"src/",
 	}
 
 	files {
-		"pch.*",
+--		"pch.*",
 		"src/**.h",
 		"src/**.c",
 		"src/**.hpp",
 		"src/**.cpp",
 	}
-
-	-- Dependencies
-	Lib_HeliosEngine{}
 	
 	filter "configurations:Debug"
 
-		kind "ConsoleApp"
-
 		defines {
-		}
-		
-		debugargs {
 		}
 
 	filter "configurations:Release"
 
-		kind "WindowedApp"
-
 		defines {
 		}
-
+		
 	filter {}

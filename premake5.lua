@@ -74,10 +74,13 @@ workspace "Helios-Project"
 	group "Vendor"
 		dir_group = "Helios-Vendor/"
 		include("vendor/dev-tools/premake/")
+		include("vendor/header/")
+		include("vendor/libs/")
 
 	group "Helios/Engine"
 		dir_group = "Helios-Engine/"
-		include("projects/engine/")
+		include("projects/engine/shared/")
+		include("projects/engine/engine/")
 		include("projects/apps/sandbox/")
 
 	group "Helios/Apps"

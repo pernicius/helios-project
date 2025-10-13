@@ -1,0 +1,6 @@
+[submodule "vendor/header/spdlog"]
+	path = vendor/header/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "vendor/libs/glfw"]
+	path = vendor/libs/glfw
+	url = https://github.com/glfw/glfw.git

@@ -1,6 +1,26 @@
------------------------
--- [ PROJECT CONFIG] --
------------------------
+-------------------------
+-- [DEPENDANCY HELPER] --
+-------------------------
+function Lib_HeliosEngine()
+	includedirs "%{wks.location}/projects/engine/engine/src/"
+
+	filter "kind:*App"
+		links "Helios-Engine"
+	filter {}
+
+	Lib_HeliosShared{}
+
+	-- vendor/header
+	Lib_Spdlog{}
+
+	-- vendor/lib
+	Lib_GLFW{}
+end
+
+
+----------------------
+-- [PROJECT CONFIG] --
+----------------------
 project "Helios-Engine"
 	language      "C++"
 	cppdialect    "C++20"
@@ -26,6 +46,9 @@ project "Helios-Engine"
 		"src/**.hpp",
 		"src/**.cpp",
 	}
+
+	-- Dependencies
+	Lib_HeliosEngine{}
 	
 	filter "configurations:Debug"
 
@@ -38,11 +61,3 @@ project "Helios-Engine"
 		}
 		
 	filter {}
-
-
-function Lib_HeliosEngine()
-	includedirs "%{wks.location}/projects/engine/src/"
-	filter "kind:*App"
-		links "Helios-Engine"
-	filter {}
-end
