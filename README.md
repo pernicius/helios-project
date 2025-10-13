@@ -47,8 +47,6 @@ Personally, I prefer Visual Studio; other development environments are officiall
 - **Modular design:** A clean and extensible codebase to support long-term growth.
 - **Engine-first approach:** Core systems and rendering prioritized before tooling or editor integration.
 
-***
-
 # Development Status
 
 ## Work In Progress
