@@ -41,11 +41,63 @@ project "Helios-Engine"
 
 	files {
 		"pch.*",
-		"src/**.h",
-		"src/**.c",
-		"src/**.hpp",
-		"src/**.cpp",
+		"src/Helios/**.h",
+		"src/Helios/**.c",
+		"src/Helios/**.hpp",
+		"src/Helios/**.cpp",
 	}
+
+	filter "platforms:Windows"
+
+		files {
+			"src/Platform/System/Windows/**.h",
+			"src/Platform/System/Windows/**.cpp",
+		}
+
+		defines {
+			"HE_RENDERER_VULKAN",
+--			"HE_RENDERER_DX12",
+		}
+
+		files {
+			"src/Platform/Renderer/Vulkan/**.h",
+			"src/Platform/Renderer/Vulkan/**.cpp",
+		}
+
+	filter "platforms:Linux"
+
+		files {
+			"src/Platform/System/Linux/**.h",
+			"src/Platform/System/Linux/**.cpp",
+		}
+
+		defines {
+			"HE_RENDERER_VULKAN",
+		}
+
+		files {
+			"src/Platform/Renderer/Vulkan/**.h",
+			"src/Platform/Renderer/Vulkan/**.cpp",
+		}
+
+	filter "platforms:MacOS"
+
+		files {
+			"src/Platform/System/MacOS/**.h",
+			"src/Platform/System/MacOS/**.cpp",
+		}
+
+		defines {
+			"HE_RENDERER_VULKAN",
+--			"HE_RENDERER_METAL",
+		}
+
+		files {
+			"src/Platform/Renderer/Vulkan/**.h",
+			"src/Platform/Renderer/Vulkan/**.cpp",
+		}
+
+	filter {}
 
 	-- Dependencies
 	Lib_HeliosEngine{}

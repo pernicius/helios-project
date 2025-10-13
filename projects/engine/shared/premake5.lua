@@ -5,7 +5,7 @@ function Lib_HeliosShared()
 	includedirs "%{wks.location}/projects/engine/shared/src/"
 
 	filter "kind:*App"
-		links "Shared-Source"
+--		links "Shared-Source"
 	filter {}
 end
 

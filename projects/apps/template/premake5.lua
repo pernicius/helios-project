@@ -14,6 +14,7 @@ project "Template"
 	pchsource "pch.cpp"
 
 	includedirs {
+		"%{prj.location}",
 		"src/",
 	}
 
