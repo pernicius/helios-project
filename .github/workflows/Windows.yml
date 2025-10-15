@@ -27,13 +27,13 @@ jobs:
         
       - name: Setup Solution
         shell: cmd
-        working-directory: ${{runner.workspace}}\scripts\windows
+        working-directory: ${{runner.workspace}}\helios-project\scripts\windows
         run: |
           dir
 
       - name: Build
         shell: cmd
-        working-directory: ${{runner.workspace}}
+        working-directory: ${{runner.workspace}}\helios-project
         run: |
           dir
           msbuild --version
