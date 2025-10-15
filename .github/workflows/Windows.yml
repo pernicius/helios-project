@@ -27,9 +27,9 @@ jobs:
         
       - name: Setup Solution
         shell: cmd
-        working-directory: ${{runner.workspace}}\\scripts\\windows
+        working-directory: ${{runner.workspace}}\scripts\windows
         run: |
-          echo TODO...
+          dir
 
       - name: Build
         shell: cmd
