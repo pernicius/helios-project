@@ -1,4 +1,4 @@
-name: Linux Build-Test [placeholder]
+name: Linux
 
 on:
   workflow_dispatch:
