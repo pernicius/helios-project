@@ -3,7 +3,9 @@
 [![Windows](https://github.com/pernicius/helios-project/actions/workflows/Windows.yml/badge.svg)](https://github.com/pernicius/helios-project/actions/workflows/Windows.yml)
 [![Linux](https://github.com/pernicius/helios-project/actions/workflows/Linux.yml/badge.svg)](https://github.com/pernicius/helios-project/actions/workflows/Linux.yml)
 [![MacOS](https://github.com/pernicius/helios-project/actions/workflows/MacOS.yml/badge.svg)](https://github.com/pernicius/helios-project/actions/workflows/MacOS.yml)
+<!--
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/11306/badge)](https://www.bestpractices.dev/projects/11306)
+-->
 
 The ultimate goal is to create the foundation of a high-performance 3D engine written in modern C++, using Vulkan as the default graphics API.
 It is a long-term project focused on performance, clean architecture, and modern rendering techniques.
