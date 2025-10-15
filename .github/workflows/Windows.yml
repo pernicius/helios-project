@@ -1,0 +1,23 @@
+name: Windows
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  placeholderjob:
+    name: "Name of the job!"
+
+    runs-on:
+      - windows-latest
+
+    steps:
+      - name: dummy
+        run: |
+          echo "This is only a placeholder!"
+          exit 1
