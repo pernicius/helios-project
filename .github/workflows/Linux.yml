@@ -1,0 +1,17 @@
+name: Linux Build-Test [placeholder]
+
+on:
+  workflow_dispatch:
+
+jobs:
+  placeholderjob:
+    name: "Name of the job!"
+
+  runs-on:
+    - ubuntu-latest
+
+  steps:
+    - name: dummy
+      run: |
+        echo "This is only a placeholder!"
+        exit 1
