@@ -11,13 +11,15 @@ permissions:
 
 jobs:
   placeholderjob:
-    name: "Name of the job!"
+    name: "Build MSVC-Solution"
 
     runs-on:
       - windows-latest
 
     steps:
-      - name: dummy
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
+      - name: debug
         run: |
-          echo "This is only a placeholder!"
+          msbuild --version
           exit 1
