@@ -1,4 +1,4 @@
-name: Linux
+name: MacOS
 
 on:
   push:
@@ -10,11 +10,9 @@ permissions:
   contents: read
 
 jobs:
-  placeholderjob:
-    name: "Name of the job!"
-
+  macos:
     runs-on:
-      - ubuntu-latest
+      - macos-latest
 
     steps:
       - name: dummy
