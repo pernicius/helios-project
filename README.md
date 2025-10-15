@@ -1,4 +1,11 @@
 # The Helios Project (C++)
+
+
+[![Linux](https://github.com/pernicius/helios-project/workflows/Linux/badge.svg)](https://github.com/pernicius/helios-project/actions?query=workflow%3ALinux)
+[![MacOS](https://github.com/pernicius/helios-project/workflows/MacOS/badge.svg)](https://github.com/pernicius/helios-project/actions?query=workflow%3AMacOS)
+[![Windows](https://github.com/pernicius/helios-project/workflows/Windows/badge.svg)](https://github.com/pernicius/helios-project/actions?query=workflow%3AWindows)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/11306/badge)](https://www.bestpractices.dev/projects/11306)
+
 The ultimate goal is to create the foundation of a high-performance 3D engine written in modern C++, using Vulkan as the default graphics API.
 It is a long-term project focused on performance, clean architecture, and modern rendering techniques.
 > [!CAUTION]
