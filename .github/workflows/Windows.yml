@@ -25,6 +25,8 @@ jobs:
         
       - name: Setup Solution
         working-directory: ${{runner.workspace}}/scripts/windows
+        run: |
+          echo TODO...
 
       - name: Build
         working-directory: ${{runner.workspace}}
