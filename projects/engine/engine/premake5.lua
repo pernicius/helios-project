@@ -1,6 +1,8 @@
 -------------------------
 -- [DEPENDANCY HELPER] --
 -------------------------
+include "premake5_renderer"
+
 function Lib_HeliosEngine()
 	includedirs "%{wks.location}/projects/engine/engine/src/"
 
@@ -10,10 +12,15 @@ function Lib_HeliosEngine()
 
 	Lib_HeliosShared{}
 
+	-- Renderer
+	Lib_RendererOpenGL{}
+	Lib_RendererVulkan{}
+
 	-- vendor/header
 	Lib_Spdlog{}
 
 	-- vendor/lib
+	Lib_glad{}
 	Lib_GLFW{}
 end
 
@@ -40,30 +47,22 @@ project "Helios-Engine"
 	}
 
 	files {
+		"premake5.lua",
+		"premake5_renderer.lua",
 		"pch.*",
 		"src/Helios/**.h",
 		"src/Helios/**.c",
 		"src/Helios/**.hpp",
 		"src/Helios/**.cpp",
 	}
+	Src_RendererOpenGL{}
+	Src_RendererVulkan{}
 
 	filter "platforms:Windows"
 
 		files {
 			"src/Platform/System/Windows/**.h",
 			"src/Platform/System/Windows/**.cpp",
-		}
-
-		defines {
-			"HE_RENDERER_VULKAN", -- should be supported on all platforms
-			"HE_RENDERER_OPENGL", -- should be supported on all platforms, works as a fallback for vulkan
---			"HE_RENDERER_DX12",   -- supported only on platforms:windows
---			"HE_RENDERER_DX11",   -- supported only on platforms:windows, works as a fallback for dx12
-		}
-
-		files {
-			"src/Platform/Renderer/Vulkan/**.h",
-			"src/Platform/Renderer/Vulkan/**.cpp",
 		}
 
 	filter "platforms:Linux"
@@ -73,32 +72,11 @@ project "Helios-Engine"
 			"src/Platform/System/Linux/**.cpp",
 		}
 
-		defines {
-			"HE_RENDERER_VULKAN", -- should be supported on all platforms
-			"HE_RENDERER_OPENGL", -- should be supported on all platforms, works as a fallback for vulkan
-		}
-
-		files {
-			"src/Platform/Renderer/Vulkan/**.h",
-			"src/Platform/Renderer/Vulkan/**.cpp",
-		}
-
 	filter "platforms:MacOS"
 
 		files {
 			"src/Platform/System/MacOS/**.h",
 			"src/Platform/System/MacOS/**.cpp",
-		}
-
-		defines {
-			"HE_RENDERER_VULKAN", -- should be supported on all platforms
-			"HE_RENDERER_OPENGL", -- should be supported on all platforms, works as a fallback for vulkan
---			"HE_RENDERER_METAL",  -- supported only on platforms:MacOS
-		}
-
-		files {
-			"src/Platform/Renderer/Vulkan/**.h",
-			"src/Platform/Renderer/Vulkan/**.cpp",
 		}
 
 	filter {}

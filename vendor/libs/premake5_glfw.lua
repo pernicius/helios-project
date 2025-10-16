@@ -8,6 +8,7 @@
 -------------------------
 function Lib_GLFW()
 	includedirs "%{wks.location}/vendor/libs/glfw/include/"
+	defines "GLFW_INCLUDE_NONE"
 
 	filter "kind:*App"
 		links "vendor.glfw"

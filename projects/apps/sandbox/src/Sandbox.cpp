@@ -20,12 +20,12 @@ HE::Application* HE::CreateApplication(HE::Application::CommandLineArgs args)
 {
 	HE::Application::Specification appSpec{};
 	{
-		appSpec.Name = "HeliosGame";
+		appSpec.Name = "Sandbox";
 		appSpec.Version = App::APP_VERSION;
 		appSpec.CmdLineArgs = args;
 		appSpec.hints |= HE::Application::Hints::HINT_USE_EXEPATH;
-		appSpec.logfile = "Game.log";
-		appSpec.configfile = "Game.cfg";
+		appSpec.logfile = "Sandbox.log";
+		appSpec.configfile = "Sandbox.cfg";
 	};
 
 	return new App(appSpec);
@@ -38,6 +38,9 @@ App::App(const HE::Application::Specification& appSpec)
 //	auto& rendererSpec = HE::DeviceManager::GetSpecification();
 //	rendererSpec.Window.windowTitle = appSpec.Name;
 //	HE::DeviceManager::SetSpecification(rendererSpec);
+
+	HE::RendererAPI::CheckSupport();
+	auto api = HE::RendererAPI::Get();
 
 	CreateAppWindow();
 

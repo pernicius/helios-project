@@ -28,7 +28,7 @@ namespace Helios::Engine {
 				return Args[index];
 			}
 
-			bool Check(std::string arg);
+			bool Check(const std::string& arg);
 			std::string Get(std::string arg, std::string default_value = "");
 		};
 
@@ -51,9 +51,9 @@ namespace Helios::Engine {
 			// Basic configuration hints
 			unsigned int hints = 0;
 			// Filename of the logfile
-			std::string logfile = "HeliosEngine.log";
+			std::string logfile = "log.log";
 			// Filename of the configfile
-			std::string configfile = "HeliosEngine.cfg";
+			std::string configfile = "config.cfg";
 		};
 
 	public:

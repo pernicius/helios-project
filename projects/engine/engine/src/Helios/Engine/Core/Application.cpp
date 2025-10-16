@@ -2,6 +2,7 @@
 #include "Helios/Engine/Core/Application.h"
 
 #include <Helios/Util/Version.h>
+#include <Helios/Util/ScopeRef.h>
 
 #include <Platform/PlatformDetection.h>
 #if defined TARGET_PLATFORM_WINDOWS
@@ -30,33 +31,46 @@ namespace Helios::Engine {
 	int AppMain(int argc, char** argv)
 	{
 		try {
-			auto app = CreateApplication({ argc, argv });
+			auto app = Scope<Application>(CreateApplication({ argc, argv }));
 			app->Run();
-			delete app;
 			return EXIT_SUCCESS;
 		}
 		catch (const std::exception& e) {
 			std::cerr << "Application terminated with exception: " << e.what() << std::endl;
-			return EXIT_FAILURE;
 		}
+		catch (...) {
+			std::cerr << "Application terminated with unknown exception." << std::endl;
+		}
+		return EXIT_FAILURE;
 	}
 	
 	
 	// ----------------------------------------------------------------------------------------------------
 
 
-	bool Application::CommandLineArgs::Check(std::string arg)
+	bool Application::CommandLineArgs::Check(const std::string& arg)
 	{
-		for (auto x = 1; x < Count; x++)
-		{
-			size_t start = std::string(Args[x]).find_first_not_of("/-");
-			std::string trimmed = std::string(Args[x]).substr(start);
-			trimmed = trimmed.substr(0, trimmed.find_first_of('='));
-
-			std::transform(trimmed.begin(), trimmed.end(), trimmed.begin(),
+		auto to_lower = [](std::string_view s) {
+			std::string result(s.size(), '\0');
+			std::transform(s.begin(), s.end(), result.begin(),
 				[](unsigned char c) { return std::tolower(c); });
+			return result;
+		};
 
-			if (trimmed == arg)
+		std::string arg_lower = to_lower(arg);
+
+		for (int x = 1; x < Count; ++x)
+		{
+			std::string_view raw_arg(Args[x]);
+			size_t start = raw_arg.find_first_not_of("/-");
+			if (start == std::string_view::npos)
+				continue;
+
+			raw_arg = raw_arg.substr(start);
+			size_t eq_pos = raw_arg.find_first_of('=');
+			std::string_view key = raw_arg.substr(0, eq_pos);
+
+			if (to_lower(key) == arg_lower)
 				return true;
 		}
 		return false;
@@ -65,17 +79,33 @@ namespace Helios::Engine {
 
 	std::string Application::CommandLineArgs::Get(std::string arg, std::string default_value)
 	{
-		for (auto x = 1; x < Count; x++)
-		{
-			size_t start = std::string(Args[x]).find_first_not_of("/-");
-			std::string trimmed = std::string(Args[x]).substr(start);
-
-			std::transform(trimmed.begin(), trimmed.end(), trimmed.begin(),
+		auto to_lower = [](std::string_view s) {
+			std::string result(s.size(), '\0');
+			std::transform(s.begin(), s.end(), result.begin(),
 				[](unsigned char c) { return std::tolower(c); });
+			return result;
+		};
 
-			std::string key = trimmed.substr(0, trimmed.find_first_of('='));
-			if (key.compare(arg) == 0)
-				return trimmed.substr(trimmed.find_first_of('=') + 1);
+		std::string arg_lower = to_lower(arg);
+
+		for (int x = 1; x < Count; ++x)
+		{
+			std::string_view raw_arg(Args[x]);
+			size_t start = raw_arg.find_first_not_of("/-");
+			if (start == std::string_view::npos)
+				continue;
+
+			raw_arg = raw_arg.substr(start);
+			size_t eq_pos = raw_arg.find_first_of('=');
+			std::string_view key = raw_arg.substr(0, eq_pos);
+
+			if (to_lower(key) == arg_lower)
+			{
+				if (eq_pos != std::string_view::npos)
+					return std::string(raw_arg.substr(eq_pos + 1));
+				else
+					return default_value;
+			}
 		}
 		return default_value;
 	}

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Helios/Util/ScopeRef.h"
-
+#include <Helios/Util/ScopeRef.h>
 #include <Platform/DebugBreak.h>
 
 #pragma warning(push, 0)
