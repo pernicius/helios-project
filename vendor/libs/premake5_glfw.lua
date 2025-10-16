@@ -39,6 +39,8 @@ project "vendor.glfw"
 	}
 	
 	files {
+		"premake5_glfw.lua",
+
 		"glfw/include/GLFW/glfw3.h",
 		"glfw/include/GLFW/glfw3native.h",
 		"glfw/src/internal.h",

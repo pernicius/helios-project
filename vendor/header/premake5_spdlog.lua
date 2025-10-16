@@ -27,6 +27,8 @@ project "vendor.spdlog"
 --	}
 	
 	files {
+		"premake5_spdlog.lua",
+
 		"spdlog/include/**.h",
 --		"spdlog/src/**.cpp",
 	}
