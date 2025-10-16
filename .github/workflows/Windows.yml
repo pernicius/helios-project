@@ -1,9 +1,9 @@
 name: Windows
 
 on:
-  push:
-    branches:
-      - master
+#  push:
+#    branches:
+#      - master
   workflow_dispatch:
 
 permissions:
@@ -11,13 +11,30 @@ permissions:
 
 jobs:
   placeholderjob:
-    name: "Name of the job!"
+    name: "Build MSVC-Solution"
 
     runs-on:
       - windows-latest
 
     steps:
-      - name: dummy
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0 - https://github.com/actions/checkout
+        with:
+          submodules: 'recursive'
+        
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2 # https://github.com/marketplace/actions/setup-msbuild
+        
+      - name: Setup Solution
+        shell: cmd
+        working-directory: ${{runner.workspace}}\helios-project\scripts\windows
         run: |
-          echo "This is only a placeholder!"
+          echo TODO...
+
+      - name: Build
+        shell: cmd
+        working-directory: ${{runner.workspace}}\helios-project
+        run: |
+          echo TODO...
+          msbuild --version
           exit 1
