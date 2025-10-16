@@ -8,6 +8,9 @@ workspace "Helios-Project"
 	configurations {
 		"Debug",
 		"Release"
+		-- TODO: do we need more? like "Relese-Candidate", "Alpha", "Beta"....
+		-- TODO: do we need more? like "Relese-Candidate", "Alpha", "Beta"....
+		-- TODO: do we need more? like "Relese-Candidate", "Alpha", "Beta"....
 	}
 
 	platforms {
@@ -56,6 +59,8 @@ workspace "Helios-Project"
 		symbols  "Off"
 		runtime  "Release"
 		
+		fatalwarnings{ "All" }
+
 		optimize "Off"
 --		optimize "On"
 --		optimize "Speed"
