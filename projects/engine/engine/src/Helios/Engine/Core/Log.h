@@ -1,10 +1,13 @@
 #pragma once
 
-#include "Helios/Engine/Core/ScopeRef.h"
+#include "Helios/Util/ScopeRef.h"
 
 #include <Platform/DebugBreak.h>
 
-#include <spdlog/spdlog.h>
+#pragma warning(push, 0)
+#	include <spdlog/spdlog.h>
+#	include <spdlog/fmt/ostr.h>
+#pragma warning(pop)
 
 #include <string>
 #include <stdexcept>
@@ -101,7 +104,7 @@ constexpr auto LOG_LEVEL_OFF   = 6;
 
 
 // EXCEPTION macros (exceptions are always logged as fatal errors)
-#define LOG_CORE_EXCEPT(x)   { LOG_CORE_FATAL(  "Core-Exception: {}",     x); throw std::runtime_error(x); }
-#define LOG_GLFW_EXCEPT(x)   { LOG_GLFW_FATAL(  "GLFW-Exception: {}",     x); throw std::runtime_error(x); }
-#define LOG_RENDER_EXCEPT(x) { LOG_RENDER_FATAL("Renderer-Exception: {}", x); throw std::runtime_error(x); }
-#define LOG_EXCEPT(x)        { LOG_FATAL(       "App-Exception: {}",      x); throw std::runtime_error(x); }
+#define LOG_CORE_EXCEPT(...)   { LOG_CORE_FATAL(  "Core-Exception: {}",     fmt::format(__VA_ARGS__)); throw std::runtime_error(fmt::format(__VA_ARGS__)); }
+#define LOG_GLFW_EXCEPT(...)   { LOG_GLFW_FATAL(  "GLFW-Exception: {}",     fmt::format(__VA_ARGS__)); throw std::runtime_error(fmt::format(__VA_ARGS__)); }
+#define LOG_RENDER_EXCEPT(...) { LOG_RENDER_FATAL("Renderer-Exception: {}", fmt::format(__VA_ARGS__)); throw std::runtime_error(fmt::format(__VA_ARGS__)); }
+#define LOG_EXCEPT(...)        { LOG_FATAL(       "App-Exception: {}",      fmt::format(__VA_ARGS__)); throw std::runtime_error(fmt::format(__VA_ARGS__)); }

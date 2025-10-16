@@ -3,33 +3,28 @@
 
 #include "Platform/System/MacOS/MacOSMain.h"
 
-#include <libgen.h>
-#include <limits.h>
+#include <filesystem>
 #include <mach-o/dyld.h>
-#include <unistd.h>
+#include <limits.h>
+#include <string>
 
 namespace Helios::Util {
 
 
-    std::string GetExecutablePath() {
-        char rawPathName[PATH_MAX];
-        char realPathName[PATH_MAX];
-        uint32_t rawPathSize = (uint32_t)sizeof(rawPathName);
+	std::string GetExecutablePath() {
+		char rawPathName[PATH_MAX];
+		uint32_t rawPathSize = (uint32_t)sizeof(rawPathName);
 
-        if (!_NSGetExecutablePath(rawPathName, &rawPathSize)) {
-            realpath(rawPathName, realPathName);
-        }
-        return  std::string(realPathName);
-    }
+		if (_NSGetExecutablePath(rawPathName, &rawPathSize) != 0)
+			return {};
+
+		std::error_code ec;
+		std::filesystem::path exePath = std::filesystem::canonical(rawPathName, ec);
+		if (ec)
+			return {};
+
+		return exePath.string();
+	}
 
 
-    std::string GetExecutableDir() {
-        std::string executablePath = GetExecutablePath();
-        char* executablePathStr = new char[executablePath.length() + 1];
-        strcpy(executablePathStr, executablePath.c_str());
-        char* executableDir = dirname(executablePathStr);
-        delete[] executablePathStr;
-        return std::string(executableDir);
-    }
-
-}
+} // namespace Helios::Util

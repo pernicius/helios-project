@@ -3,7 +3,7 @@
 #include <memory>
 #include <utility>
 
-namespace Helios::Engine { // start of namespace
+namespace Helios { // start of namespace
 
 
 	// unique pointers (type)
@@ -28,4 +28,4 @@ namespace Helios::Engine { // start of namespace
 	}
 
 
-} // namespace Helios::Engine
+} // namespace Helios

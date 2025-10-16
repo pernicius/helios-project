@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Helios/Engine/Core/Application.h"
 
-#include "Helios/Version.h"
+#include <Helios/Util/Version.h>
 
 #include <Platform/PlatformDetection.h>
 #if defined TARGET_PLATFORM_WINDOWS
@@ -19,6 +19,7 @@
 #include <filesystem>
 #include <cstdlib>
 #include <cctype>
+#include <iostream>
 
 namespace Helios::Engine {
 
@@ -28,11 +29,16 @@ namespace Helios::Engine {
 	
 	int AppMain(int argc, char** argv)
 	{
-		auto app = CreateApplication({ argc, argv });
-		app->Run();
-		delete app;
-
-		return EXIT_SUCCESS;
+		try {
+			auto app = CreateApplication({ argc, argv });
+			app->Run();
+			delete app;
+			return EXIT_SUCCESS;
+		}
+		catch (const std::exception& e) {
+			std::cerr << "Application terminated with exception: " << e.what() << std::endl;
+			return EXIT_FAILURE;
+		}
 	}
 	
 	
@@ -81,6 +87,12 @@ namespace Helios::Engine {
 	Application::Application(const Specification& spec)
 		: m_Spec(spec)
 	{
+		// Check singleton
+		if (s_Instance) {
+			LOG_CORE_EXCEPT("Application already exists!");
+		}
+		s_Instance = this;
+
 		// Init working directory
 		if (!m_Spec.WorkingDirectory.empty())
 			std::filesystem::current_path(m_Spec.WorkingDirectory);
@@ -126,10 +138,6 @@ namespace Helios::Engine {
 //			GLM_VERSION_PATCH);
 		LOG_CORE_DEBUG("Working path: {}", m_Spec.WorkingDirectory);
 
-		// Check singleton
-		LOG_CORE_ASSERT(!s_Instance, "Application already exists!");
-		s_Instance = this;
-
 		// Read config
 //		Config::Read(m_Spec.configfile, m_Spec.WorkingDirectory);
 
@@ -142,6 +150,26 @@ namespace Helios::Engine {
 #				ifdef HE_RENDERER_VULKAN
 				if (m_Spec.CmdLineArgs[x] == "--vulkan")
 {}//					Config::Override("RendererAPI", "Vulkan");
+#				endif
+
+#				ifdef HE_RENDERER_OPENGL
+				if (m_Spec.CmdLineArgs[x] == "--opengl")
+{}//					Config::Override("RendererAPI", "OpenGL");
+#				endif
+
+#				ifdef HE_RENDERER_METAL
+				if (m_Spec.CmdLineArgs[x] == "--metal")
+{}//					Config::Override("RendererAPI", "Metal");
+#				endif
+
+#				ifdef HE_RENDERER_DX12
+				if (m_Spec.CmdLineArgs[x] == "--dx12")
+{}//					Config::Override("RendererAPI", "DX12");
+#				endif
+
+#				ifdef HE_RENDERER_DX11
+				if (m_Spec.CmdLineArgs[x] == "--dx11")
+{}//					Config::Override("RendererAPI", "DX11");
 #				endif
 			}
 		}

@@ -55,8 +55,10 @@ project "Helios-Engine"
 		}
 
 		defines {
-			"HE_RENDERER_VULKAN",
---			"HE_RENDERER_DX12",
+			"HE_RENDERER_VULKAN", -- should be supported on all platforms
+			"HE_RENDERER_OPENGL", -- should be supported on all platforms, works as a fallback for vulkan
+--			"HE_RENDERER_DX12",   -- supported only on platforms:windows
+--			"HE_RENDERER_DX11",   -- supported only on platforms:windows, works as a fallback for dx12
 		}
 
 		files {
@@ -72,7 +74,8 @@ project "Helios-Engine"
 		}
 
 		defines {
-			"HE_RENDERER_VULKAN",
+			"HE_RENDERER_VULKAN", -- should be supported on all platforms
+			"HE_RENDERER_OPENGL", -- should be supported on all platforms, works as a fallback for vulkan
 		}
 
 		files {
@@ -88,8 +91,9 @@ project "Helios-Engine"
 		}
 
 		defines {
-			"HE_RENDERER_VULKAN",
---			"HE_RENDERER_METAL",
+			"HE_RENDERER_VULKAN", -- should be supported on all platforms
+			"HE_RENDERER_OPENGL", -- should be supported on all platforms, works as a fallback for vulkan
+--			"HE_RENDERER_METAL",  -- supported only on platforms:MacOS
 		}
 
 		files {

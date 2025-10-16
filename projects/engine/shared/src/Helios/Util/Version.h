@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 
 namespace Helios::Version {
 	enum Type
@@ -10,6 +12,12 @@ namespace Helios::Version {
 		//		Beta,
 		//		ReleaseCandidate,
 		Release
+	};
+	namespace Max {
+		constexpr uint32_t Type  = 7;    // 3 bits
+		constexpr uint32_t Major = 127;  // 7 bits
+		constexpr uint32_t Minor = 1023; // 10 bits
+		constexpr uint32_t Patch = 4095; // 12 bits
 	};
 }
 
@@ -38,7 +46,3 @@ namespace Helios::Version {
 	(HE_VERSION_TYPE(version) == Helios::Version::Type::Debug)   ? "Debug" : \
 	(HE_VERSION_TYPE(version) == Helios::Version::Type::Release) ? "Release" : \
 	"Unknown")
-
-
-// Version of the Helios-Engine
-#define HE_VERSION HE_MAKE_VERSION(0, 1, 0)

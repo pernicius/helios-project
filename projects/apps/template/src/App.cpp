@@ -1,8 +1,4 @@
 #include "pch.h"
-
-#include <Helios/Engine/Core/Application.h>
-#include <Helios/Version.h>
-
 namespace HE = Helios::Engine;
 
 

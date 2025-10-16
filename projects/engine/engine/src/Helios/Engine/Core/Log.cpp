@@ -1,24 +1,17 @@
 #include "pch.h"
 #include "Log.h"
 
-#include <filesystem>
-
 #pragma warning(push, 0)
-#	include <spdlog/spdlog.h>
-#	include <spdlog/fmt/ostr.h>
 #	include <spdlog/sinks/stdout_color_sinks.h>
-#	include <spdlog/sinks/basic_file_sink.h>
+//#	include <spdlog/sinks/basic_file_sink.h>
+#	include <spdlog/sinks/rotating_file_sink.h>
 #pragma warning(pop)
 
 #include <GLFW/glfw3.h>
 
+#include <filesystem>
+
 namespace Helios::Engine {
-
-
-//	Ref<spdlog::logger> Log::s_CoreLogger;
-//	Ref<spdlog::logger> Log::s_GLFWLogger;
-//	Ref<spdlog::logger> Log::s_AppLogger;
-//	Ref<spdlog::logger> Log::s_RenderLogger;
 
 
 	void GLFW_error_callback(int code, const char* description)
@@ -35,15 +28,19 @@ namespace Helios::Engine {
 			(path.empty() ? "" : path + "/") + (filename.empty() ? "logger.log" : filename)
 		).make_preferred().string();
 
+		// console logger
 		logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
-		logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(file, true));
+		// file logger
+//		logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(file, true));
+		// rotating file logger (10 Mbyte, 3 files)
+		logSinks.emplace_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(file, 1048575*10, 3, true));
 
 //		logSinks[0]->set_pattern("%T.%e [P.%P:T.%t] %4n:%-5!l >> %^%v%$");
 //		logSinks[1]->set_pattern("%T.%e [P.%P:T.%t] %4n:%-5!l >> %v");
 		logSinks[0]->set_pattern("%T %4n:%-5!l >> %^%v%$");
 		logSinks[1]->set_pattern("%T %4n:%-5!l >> %v");
 
-		// Logger for the HeliosEngine
+		// Logger for the Engine
 		s_CoreLogger = std::make_shared<spdlog::logger>("CORE", begin(logSinks), end(logSinks));
 		spdlog::register_logger(s_CoreLogger);
 		s_CoreLogger->set_level(spdlog::level::trace);
@@ -57,6 +54,7 @@ namespace Helios::Engine {
 		s_GLFWLogger->flush_on(spdlog::level::trace);
 		LOG_GLFW_DEBUG("Log initialized");
 
+		// Setup the error callback for GLFW
 		glfwSetErrorCallback(GLFW_error_callback);
 
 		// Logger for the Renderer

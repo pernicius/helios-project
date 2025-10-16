@@ -3,23 +3,22 @@
 
 #include "Platform/System/Windows/WinMain.h"
 
+#include <filesystem>
+
 namespace Helios::Util {
 
 
-    std::string GetExecutablePath()
-    {
-        std::string path;
-        char ctemp[MAX_PATH];
-        wchar_t wtemp[MAX_PATH];
- 
-        GetModuleFileName(NULL, wtemp, MAX_PATH);
-        wcstombs_s(nullptr, ctemp, wtemp, MAX_PATH);
- 
-        std::string strtemp(ctemp);
-        path = strtemp.substr(0, strtemp.find_last_of("/\\"));
- 
-        return path;
-    }
+	std::string GetExecutablePath()
+	{
+		wchar_t wtemp[MAX_PATH] = { 0 };
+		if (GetModuleFileNameW(NULL, wtemp, MAX_PATH) == 0) {
+			// TODO: error handling
+			return {};
+		}
+
+		std::filesystem::path exePath(wtemp);
+		return exePath.parent_path().string();
+	}
 
 
 } // namespace Helios::Util

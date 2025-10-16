@@ -1,36 +1,26 @@
 #include "pch.h"
 #include "Platform/System/Linux/LinuxUtil.h"
 
-#include "Platform/System/Linux/LinuxMain.h"
-
-#include <limits.h>
-#include <libgen.h>
 #include <unistd.h>
-
-#if defined(__sun)
-#   define PROC_SELF_EXE "/proc/self/path/a.out"
-#else
-#   define PROC_SELF_EXE "/proc/self/exe"
-#endif
+#include <limits.h>
+#include <string>
+#include <filesystem>
 
 namespace Helios::Util {
 
 
-    std::string GetExecutablePath() {
-        char rawPathName[PATH_MAX];
-        realpath(PROC_SELF_EXE, rawPathName);
-        return  std::string(rawPathName);
-    }
+	std::string GetExecutablePath()
+	{
+		char result[PATH_MAX] = { 0 };
+		ssize_t count = readlink("/proc/self/exe", result, PATH_MAX - 1);
+		if (count == -1) {
+			// TODO: error handling
+			return {};
+		}
+
+		std::filesystem::path exePath(result);
+		return exePath.parent_path().string();
+	}
 
 
-    std::string GetExecutableDir() {
-        std::string executablePath = GetExecutablePath();
-        char* executablePathStr = new char[executablePath.length() + 1];
-        strcpy(executablePathStr, executablePath.c_str());
-        char* executableDir = dirname(executablePathStr);
-        delete[] executablePathStr;
-        return std::string(executableDir);
-    }
-
-
-}
+} // namespace Helios::Util
