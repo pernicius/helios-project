@@ -39,8 +39,8 @@ App::App(const HE::Application::Specification& appSpec)
 //	rendererSpec.Window.windowTitle = appSpec.Name;
 //	HE::DeviceManager::SetSpecification(rendererSpec);
 
-	HE::RendererAPI::CheckSupport();
-	auto api = HE::RendererAPI::Get();
+	HE::RendererAPI::CheckAPISupport();
+	auto api = HE::RendererAPI::GetAPI();
 
 	CreateAppWindow();
 

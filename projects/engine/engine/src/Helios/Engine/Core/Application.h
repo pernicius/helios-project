@@ -6,6 +6,7 @@
 //#include "Helios/Engine/Events/ApplicationEvent.h"
 
 #include <string>
+#include <string_view>
 #include <cstdint>
 
 namespace Helios::Engine {
@@ -28,8 +29,8 @@ namespace Helios::Engine {
 				return Args[index];
 			}
 
-			bool Check(const std::string& arg);
-			std::string Get(std::string arg, std::string default_value = "");
+			bool Check(std::string_view arg) const;
+			std::string Get(std::string_view arg, std::string_view default_value = {}) const;
 		};
 
 		enum Hints

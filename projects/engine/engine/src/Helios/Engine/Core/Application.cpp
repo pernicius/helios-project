@@ -25,6 +25,37 @@
 namespace Helios::Engine {
 
 
+	namespace { // internal helpers
+		inline bool ci_equal(std::string_view a, std::string_view b) noexcept
+		{
+			if (a.size() != b.size()) return false;
+			for (size_t i = 0; i < a.size(); ++i)
+			{
+				if (std::tolower(static_cast<unsigned char>(a[i])) !=
+					std::tolower(static_cast<unsigned char>(b[i])))
+					return false;
+			}
+			return true;
+		}
+
+		inline void split_arg(std::string_view raw, std::string_view& out_key, std::string_view& out_val) noexcept
+		{
+			out_key = {};
+			out_val = {};
+
+			size_t start = raw.find_first_not_of("/-");
+			if (start == std::string_view::npos)
+				return;
+
+			raw.remove_prefix(start);
+			size_t eq_pos = raw.find('=');
+			out_key = raw.substr(0, eq_pos);
+			if (eq_pos != std::string_view::npos)
+				out_val = raw.substr(eq_pos + 1);
+		}
+	} // internal helpers
+
+
 	// ----------------------------------------------------------------------------------------------------
 	
 	
@@ -48,66 +79,48 @@ namespace Helios::Engine {
 	// ----------------------------------------------------------------------------------------------------
 
 
-	bool Application::CommandLineArgs::Check(const std::string& arg)
+	bool Application::CommandLineArgs::Check(std::string_view arg) const
 	{
-		auto to_lower = [](std::string_view s) {
-			std::string result(s.size(), '\0');
-			std::transform(s.begin(), s.end(), result.begin(),
-				[](unsigned char c) { return std::tolower(c); });
-			return result;
-		};
-
-		std::string arg_lower = to_lower(arg);
+		if (arg.empty())
+			return false;
 
 		for (int x = 1; x < Count; ++x)
 		{
 			std::string_view raw_arg(Args[x]);
-			size_t start = raw_arg.find_first_not_of("/-");
-			if (start == std::string_view::npos)
+			std::string_view key, value;
+			split_arg(raw_arg, key, value);
+
+			if (key.empty())
 				continue;
 
-			raw_arg = raw_arg.substr(start);
-			size_t eq_pos = raw_arg.find_first_of('=');
-			std::string_view key = raw_arg.substr(0, eq_pos);
-
-			if (to_lower(key) == arg_lower)
+			if (ci_equal(key, arg))
 				return true;
 		}
 		return false;
 	}
 
-
-	std::string Application::CommandLineArgs::Get(std::string arg, std::string default_value)
+	std::string Application::CommandLineArgs::Get(std::string_view arg, std::string_view default_value) const
 	{
-		auto to_lower = [](std::string_view s) {
-			std::string result(s.size(), '\0');
-			std::transform(s.begin(), s.end(), result.begin(),
-				[](unsigned char c) { return std::tolower(c); });
-			return result;
-		};
-
-		std::string arg_lower = to_lower(arg);
+		if (arg.empty())
+			return std::string(default_value);
 
 		for (int x = 1; x < Count; ++x)
 		{
 			std::string_view raw_arg(Args[x]);
-			size_t start = raw_arg.find_first_not_of("/-");
-			if (start == std::string_view::npos)
+			std::string_view key, value;
+			split_arg(raw_arg, key, value);
+
+			if (key.empty())
 				continue;
 
-			raw_arg = raw_arg.substr(start);
-			size_t eq_pos = raw_arg.find_first_of('=');
-			std::string_view key = raw_arg.substr(0, eq_pos);
-
-			if (to_lower(key) == arg_lower)
+			if (ci_equal(key, arg))
 			{
-				if (eq_pos != std::string_view::npos)
-					return std::string(raw_arg.substr(eq_pos + 1));
-				else
-					return default_value;
+				if (!value.empty())
+					return std::string(value);
+				return std::string(default_value);
 			}
 		}
-		return default_value;
+		return std::string(default_value);
 	}
 
 
@@ -192,14 +205,9 @@ namespace Helios::Engine {
 {}//					Config::Override("RendererAPI", "Metal");
 #				endif
 
-#				ifdef HE_RENDERER_DX12
-				if (m_Spec.CmdLineArgs[x] == "--dx12")
-{}//					Config::Override("RendererAPI", "DX12");
-#				endif
-
-#				ifdef HE_RENDERER_DX11
-				if (m_Spec.CmdLineArgs[x] == "--dx11")
-{}//					Config::Override("RendererAPI", "DX11");
+#				ifdef HE_RENDERER_DIRECTX
+				if (m_Spec.CmdLineArgs[x] == "--directx")
+{}//					Config::Override("RendererAPI", "DirectX");
 #				endif
 			}
 		}

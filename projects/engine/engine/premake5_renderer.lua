@@ -17,6 +17,8 @@ function Lib_RendererOpenGL()
 --		libdirs ""
 --		links ""
 	filter {}
+
+	Lib_glad{}
 end
 
 --------------

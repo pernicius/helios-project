@@ -10,7 +10,7 @@
 
 namespace Helios::Engine::OpenGL
 {
-	bool IsSupported()
+	bool IsAPISupported()
 	{
 
 

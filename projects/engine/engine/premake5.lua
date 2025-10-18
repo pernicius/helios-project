@@ -20,7 +20,6 @@ function Lib_HeliosEngine()
 	Lib_Spdlog{}
 
 	-- vendor/lib
-	Lib_glad{}
 	Lib_GLFW{}
 end
 

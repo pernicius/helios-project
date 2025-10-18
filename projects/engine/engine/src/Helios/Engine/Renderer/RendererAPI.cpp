@@ -19,38 +19,38 @@
 namespace Helios::Engine
 {
 
-	bool RendererAPI::Set(API api)
+	bool RendererAPI::SetAPI(API api)
 	{
 		bool supported = false;
 		switch (api)
 		{
 #		ifdef HE_RENDERER_OPENGL
-			case API::OpenGL:  supported = OpenGL::IsSupported();    break;
+			case API::OpenGL:  supported = OpenGL::IsAPISupported();    break;
 #		endif
 #		ifdef HE_RENDERER_VULKAN
-			case API::Vulkan:  supported = Vulkan::IsSupported();    break;
+			case API::Vulkan:  supported = Vulkan::IsAPISupported();    break;
 #		endif
 #		ifdef HE_RENDERER_DIRECTX
-			case API::DirectX: supported = DirectX::IsSupported(); break;
+			case API::DirectX: supported = DirectX::IsAPISupported(); break;
 #		endif
 #		ifdef HE_RENDERER_METAL
-			case API::Metal:   supported = Metal::IsSupported();     break;
+			case API::Metal:   supported = Metal::IsAPISupported();     break;
 #		endif
 		default: break;
 		}
 
 		if (supported) {
 			s_API = api;
-			LOG_RENDER_INFO("Set RendererAPI to {}", GetName(api));
+			LOG_RENDER_INFO("Set RendererAPI to {}", GetAPIName(api));
 		}
 		else {
-			LOG_RENDER_EXCEPT("The requested RendererAPI::{} is not supported!", GetName(api));
+			LOG_RENDER_EXCEPT("The requested RendererAPI::{} is not supported!", GetAPIName(api));
 		}
 
 		return supported;
 	}
 
-	std::string_view RendererAPI::GetName(RendererAPI::API api)
+	std::string_view RendererAPI::GetAPIName(RendererAPI::API api)
 	{
 		size_t idx = static_cast<size_t>(api);
 		if (idx < API_NAMES.size())
@@ -59,33 +59,33 @@ namespace Helios::Engine
 	}
 
 
-	bool RendererAPI::IsSupported(API api)
+	bool RendererAPI::IsAPISupported(API api)
 	{
 		switch (api)
 		{
 #		ifdef HE_RENDERER_OPENGL
-			case RendererAPI::API::OpenGL:  return OpenGL::IsSupported();
+			case RendererAPI::API::OpenGL:  return OpenGL::IsAPISupported();
 #		endif
 #		ifdef HE_RENDERER_VULKAN
-			case RendererAPI::API::Vulkan:  return Vulkan::IsSupported();
+			case RendererAPI::API::Vulkan:  return Vulkan::IsAPISupported();
 #		endif
-#		ifdef HE_RENDERER_DX12
-			case RendererAPI::API::DirectX: return DirectX::IsSupported();
+#		ifdef HE_RENDERER_DIRECTX
+			case RendererAPI::API::DirectX: return DirectX::IsAPISupported();
 #		endif
 #		ifdef HE_RENDERER_METAL
-			case RendererAPI::API::Metal:   return Metal::IsSupported();
+			case RendererAPI::API::Metal:   return Metal::IsAPISupported();
 #		endif
 			default:                        return false;
 		}
 	}
 
-	void RendererAPI::CheckSupport()
+	void RendererAPI::CheckAPISupport()
 	{
 		bool isSet = false;
 		for (int i = 1; i < static_cast<int>(RendererAPI::API::_max); ++i) {
 			RendererAPI::API api = static_cast<RendererAPI::API>(i);
-			if (IsSupported(api) and (isSet == false)) {
-				isSet = Set(api);
+			if (IsAPISupported(api) and (isSet == false)) {
+				isSet = SetAPI(api);
 			}
 		}
 	}

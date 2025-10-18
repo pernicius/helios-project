@@ -10,7 +10,7 @@
 namespace Helios::Engine::Vulkan
 {
 
-	bool IsSupported()
+	bool IsAPISupported()
 	{
 		static std::once_flag s_flag;
 		static bool s_result = false;
