@@ -1,5 +1,7 @@
 # The Helios Project (C++)
 
+<!--[![License](https://img.shields.io/github/license/pernicius/helios-project)](https://github.com/pernicius/helios-project/blob/master/LICENSE)-->
+
 [![Windows](https://github.com/pernicius/helios-project/actions/workflows/Windows.yml/badge.svg)](https://github.com/pernicius/helios-project/actions/workflows/Windows.yml)
 [![Linux](https://github.com/pernicius/helios-project/actions/workflows/Linux.yml/badge.svg)](https://github.com/pernicius/helios-project/actions/workflows/Linux.yml)
 [![MacOS](https://github.com/pernicius/helios-project/actions/workflows/MacOS.yml/badge.svg)](https://github.com/pernicius/helios-project/actions/workflows/MacOS.yml)
