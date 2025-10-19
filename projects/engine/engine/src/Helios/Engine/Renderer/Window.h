@@ -16,17 +16,15 @@ namespace Helios::Engine
 		static Scope<Window> Create();
 		virtual ~Window() = default;
 
-		GLFWwindow* GetNativeWindow() { return m_window; }
+		GLFWwindow* GetNativeWindow() { return m_Window; }
 
 		virtual void OnUpdate() = 0;
 		
-		unsigned int GetWidth() { return m_width; }
-		unsigned int GetHeight() { return m_height; }
+		virtual void Show() = 0;
+		virtual void Hide() = 0;
 
-	private:
-		GLFWwindow* m_window = nullptr;
-		unsigned int m_width = 0;
-		unsigned int m_height = 0;
+	protected:
+		GLFWwindow* m_Window = nullptr;
 	};
 
 

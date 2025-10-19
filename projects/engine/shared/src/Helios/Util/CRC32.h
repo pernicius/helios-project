@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <array>
 #include <span>
+#include <string_view>
 
 namespace Helios::Util {
 
@@ -24,6 +25,12 @@ namespace Helios::Util {
 				crc = table[(crc ^ byte) & 0xFF] ^ (crc >> 8);
 			}
 			return crc ^ 0xFFFFFFFFu;
+		}
+
+		static uint32_t Compute(std::string_view sv, uint32_t seed = DefaultSeed)
+		{
+			auto bytes = std::span<const uint8_t>(reinterpret_cast<const uint8_t*>(sv.data()), sv.size());
+			return Compute(bytes, seed);
 		}
 
 	private:

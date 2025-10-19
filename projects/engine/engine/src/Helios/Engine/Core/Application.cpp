@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "Helios/Engine/Core/Application.h"
 
+#include "Helios/Engine/Events/EventManager.h"
+#include <Helios/Engine/Renderer/RendererAPI.h>
+
 #include <Helios/Util/Version.h>
 #include <Helios/Util/ScopeRef.h>
 
@@ -16,6 +19,7 @@
 #include <GLFW/glfw3.h>
 
 #include <string>
+#include <string_view>
 #include <algorithm>
 #include <filesystem>
 #include <cstdlib>
@@ -129,6 +133,7 @@ namespace Helios::Engine {
 
 	Application::Application(const Specification& spec)
 		: m_Spec(spec)
+		, m_WindowCloseCallback([this](const Events::WindowCloseEvent& e) { OnWindowClose(e); })
 	{
 		// Check singleton
 		if (s_Instance) {
@@ -171,14 +176,14 @@ namespace Helios::Engine {
 			SPDLOG_VER_MAJOR,
 			SPDLOG_VER_MINOR,
 			SPDLOG_VER_PATCH);
-//		LOG_CORE_DEBUG("Lib \"EnTT\": {}.{}.{}",
-//			ENTT_VERSION_MAJOR,
-//			ENTT_VERSION_MINOR,
-//			ENTT_VERSION_PATCH);
-//		LOG_CORE_DEBUG("Lib \"GLM\": {}.{}.{}",
-//			GLM_VERSION_MAJOR,
-//			GLM_VERSION_MINOR,
-//			GLM_VERSION_PATCH);
+		//		LOG_CORE_DEBUG("Lib \"EnTT\": {}.{}.{}",
+		//			ENTT_VERSION_MAJOR,
+		//			ENTT_VERSION_MINOR,
+		//			ENTT_VERSION_PATCH);
+		//		LOG_CORE_DEBUG("Lib \"GLM\": {}.{}.{}",
+		//			GLM_VERSION_MAJOR,
+		//			GLM_VERSION_MINOR,
+		//			GLM_VERSION_PATCH);
 		LOG_CORE_DEBUG("Working path: {}", m_Spec.WorkingDirectory);
 
 		// Read config
@@ -188,29 +193,43 @@ namespace Helios::Engine {
 		if (m_Spec.CmdLineArgs.Count > 1)
 		{
 			for (auto x = 1; x < m_Spec.CmdLineArgs.Count; x++) {
-				LOG_CORE_INFO("CmdArg[{}] = \"{}\"", x, m_Spec.CmdLineArgs[x]);
-
-#				ifdef HE_RENDERER_VULKAN
-				if (m_Spec.CmdLineArgs[x] == "--vulkan")
-{}//					Config::Override("RendererAPI", "Vulkan");
-#				endif
-
-#				ifdef HE_RENDERER_OPENGL
-				if (m_Spec.CmdLineArgs[x] == "--opengl")
-{}//					Config::Override("RendererAPI", "OpenGL");
-#				endif
-
-#				ifdef HE_RENDERER_METAL
-				if (m_Spec.CmdLineArgs[x] == "--metal")
-{}//					Config::Override("RendererAPI", "Metal");
-#				endif
-
-#				ifdef HE_RENDERER_DIRECTX
-				if (m_Spec.CmdLineArgs[x] == "--directx")
-{}//					Config::Override("RendererAPI", "DirectX");
-#				endif
+				LOG_CORE_INFO("CmdArg[] = \"{}\"", m_Spec.CmdLineArgs[x]);
 			}
 		}
+
+		// Init renderer
+		RendererAPI::CheckAPISupport();
+#		ifdef HE_RENDERER_VULKAN
+			if (m_Spec.CmdLineArgs.Check("vulkan")) {
+//				Config::Override("RendererAPI", "Vulkan");
+				LOG_CORE_INFO("Overriding renderer API to Vulkan by command-line-switch");
+				RendererAPI::SetAPI(RendererAPI::API::Vulkan);
+			}
+#		endif
+#		ifdef HE_RENDERER_OPENGL
+			if (m_Spec.CmdLineArgs.Check("opengl")) {
+				LOG_CORE_INFO("Overriding renderer API to OpenGL by command-line-switch");
+				RendererAPI::SetAPI(RendererAPI::API::OpenGL);
+//				Config::Override("RendererAPI", "OpenGL");
+			}
+#		endif
+#		ifdef HE_RENDERER_METAL
+			if (m_Spec.CmdLineArgs.Check("metal")) {
+				LOG_CORE_INFO("Overriding renderer API to Metal by command-line-switch");
+				RendererAPI::SetAPI(RendererAPI::API::Metal);
+//				Config::Override("RendererAPI", "Metal");
+			}
+#		endif
+#		ifdef HE_RENDERER_DIRECTX
+			if (m_Spec.CmdLineArgs.Check("directx")) {
+				LOG_CORE_INFO("Overriding renderer API to DirectX by command-line-switch");
+				RendererAPI::SetAPI(RendererAPI::API::DirectX);
+//				Config::Override("RendererAPI", "DirectX");
+			}
+#		endif
+
+		// Events
+		Events::Subscribe<Events::WindowCloseEvent>(m_WindowCloseCallback);
 	}
 
 
@@ -220,6 +239,7 @@ namespace Helios::Engine {
 
 //		Config::Save();
 //		Renderer::Shutdown();
+		Events::Shutdown();
 
 		s_Instance = nullptr;
 	}
@@ -251,9 +271,8 @@ namespace Helios::Engine {
 
 	void Application::CreateAppWindow()
 	{
-//		auto wnd = DeviceManager::CreateMainWindow();
-//		wnd->SetEventCallback(HE_BIND_EVENT_FN(OnEvent));
-//		wnd->Show();
+		m_Window = Window::Create();
+		m_Window->Show();
 
 //		CreateDevice()
 //		CreateSwapChain()
@@ -267,22 +286,6 @@ namespace Helios::Engine {
 	{
 		m_Running = false;
 	}
-
-
-//	void Application::OnEvent(Event& e)
-//	{
-//		EventDispatcher dispatcher(e);
-//		dispatcher.Dispatch<WindowCloseEvent>(HE_BIND_EVENT_FN(Application::OnWindowClose));
-//		dispatcher.Dispatch<WindowResizeEvent>(HE_BIND_EVENT_FN(Application::OnWindowResize));
-//		dispatcher.Dispatch<FramebufferResizeEvent>(HE_BIND_EVENT_FN(Application::OnFramebufferResize));
-//
-//		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
-//		{
-//			if (e.Handled)
-//				break;
-//			(*it)->OnEvent(e);
-//		}
-//	}
 
 
 	void Application::Run()
@@ -360,16 +363,17 @@ namespace Helios::Engine {
 			}
 
 			// Poll events and so on
-//			DeviceManager::GetMainWindow()->OnUpdate();
+			m_Window->OnUpdate();
+			Events::Dispatch();
 		}
 	}
 
 
-//	bool Application::OnWindowClose(WindowCloseEvent& e)
-//	{
-//		m_Running = false;
-//		return true;
-//	}
+	void Application::OnWindowClose(const Events::WindowCloseEvent& e)
+	{
+		LOG_CORE_INFO("Window close event received.");
+		m_Running = false;
+	}
 
 
 //	bool Application::OnWindowResize(WindowResizeEvent& e)

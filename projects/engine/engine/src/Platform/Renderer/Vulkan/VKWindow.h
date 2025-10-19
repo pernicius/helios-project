@@ -9,10 +9,13 @@ namespace Helios::Engine
 	class VKWindow : public Window
 	{
 	public:
-		VKWindow() {};
-		~VKWindow() = default;
+		VKWindow();
+		~VKWindow();
 
-		virtual void OnUpdate() override {}
+		virtual void OnUpdate() override;
+
+		virtual void Show() override;
+		virtual void Hide() override;
 	};
 
 

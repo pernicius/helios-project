@@ -39,7 +39,6 @@ App::App(const HE::Application::Specification& appSpec)
 //	rendererSpec.Window.windowTitle = appSpec.Name;
 //	HE::DeviceManager::SetSpecification(rendererSpec);
 
-	HE::RendererAPI::CheckAPISupport();
 	auto api = HE::RendererAPI::GetAPI();
 
 	CreateAppWindow();
@@ -53,4 +52,5 @@ App::App(const HE::Application::Specification& appSpec)
 
 App::~App()
 {
+	LOG_INFO("Sandbox App Shutdown.");
 }

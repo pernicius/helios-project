@@ -2,8 +2,10 @@
 
 #include "Helios/Engine/Core/Log.h"
 //#include "Helios/Engine/Core/Layer.h"
-//#include "Helios/Engine/Events/Event.h"
+#include "Helios/Engine/Events/EventHandler.h"
+#include "Helios/Engine/Events/Events_Window.h"
 //#include "Helios/Engine/Events/ApplicationEvent.h"
+#include "Helios/Engine/Renderer/Window.h"
 
 #include <string>
 #include <string_view>
@@ -79,15 +81,19 @@ namespace Helios::Engine {
 //		bool OnFramebufferResize(FramebufferResizeEvent& e);
 
 	private:
+		Scope<Window> m_Window;
 		Specification m_Spec;
 		bool m_Running = true;
 		bool m_Minimized = false;
 //		LayerStack m_LayerStack;
 
-
 	private:
 		static inline Application* s_Instance = nullptr;
 		friend int AppMain(int argc, char** argv);
+
+	private:
+		void OnWindowClose(const Events::WindowCloseEvent& e);
+		EventHandler<Events::WindowCloseEvent> m_WindowCloseCallback;
 	};
 
 

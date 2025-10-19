@@ -69,6 +69,12 @@ namespace Helios::Engine {
 		}
 
 
+		inline void Dispatch()
+		{
+			g_EventManager.DispatchEvents();
+		}
+
+
 		inline void Shutdown()
 		{
 			g_EventManager.Shutdown();
