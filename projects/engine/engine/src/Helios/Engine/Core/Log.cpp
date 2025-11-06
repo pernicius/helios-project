@@ -5,6 +5,7 @@
 #	include <spdlog/sinks/stdout_color_sinks.h>
 //#	include <spdlog/sinks/basic_file_sink.h>
 #	include <spdlog/sinks/rotating_file_sink.h>
+#	include <spdlog/sinks/null_sink.h>
 #pragma warning(pop)
 
 #include <GLFW/glfw3.h>
@@ -18,6 +19,20 @@ namespace Helios::Engine {
 	{
 		LOG_GLFW_ERROR("ErrorCallback({}) {}", code, description);
 	}
+
+
+	// Helper that creates a no-op logger (does not register it with spdlog registry).
+	static Ref<spdlog::logger> CreateNoopLogger(const std::string& name)
+	{
+		auto sink = std::make_shared<spdlog::sinks::null_sink_mt>();
+		auto logger = std::make_shared<spdlog::logger>(name, sink);
+		logger->set_level(spdlog::level::off);
+		// Do NOT register this logger with the spdlog registry; keep it local so it remains valid even if spdlog::shutdown() is called.
+		return logger;
+	}
+
+
+	// ----------------------------------------------------------------------------------------------------
 
 
 	void Log::Init(const std::string& filename, const std::string& path)
@@ -70,6 +85,43 @@ namespace Helios::Engine {
 		s_AppLogger->set_level(spdlog::level::trace);
 		s_AppLogger->flush_on(spdlog::level::trace);
 		LOG_DEBUG("Log initialized");
+	}
+
+
+	void Log::Shutdown()
+	{
+		// log shutdown start; after we remove the GLFW callback no further GLFW errors will be forwarded here
+		LOG_CORE_DEBUG("Shutting down log.");
+
+		// Unregister GLFW error callback to avoid it invoking logging while we're tearing down
+		glfwSetErrorCallback(nullptr);
+
+		// flush existing loggers
+		if (s_CoreLogger)   s_CoreLogger->flush();
+		if (s_GLFWLogger)   s_GLFWLogger->flush();
+		if (s_RenderLogger) s_RenderLogger->flush();
+		if (s_AppLogger)    s_AppLogger->flush();
+
+		// remove named loggers from spdlog registry (optional but explicit)
+		try {
+			spdlog::drop("CORE");
+			spdlog::drop("GLFW");
+			spdlog::drop("REND");
+			spdlog::drop("APP ");
+		}
+		catch (...) {
+			// ignore any drop errors during shutdown
+		}
+
+		// global shutdown: releases sinks and clears registry
+		spdlog::shutdown();
+
+		// Replace our references with no-op loggers so logging macros stay safe between Shutdown() and the next Init().
+		// These no-op loggers hold their own null sinks and are NOT registered with spdlog's global registry.
+		s_CoreLogger   = CreateNoopLogger("CORE_NOOP");
+		s_GLFWLogger   = CreateNoopLogger("GLFW_NOOP");
+		s_RenderLogger = CreateNoopLogger("REND_NOOP");
+		s_AppLogger    = CreateNoopLogger("APP_NOOP");
 	}
 
 

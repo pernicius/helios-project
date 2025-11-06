@@ -62,21 +62,32 @@ namespace Helios::Engine {
 
 	// ----------------------------------------------------------------------------------------------------
 	
-	
+	static bool g_AppNeedRestart = true;
+
 	int AppMain(int argc, char** argv)
 	{
-		try {
-			auto app = Scope<Application>(CreateApplication({ argc, argv }));
-			app->Run();
-			return EXIT_SUCCESS;
+		int rval = EXIT_FAILURE;
+
+		while (g_AppNeedRestart)
+		{
+			g_AppNeedRestart = false;
+
+			try {
+				auto app = Scope<Application>(CreateApplication({ argc, argv }));
+				app->Run();
+				app.reset();
+
+				rval = EXIT_SUCCESS;
+			}
+			catch (const std::exception& e) {
+				std::cerr << "Application terminated with exception: " << e.what() << std::endl;
+			}
+			catch (...) {
+				std::cerr << "Application terminated with unknown exception." << std::endl;
+			}
 		}
-		catch (const std::exception& e) {
-			std::cerr << "Application terminated with exception: " << e.what() << std::endl;
-		}
-		catch (...) {
-			std::cerr << "Application terminated with unknown exception." << std::endl;
-		}
-		return EXIT_FAILURE;
+
+		return rval;
 	}
 	
 	
@@ -237,9 +248,12 @@ namespace Helios::Engine {
 	{
 		LOG_CORE_INFO("App Shutdown.");
 
+		m_Window.reset();
+
 //		Config::Save();
 //		Renderer::Shutdown();
 		Events::Shutdown();
+		Log::Shutdown();
 
 		s_Instance = nullptr;
 	}
@@ -282,10 +296,18 @@ namespace Helios::Engine {
 	}
 
 
-	void Application::Close()
+	bool Application::NeedRestart(bool setRestart)
 	{
-		m_Running = false;
+		if (setRestart)
+			g_AppNeedRestart = true;
+		return g_AppNeedRestart;
 	}
+
+
+//	void Application::Close()
+//	{
+//		m_Running = false;
+//	}
 
 
 	void Application::Run()

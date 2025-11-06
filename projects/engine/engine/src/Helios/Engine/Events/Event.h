@@ -4,6 +4,9 @@
 
 #include <Helios/Util/CRC32.h>
 
+// TODO: replace with <fmt/...> when available in the engine
+#include <spdlog/fmt/fmt.h>
+
 #include <sstream>
 #include <string>
 

@@ -3,7 +3,7 @@
 #include "Helios/Engine/Core/Log.h"
 //#include "Helios/Engine/Core/Layer.h"
 #include "Helios/Engine/Events/EventHandler.h"
-#include "Helios/Engine/Events/Events_Window.h"
+#include "Helios/Engine/Events/Types/Window.h"
 //#include "Helios/Engine/Events/ApplicationEvent.h"
 #include "Helios/Engine/Renderer/Window.h"
 
@@ -67,7 +67,9 @@ namespace Helios::Engine {
 		static Application& Get() { return *s_Instance; }
 		const Specification& GetSpecification() const { return m_Spec; }
 		void CreateAppWindow();
-		void Close();
+//		void Close();
+
+		bool NeedRestart(bool setRestart = false);
 
 //		void OnEvent(Event& e);
 

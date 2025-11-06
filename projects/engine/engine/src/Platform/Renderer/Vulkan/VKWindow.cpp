@@ -2,8 +2,6 @@
 #include "Platform/Renderer/Vulkan/VKWindow.h"
 
 #include "Helios/Engine/Core/Log.h"
-#include "Helios/Engine/Events/EventManager.h"
-#include "Helios/Engine/Events/Events_Window.h"
 
 #ifdef TARGET_PLATFORM_WINDOWS
 #	include <ShellScalingApi.h>
@@ -119,17 +117,14 @@ namespace Helios::Engine {
 //		if (m_Spec.Window.posX != -1 && m_Spec.Window.posY != -1)
 //			glfwSetWindowPos(m_Window, m_Spec.Window.posX, m_Spec.Window.posY);
 
-		// Callbacks
-		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window) {
-			Scope<Events::WindowCloseEvent> closeEvent = CreateScope<Events::WindowCloseEvent>();
-			Events::QueueEvent(std::move(closeEvent));
-			});
-}
+		InitCallbacks();
+	}
 
 
 	VKWindow::~VKWindow()
 	{
 		LOG_INFO("Destroying VKWindow.");
+		glfwDestroyWindow(m_Window);
 	}
 
 

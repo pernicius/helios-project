@@ -24,6 +24,9 @@ namespace Helios::Engine
 		virtual void Hide() = 0;
 
 	protected:
+		void InitCallbacks();
+
+	protected:
 		GLFWwindow* m_Window = nullptr;
 	};
 
