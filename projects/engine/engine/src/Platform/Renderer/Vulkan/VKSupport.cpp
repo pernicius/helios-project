@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "Platform/Renderer/Vulkan/VKSupport.h"
 
-#include "Helios/Engine/Core/Log.h"
-
 #include <vulkan/vulkan.hpp>
 
 #include <mutex>

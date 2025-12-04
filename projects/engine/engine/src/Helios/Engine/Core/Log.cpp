@@ -10,8 +10,6 @@
 
 #include <GLFW/glfw3.h>
 
-#include <filesystem>
-
 namespace Helios::Engine {
 
 

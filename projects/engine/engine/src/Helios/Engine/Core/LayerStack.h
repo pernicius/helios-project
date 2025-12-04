@@ -2,8 +2,6 @@
 
 #include "Helios/Engine/Core/Layer.h"
 
-#include <vector>
-
 namespace Helios::Engine {
 
 

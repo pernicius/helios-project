@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "Helios/Engine/Renderer/RendererAPI.h"
 
-#include "Helios/Engine/Core/Log.h"
-
 #ifdef HE_RENDERER_VULKAN
 #	include "Platform/Renderer/Vulkan/VKSupport.h"
 #endif

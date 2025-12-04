@@ -1,5 +1,20 @@
 #pragma once
 
+// C includes
+#include <cctype>
+#include <cstdint>
+#include <cstdlib>
+
+// C++ includes
+#include <array>
+#include <filesystem>
+#include <functional>
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <string_view>
+#include <vector>
+
 // Platform related includes
 #include <Platform/PlatformDetection.h>
 #if defined TARGET_PLATFORM_WINDOWS
@@ -18,10 +33,10 @@
 #include <Helios/Util/Version.h>
 
 // Engine includes
+#include "Helios/Engine/Core/Log.h"
+#include "Helios/Engine/Core/Application.h"
 #include "Helios/Engine/Core/Version.h"
 
 // Library includes
 #include <GLFW/glfw3.h>
-
-// C/C++ includes
 

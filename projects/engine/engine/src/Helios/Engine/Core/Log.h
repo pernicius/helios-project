@@ -1,15 +1,11 @@
 #pragma once
 
-#include <Helios/Util/ScopeRef.h>
 #include <Platform/DebugBreak.h>
 
 #pragma warning(push, 0)
 #	include <spdlog/spdlog.h>
 #	include <spdlog/fmt/ostr.h>
 #pragma warning(pop)
-
-#include <string>
-#include <stdexcept>
 
 namespace Helios::Engine {
 

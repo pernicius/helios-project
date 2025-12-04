@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Platform/Renderer/Vulkan/VKWindow.h"
 
-#include "Helios/Engine/Core/Log.h"
+#include "Helios/Engine/Spec/SpecWindow.h"
 
 #ifdef TARGET_PLATFORM_WINDOWS
 #	include <ShellScalingApi.h>
@@ -16,12 +16,12 @@ namespace Helios::Engine {
 		LOG_RENDER_DEBUG("Creating VKWindow.");
 
 #		ifdef TARGET_PLATFORM_WINDOWS
-//			if (!m_Spec.Window.enablePerMonitorDPI)
-//			{
-//				// glfwInit enables the maximum supported level of DPI awareness unconditionally.
-//				// If the app doesn't need it, we have to call this function before glfwInit to override that behavior.
-//				SetProcessDpiAwareness(PROCESS_DPI_UNAWARE);
-//			}
+			if (!Spec::Window::enablePerMonitorDPI)
+			{
+				// glfwInit enables the maximum supported level of DPI awareness unconditionally.
+				// If the app doesn't need it, we have to call this function before glfwInit to override that behavior.
+				SetProcessDpiAwareness(PROCESS_DPI_UNAWARE);
+			}
 #		endif
 
 		int success = glfwInit();
@@ -93,23 +93,23 @@ namespace Helios::Engine {
 
 //		glfwWindowHint(GLFW_SAMPLES, m_Spec.Device.swapChainSampleCount);
 //		glfwWindowHint(GLFW_REFRESH_RATE, m_Spec.Device.refreshRate);
-//		glfwWindowHint(GLFW_SCALE_TO_MONITOR, m_Spec.Window.resizeWindowWithDisplayScale);
+		glfwWindowHint(GLFW_SCALE_TO_MONITOR, Spec::Window::resizeWindowWithDisplayScale);
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Ignored for fullscreen
 
-//		if (m_Spec.Window.startBorderless)
-//			glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // Borderless window
-//		if (m_Spec.Window.allowResizing)
+		if (Spec::Window::startBorderless)
+			glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // Borderless window
+		if (Spec::Window::allowResizing)
 			glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
 		// finally create the window
 		m_Window = glfwCreateWindow(800, 600, //m_Spec.Device.backBufferWidth, m_Spec.Device.backBufferHeight,
-			"test", //m_Spec.Window.windowTitle.c_str(),
-			nullptr, //m_Spec.Window.startFullscreen ? glfwGetPrimaryMonitor() : nullptr,
+			Spec::Window::windowTitle.c_str(),
+			Spec::Window::startFullscreen ? glfwGetPrimaryMonitor() : nullptr,
 			nullptr);
 		LOG_GLFW_ASSERT(m_Window, "Could not create the window!");
 //		s_GLFWWindowCount++;
 
-//		if (m_Spec.Window.startFullscreen) {
+//		if (Spec::Window::startFullscreen) {
 //			glfwSetWindowMonitor(m_Window, glfwGetPrimaryMonitor(), 0, 0,
 //				m_Spec.Device.backBufferWidth, m_Spec.Device.backBufferHeight, m_Spec.Device.refreshRate);
 //		}
@@ -120,8 +120,8 @@ namespace Helios::Engine {
 //			m_Spec.Device.backBufferHeight = fbHeight;
 //		}
 
-//		if (m_Spec.Window.posX != -1 && m_Spec.Window.posY != -1)
-//			glfwSetWindowPos(m_Window, m_Spec.Window.posX, m_Spec.Window.posY);
+		if (Spec::Window::posX != -1 && Spec::Window::posY != -1)
+			glfwSetWindowPos(m_Window, Spec::Window::posX, Spec::Window::posY);
 
 		InitCallbacks();
 	}
@@ -145,8 +145,8 @@ namespace Helios::Engine {
 	{
 		glfwShowWindow(m_Window);
 
-//		if (m_Spec.Window.startMaximized)
-//			glfwMaximizeWindow(m_Window);
+		if (Spec::Window::startMaximized)
+			glfwMaximizeWindow(m_Window);
 
 		// reset the back buffer size state to enforce a resize event
 //		m_Spec.Device.backBufferWidth = 0;

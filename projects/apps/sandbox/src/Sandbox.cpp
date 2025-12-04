@@ -1,6 +1,6 @@
 #include "pch.h"
-#include <Helios/Engine/Renderer/RendererAPI.h>
 namespace HE = Helios::Engine;
+#include <Helios/Engine/Spec/Spec.h>
 
 
 class App : public HE::Application
@@ -11,35 +11,30 @@ public:
 	static constexpr int APP_VERSION_PATCH = 0;
 	static constexpr uint32_t APP_VERSION = HE_MAKE_VERSION(APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_PATCH);
 
-	App(const HE::Application::Specification& spec);
+	App();
 	~App();
 };
 
 
-HE::Application* HE::CreateApplication(HE::Application::CommandLineArgs args)
+HE::Application* HE::CreateApplication()
 {
-	HE::Application::Specification appSpec{};
-	{
-		appSpec.Name = "Sandbox";
-		appSpec.Version = App::APP_VERSION;
-		appSpec.CmdLineArgs = args;
-		appSpec.hints |= HE::Application::Hints::HINT_USE_EXEPATH;
-		appSpec.logfile = "Sandbox.log";
-		appSpec.configfile = "Sandbox.cfg";
+	{ // Init App Specification
+		HE::Spec::App::Name = "Sandbox";
+		HE::Spec::App::Version = App::APP_VERSION;
+		HE::Spec::App::Hints |= HE::Spec::App::HintFlags::USE_EXEPATH;
+		HE::Spec::App::LogFile = "Sandbox.log";
+		HE::Spec::App::ConfigFile = "Sandbox.cfg";
 	};
 
-	return new App(appSpec);
+	return new App;
 }
 
 
-App::App(const HE::Application::Specification& appSpec)
-	: HE::Application(appSpec)
+App::App()
 {
 //	auto& rendererSpec = HE::DeviceManager::GetSpecification();
 //	rendererSpec.Window.windowTitle = appSpec.Name;
 //	HE::DeviceManager::SetSpecification(rendererSpec);
-
-	auto api = HE::RendererAPI::GetAPI();
 
 	CreateAppWindow();
 

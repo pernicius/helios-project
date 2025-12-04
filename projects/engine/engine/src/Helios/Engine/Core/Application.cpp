@@ -4,11 +4,9 @@
 #include "Helios/Engine/Events/Event.h"
 #include "Helios/Engine/Core/Timer.h"
 #include "Helios/Engine/Core/Timestep.h"
+#include "Helios/Engine/Spec/SpecApp.h"
 
 #include "Helios/Engine/Renderer/RendererAPI.h"
-
-#include <Helios/Util/Version.h>
-#include <Helios/Util/ScopeRef.h>
 
 #include <Platform/PlatformDetection.h>
 #if defined TARGET_PLATFORM_WINDOWS
@@ -22,47 +20,10 @@
 #include <GLFW/glfw3.h>
 
 #include <algorithm>
-#include <filesystem>
-#include <cstdlib>
-#include <cctype>
-#include <iostream>
 
 namespace Helios::Engine {
 
 
-	namespace { // internal helpers for Application::CommandLineArgs
-		inline bool ci_equal(std::string_view a, std::string_view b) noexcept
-		{
-			if (a.size() != b.size()) return false;
-			for (size_t i = 0; i < a.size(); ++i)
-			{
-				if (std::tolower(static_cast<unsigned char>(a[i])) !=
-					std::tolower(static_cast<unsigned char>(b[i])))
-					return false;
-			}
-			return true;
-		}
-
-		inline void split_arg(std::string_view raw, std::string_view& out_key, std::string_view& out_val) noexcept
-		{
-			out_key = {};
-			out_val = {};
-
-			size_t start = raw.find_first_not_of("/-");
-			if (start == std::string_view::npos)
-				return;
-
-			raw.remove_prefix(start);
-			size_t eq_pos = raw.find('=');
-			out_key = raw.substr(0, eq_pos);
-			if (eq_pos != std::string_view::npos)
-				out_val = raw.substr(eq_pos + 1);
-		}
-	} // internal helpers for Application::CommandLineArgs
-
-
-	// ----------------------------------------------------------------------------------------------------
-	
 	static bool g_AppNeedRestart = true;
 
 	int AppMain(int argc, char** argv)
@@ -74,7 +35,8 @@ namespace Helios::Engine {
 			g_AppNeedRestart = false;
 
 			try {
-				auto app = Scope<Application>(CreateApplication({ argc, argv }));
+				Spec::App::CmdLineArgs = { argc, argv };
+				auto app = Scope<Application>(CreateApplication());
 				app->Run();
 				app.reset();
 
@@ -90,61 +52,12 @@ namespace Helios::Engine {
 
 		return rval;
 	}
-	
-	
-	// ----------------------------------------------------------------------------------------------------
-
-
-	bool Application::CommandLineArgs::Check(std::string_view arg) const
-	{
-		if (arg.empty())
-			return false;
-
-		for (int x = 1; x < Count; ++x)
-		{
-			std::string_view raw_arg(Args[x]);
-			std::string_view key, value;
-			split_arg(raw_arg, key, value);
-
-			if (key.empty())
-				continue;
-
-			if (ci_equal(key, arg))
-				return true;
-		}
-		return false;
-	}
-
-	std::string Application::CommandLineArgs::Get(std::string_view arg, std::string_view default_value) const
-	{
-		if (arg.empty())
-			return std::string(default_value);
-
-		for (int x = 1; x < Count; ++x)
-		{
-			std::string_view raw_arg(Args[x]);
-			std::string_view key, value;
-			split_arg(raw_arg, key, value);
-
-			if (key.empty())
-				continue;
-
-			if (ci_equal(key, arg))
-			{
-				if (!value.empty())
-					return std::string(value);
-				return std::string(default_value);
-			}
-		}
-		return std::string(default_value);
-	}
 
 
 	// ----------------------------------------------------------------------------------------------------
 
 
-	Application::Application(const Specification& spec)
-		: m_Spec(spec)
+	Application::Application()
 	{
 		// Check singleton
 		if (s_Instance) {
@@ -153,18 +66,18 @@ namespace Helios::Engine {
 		s_Instance = this;
 
 		// Init working directory
-		if (!m_Spec.WorkingDirectory.empty())
-			std::filesystem::current_path(m_Spec.WorkingDirectory);
-		if (m_Spec.hints & Hints::HINT_USE_CWD)
-			m_Spec.WorkingDirectory = std::filesystem::current_path().string();
-		if (m_Spec.hints & Hints::HINT_USE_EXEPATH)
+		if (!Spec::App::WorkingDirectory.empty())
+			std::filesystem::current_path(Spec::App::WorkingDirectory);
+		if (Spec::App::Hints & Spec::App::HintFlags::USE_CWD)
+			Spec::App::WorkingDirectory = std::filesystem::current_path().string();
+		if (Spec::App::Hints & Spec::App::HintFlags::USE_EXEPATH)
 		{
-			m_Spec.WorkingDirectory = Util::GetExecutablePath();
-			std::filesystem::current_path(m_Spec.WorkingDirectory);
+			Spec::App::WorkingDirectory = Util::GetExecutablePath();
+			std::filesystem::current_path(Spec::App::WorkingDirectory);
 		}
 
 		// Init logging
-		Log::Init(m_Spec.logfile, m_Spec.WorkingDirectory);
+		Log::Init(Spec::App::LogFile, Spec::App::WorkingDirectory);
 		LOG_CORE_INFO("Logging started.");
 
 		// Log versions
@@ -174,11 +87,11 @@ namespace Helios::Engine {
 			HE_VERSION_PATCH(HE_VERSION),
 			HE_VERSION_TYPE_STRING(HE_VERSION));
 		LOG_CORE_INFO("Application-Version: {}.{}.{} ({}) - {}",
-			HE_VERSION_MAJOR(m_Spec.Version),
-			HE_VERSION_MINOR(m_Spec.Version),
-			HE_VERSION_PATCH(m_Spec.Version),
-			HE_VERSION_TYPE_STRING(m_Spec.Version),
-			spec.Name);
+			HE_VERSION_MAJOR(Spec::App::Version),
+			HE_VERSION_MINOR(Spec::App::Version),
+			HE_VERSION_PATCH(Spec::App::Version),
+			HE_VERSION_TYPE_STRING(Spec::App::Version),
+			Spec::App::Name);
 		LOG_CORE_DEBUG("Lib \"GLFW\": {}.{}.{}",
 			GLFW_VERSION_MAJOR,
 			GLFW_VERSION_MINOR,
@@ -195,44 +108,44 @@ namespace Helios::Engine {
 //			GLM_VERSION_MAJOR,
 //			GLM_VERSION_MINOR,
 //			GLM_VERSION_PATCH);
-		LOG_CORE_DEBUG("Working path: {}", m_Spec.WorkingDirectory);
+		LOG_CORE_DEBUG("Working path: {}", Spec::App::WorkingDirectory);
 
 		// Read config
 //		Config::Read(m_Spec.configfile, m_Spec.WorkingDirectory);
 
 		// Log and "parse" CmdArgs
-		if (m_Spec.CmdLineArgs.Count > 1)
+		if (Spec::App::CmdLineArgs.Count > 1)
 		{
-			for (auto x = 1; x < m_Spec.CmdLineArgs.Count; x++) {
-				LOG_CORE_INFO("CmdArg[] = \"{}\"", m_Spec.CmdLineArgs[x]);
+			for (auto x = 1; x < Spec::App::CmdLineArgs.Count; x++) {
+				LOG_CORE_INFO("CmdArg[] = \"{}\"", Spec::App::CmdLineArgs[x]);
 			}
 		}
 
 		// Init renderer
 		RendererAPI::CheckAPISupport();
 #		ifdef HE_RENDERER_VULKAN
-			if (m_Spec.CmdLineArgs.Check("vulkan")) {
+			if (Spec::App::CmdLineArgs.Check("vulkan")) {
 //				Config::Override("RendererAPI", "Vulkan");
 				LOG_CORE_INFO("Overriding renderer API to Vulkan by command-line-switch");
 				RendererAPI::SetAPI(RendererAPI::API::Vulkan);
 			}
 #		endif
 #		ifdef HE_RENDERER_OPENGL
-			if (m_Spec.CmdLineArgs.Check("opengl")) {
+			if (Spec::App::CmdLineArgs.Check("opengl")) {
 				LOG_CORE_INFO("Overriding renderer API to OpenGL by command-line-switch");
 				RendererAPI::SetAPI(RendererAPI::API::OpenGL);
 //				Config::Override("RendererAPI", "OpenGL");
 			}
 #		endif
 #		ifdef HE_RENDERER_METAL
-			if (m_Spec.CmdLineArgs.Check("metal")) {
+			if (Spec::App::CmdLineArgs.Check("metal")) {
 				LOG_CORE_INFO("Overriding renderer API to Metal by command-line-switch");
 				RendererAPI::SetAPI(RendererAPI::API::Metal);
 //				Config::Override("RendererAPI", "Metal");
 			}
 #		endif
 #		ifdef HE_RENDERER_DIRECTX
-			if (m_Spec.CmdLineArgs.Check("directx")) {
+			if (Spec::App::CmdLineArgs.Check("directx")) {
 				LOG_CORE_INFO("Overriding renderer API to DirectX by command-line-switch");
 				RendererAPI::SetAPI(RendererAPI::API::DirectX);
 //				Config::Override("RendererAPI", "DirectX");

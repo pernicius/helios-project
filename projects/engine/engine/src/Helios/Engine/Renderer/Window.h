@@ -2,11 +2,7 @@
 
 #include "Helios/Engine/Events/Event.h"
 
-#include <Helios/Util/ScopeRef.h>
-
 #include <GLFW/glfw3.h>
-
-#include <string>
 
 namespace Helios::Engine {
 
