@@ -4,7 +4,7 @@
 #include "Helios/Engine/Core/Log.h"
 #include "Helios/Engine/Renderer/RendererAPI.h"
 
-#include "Helios/Engine/Events/EventManager.h"
+#include "Helios/Engine/Core/Application.h"
 #include "Helios/Engine/Events/Types/Key.h"
 #include "Helios/Engine/Events/Types/Mouse.h"
 #include "Helios/Engine/Events/Types/Window.h"
@@ -21,6 +21,8 @@
 #ifdef HE_RENDERER_METAL
 #	include "Platform/Renderer/Metal/MTWindow.h"
 #endif
+
+#include <memory>
 
 namespace Helios::Engine {
 
@@ -52,70 +54,95 @@ namespace Helios::Engine {
 	}
 
 
+	void Window::RaiseEvent(Scope<Event> event)
+	{
+		Application::Get().SubmitEvent(std::move(event));
+	}
+
+
 	void Window::InitCallbacks()
 	{
+		glfwSetWindowUserPointer(m_Window, this);
+
 		// glfwSetWindowPosCallback
 
-		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height) {
-//			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
-//			data.Width = width;
-//			data.Height = height;
-			Events::TriggerEvent(Events::WindowResizeEvent(width, height));
-			});
+		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* handle, int width, int height) {
+			auto* window = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+			if (!window) return;
+			window->RaiseEvent(CreateScope<WindowResizeEvent>(width, height));
+		});
 
-		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window) {
-			Scope<Events::WindowCloseEvent> closeEvent = CreateScope<Events::WindowCloseEvent>();
-			Events::QueueEvent(std::move(closeEvent));
-			});
+		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* handle) {
+			auto* window = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+			if (!window) return;
+			window->RaiseEvent(CreateScope<WindowCloseEvent>());
+		});
 
 		// glfwSetWindowRefreshCallback
 		// glfwSetWindowFocusCallback
 		// glfwSetWindowIconifyCallback
 		// glfwSetWindowMaximizeCallback
-		// glfwSetFramebufferSizeCallback
+
+		glfwSetFramebufferSizeCallback(m_Window, [](GLFWwindow* handle, int width, int height) {
+			auto* window = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+			if (!window) return;
+			window->RaiseEvent(CreateScope<FramebufferResizeEvent>(width, height));
+		});
+
 		// glfwSetWindowContentScaleCallback
 		
-		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods) {
+		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* handle, int button, int action, int mods)
+		{
+			auto* window = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+			if (!window) return;
 			switch (action)
 			{
-			case GLFW_PRESS:
-				Events::TriggerEvent(Events::MouseButtonPressedEvent(button));
-				break;
-			case GLFW_RELEASE:
-				Events::TriggerEvent(Events::MouseButtonReleasedEvent(button));
-				break;
+				case GLFW_PRESS:
+					window->RaiseEvent(CreateScope<MouseButtonPressedEvent>(button));
+					break;
+				case GLFW_RELEASE:
+					window->RaiseEvent(CreateScope<MouseButtonReleasedEvent>(button));
+					break;
 			}
-			});
+		});
 		
-		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xPos, double yPos) {
-			Events::TriggerEvent(Events::MouseMovedEvent((float)xPos, (float)yPos));
-			});
+		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* handle, double xPos, double yPos) {
+			auto* window = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+			if (!window) return;
+			window->RaiseEvent(CreateScope<MouseMovedEvent>(static_cast<float>(xPos), static_cast<float>(yPos)));
+		});
 		
 		// glfwSetCursorEnterCallback
 		
-		glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xOffset, double yOffset) {
-			Events::TriggerEvent(Events::MouseScrolledEvent((float)xOffset, (float)yOffset));
-			});
+		glfwSetScrollCallback(m_Window, [](GLFWwindow* handle, double xOffset, double yOffset) {
+			auto* window = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+			if (!window) return;
+			window->RaiseEvent(CreateScope<MouseScrolledEvent>(static_cast<float>(xOffset), static_cast<float>(yOffset)));
+		});
 
-		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int mode) {
+		glfwSetKeyCallback(m_Window, [](GLFWwindow* handle, int key, int scancode, int action, int mode)
+		{
+			auto* window = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+			if (!window) return;
 			switch (action)
 			{
-			case GLFW_PRESS:
-				Events::TriggerEvent(Events::KeyPressedEvent(key, 0));
-				break;
-			case GLFW_RELEASE:
-				Events::TriggerEvent(Events::KeyReleasedEvent(key));
-				break;
-			case GLFW_REPEAT:
-				Events::TriggerEvent(Events::KeyPressedEvent(key, 1));
-				break;
+				case GLFW_PRESS:
+					window->RaiseEvent(CreateScope<KeyPressedEvent>(key, 0));
+					break;
+				case GLFW_RELEASE:
+					window->RaiseEvent(CreateScope<KeyReleasedEvent>(key));
+					break;
+				case GLFW_REPEAT:
+					window->RaiseEvent(CreateScope<KeyPressedEvent>(key, 1));
+					break;
 			}
-			});
-		
-		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int keycode) {
-			Scope<Events::KeyTypedEvent> keyTypeEvent = CreateScope<Events::KeyTypedEvent>(keycode);
-			Events::QueueEvent(std::move(keyTypeEvent));
-			});
+		});
+
+		glfwSetCharCallback(m_Window, [](GLFWwindow* handle, unsigned int keycode) {
+			auto* window = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+			if (!window) return;
+			window->RaiseEvent(CreateScope<KeyTypedEvent>(keycode));
+		});
 
 		// glfwSetDropCallback
 		// glfwSetMonitorCallback
@@ -123,4 +150,4 @@ namespace Helios::Engine {
 	}
 
 
-}// namespace Helios::Engine
+} // namespace Helios::Engine

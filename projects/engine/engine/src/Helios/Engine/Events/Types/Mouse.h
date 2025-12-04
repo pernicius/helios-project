@@ -1,22 +1,23 @@
 #pragma once
+
 #include "Helios/Engine/Events/Event.h"
 
 using MouseCode = uint16_t;
 
-namespace Helios::Engine::Events
+namespace Helios::Engine
 {
 
 
 	class MouseMovedEvent : public Event
 	{
 	public:
-		EVENT_TYPE("MouseMovedEvent");
+		EVENT_CLASS_TYPE(MouseMoved);
+		EVENT_CLASS_CATEGORY(EventCategory::Input | EventCategory::Mouse);
 
 		MouseMovedEvent(float x, float y)
 		: mouseX(x)
 		, mouseY(y)
-		{
-		}
+		{ }
 
 		std::string ToString() const override
 		{
@@ -32,13 +33,13 @@ namespace Helios::Engine::Events
 	class MouseScrolledEvent : public Event
 	{
 	public:
-		EVENT_TYPE("MouseScrolledEvent");
+		EVENT_CLASS_TYPE(MouseScrolled);
+		EVENT_CLASS_CATEGORY(EventCategory::Input | EventCategory::Mouse);
 
 		MouseScrolledEvent(float xOffset_, float yOffset_)
 		: xOffset(xOffset_)
 		, yOffset(yOffset_)
-		{
-		}
+		{ }
 
 		std::string ToString() const override
 		{
@@ -54,12 +55,12 @@ namespace Helios::Engine::Events
 	class MouseButtonPressedEvent : public Event
 	{
 	public:
-		EVENT_TYPE("MouseButtonPressedEvent");
+		EVENT_CLASS_TYPE(MouseButtonPressed);
+		EVENT_CLASS_CATEGORY(EventCategory::Input | EventCategory::MouseButton);
 
 		MouseButtonPressedEvent(int button)
 		: button(button)
-		{
-		}
+		{ }
 
 		std::string ToString() const override
 		{
@@ -74,12 +75,12 @@ namespace Helios::Engine::Events
 	class MouseButtonReleasedEvent : public Event
 	{
 	public:
-		EVENT_TYPE("MouseButtonReleasedEvent");
+		EVENT_CLASS_TYPE(MouseButtonReleased);
+		EVENT_CLASS_CATEGORY(EventCategory::Input | EventCategory::MouseButton);
 
 		MouseButtonReleasedEvent(int button)
 		: button(button)
-		{
-		}
+		{ }
 
 		std::string ToString() const override
 		{
@@ -91,4 +92,4 @@ namespace Helios::Engine::Events
 	};
 
 
-}// namespace Helios::Engine::Events
+}// namespace Helios::Engine

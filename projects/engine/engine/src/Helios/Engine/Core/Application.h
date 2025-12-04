@@ -1,15 +1,17 @@
 #pragma once
 
 #include "Helios/Engine/Core/Log.h"
-//#include "Helios/Engine/Core/Layer.h"
-#include "Helios/Engine/Events/EventHandler.h"
+#include "Helios/Engine/Core/LayerStack.h"
+#include "Helios/Engine/Events/Event.h"
 #include "Helios/Engine/Events/Types/Window.h"
-//#include "Helios/Engine/Events/ApplicationEvent.h"
 #include "Helios/Engine/Renderer/Window.h"
 
 #include <string>
 #include <string_view>
 #include <cstdint>
+#include <mutex>
+#include <vector>
+#include <memory>
 
 namespace Helios::Engine {
 
@@ -71,31 +73,36 @@ namespace Helios::Engine {
 
 		bool NeedRestart(bool setRestart = false);
 
-//		void OnEvent(Event& e);
+		void PushLayer(Layer* layer) { m_LayerStack.PushLayer(layer); }
+		void PopLayer(Layer* layer) { m_LayerStack.PopLayer(layer); }
+		void PushOverlay(Layer* layer) { m_LayerStack.PushOverlay(layer); }
+		void PopOverlay(Layer* layer) { m_LayerStack.PopOverlay(layer); }
 
-//		void PushLayer(Layer* layer);
-//		void PushOverlay(Layer* layer);
+		void SubmitEvent(Scope<Event> event);
+		void ProcessEvents();
+		void OnEvent(Event& e);
 
 	private:
 		void Run();
-//		bool OnWindowClose(WindowCloseEvent& e);
-//		bool OnWindowResize(WindowResizeEvent& e);
-//		bool OnFramebufferResize(FramebufferResizeEvent& e);
 
 	private:
 		Scope<Window> m_Window;
 		Specification m_Spec;
 		bool m_Running = true;
 		bool m_Minimized = false;
-//		LayerStack m_LayerStack;
+		LayerStack m_LayerStack;
+
+		std::mutex m_EventQueueMutex;
+		std::vector<Scope<Event>> m_EventQueue;
 
 	private:
 		static inline Application* s_Instance = nullptr;
 		friend int AppMain(int argc, char** argv);
 
 	private:
-		void OnWindowClose(const Events::WindowCloseEvent& e);
-		EventHandler<Events::WindowCloseEvent> m_WindowCloseCallback;
+		bool OnWindowClose(const WindowCloseEvent& e);
+//		bool OnWindowResize(const WindowResizeEvent& e);
+//		bool OnFramebufferResize(const FramebufferResizeEvent& e);
 	};
 
 

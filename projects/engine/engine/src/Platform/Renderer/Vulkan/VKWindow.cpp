@@ -13,6 +13,8 @@ namespace Helios::Engine {
 
 	VKWindow::VKWindow()
 	{
+		LOG_RENDER_DEBUG("Creating VKWindow.");
+
 #		ifdef TARGET_PLATFORM_WINDOWS
 //			if (!m_Spec.Window.enablePerMonitorDPI)
 //			{
@@ -27,6 +29,12 @@ namespace Helios::Engine {
 
 		glfwDefaultWindowHints();
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+
+		// ========================================================================================================
+		// TODO: implement in format.h / format.cpp
+		//       see: nvrhi.h / format-info.cpp
+		// ========================================================================================================
 
 //		const struct
 //		{
@@ -101,8 +109,6 @@ namespace Helios::Engine {
 		LOG_GLFW_ASSERT(m_Window, "Could not create the window!");
 //		s_GLFWWindowCount++;
 
-//		glfwSetWindowUserPointer(m_Window, &m_Data);
-
 //		if (m_Spec.Window.startFullscreen) {
 //			glfwSetWindowMonitor(m_Window, glfwGetPrimaryMonitor(), 0, 0,
 //				m_Spec.Device.backBufferWidth, m_Spec.Device.backBufferHeight, m_Spec.Device.refreshRate);
@@ -123,8 +129,9 @@ namespace Helios::Engine {
 
 	VKWindow::~VKWindow()
 	{
-		LOG_INFO("Destroying VKWindow.");
+		LOG_RENDER_DEBUG("Destroying VKWindow.");
 		glfwDestroyWindow(m_Window);
+		glfwTerminate();
 	}
 
 

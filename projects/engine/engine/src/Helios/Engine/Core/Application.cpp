@@ -1,8 +1,11 @@
 #include "pch.h"
 #include "Helios/Engine/Core/Application.h"
 
-#include "Helios/Engine/Events/EventManager.h"
-#include <Helios/Engine/Renderer/RendererAPI.h>
+#include "Helios/Engine/Events/Event.h"
+#include "Helios/Engine/Core/Timer.h"
+#include "Helios/Engine/Core/Timestep.h"
+
+#include "Helios/Engine/Renderer/RendererAPI.h"
 
 #include <Helios/Util/Version.h>
 #include <Helios/Util/ScopeRef.h>
@@ -18,8 +21,6 @@
 
 #include <GLFW/glfw3.h>
 
-#include <string>
-#include <string_view>
 #include <algorithm>
 #include <filesystem>
 #include <cstdlib>
@@ -29,7 +30,7 @@
 namespace Helios::Engine {
 
 
-	namespace { // internal helpers
+	namespace { // internal helpers for Application::CommandLineArgs
 		inline bool ci_equal(std::string_view a, std::string_view b) noexcept
 		{
 			if (a.size() != b.size()) return false;
@@ -57,7 +58,7 @@ namespace Helios::Engine {
 			if (eq_pos != std::string_view::npos)
 				out_val = raw.substr(eq_pos + 1);
 		}
-	} // internal helpers
+	} // internal helpers for Application::CommandLineArgs
 
 
 	// ----------------------------------------------------------------------------------------------------
@@ -144,7 +145,6 @@ namespace Helios::Engine {
 
 	Application::Application(const Specification& spec)
 		: m_Spec(spec)
-		, m_WindowCloseCallback([this](const Events::WindowCloseEvent& e) { OnWindowClose(e); })
 	{
 		// Check singleton
 		if (s_Instance) {
@@ -187,14 +187,14 @@ namespace Helios::Engine {
 			SPDLOG_VER_MAJOR,
 			SPDLOG_VER_MINOR,
 			SPDLOG_VER_PATCH);
-		//		LOG_CORE_DEBUG("Lib \"EnTT\": {}.{}.{}",
-		//			ENTT_VERSION_MAJOR,
-		//			ENTT_VERSION_MINOR,
-		//			ENTT_VERSION_PATCH);
-		//		LOG_CORE_DEBUG("Lib \"GLM\": {}.{}.{}",
-		//			GLM_VERSION_MAJOR,
-		//			GLM_VERSION_MINOR,
-		//			GLM_VERSION_PATCH);
+//		LOG_CORE_DEBUG("Lib \"EnTT\": {}.{}.{}",
+//			ENTT_VERSION_MAJOR,
+//			ENTT_VERSION_MINOR,
+//			ENTT_VERSION_PATCH);
+//		LOG_CORE_DEBUG("Lib \"GLM\": {}.{}.{}",
+//			GLM_VERSION_MAJOR,
+//			GLM_VERSION_MINOR,
+//			GLM_VERSION_PATCH);
 		LOG_CORE_DEBUG("Working path: {}", m_Spec.WorkingDirectory);
 
 		// Read config
@@ -239,8 +239,6 @@ namespace Helios::Engine {
 			}
 #		endif
 
-		// Events
-		Events::Subscribe<Events::WindowCloseEvent>(m_WindowCloseCallback);
 	}
 
 
@@ -248,39 +246,15 @@ namespace Helios::Engine {
 	{
 		LOG_CORE_INFO("App Shutdown.");
 
-		m_Window.reset();
-
 //		Config::Save();
+
 //		Renderer::Shutdown();
-		Events::Shutdown();
+		m_Window.reset();
+		
 		Log::Shutdown();
 
 		s_Instance = nullptr;
 	}
-
-
-//	void Application::PushLayer(Layer* layer)
-//	{
-//		m_LayerStack.PushLayer(layer);
-//		layer->OnAttach();
-//
-//		int size_x, size_y;
-//		glfwGetWindowSize((GLFWwindow*)DeviceManager::GetMainWindow()->GetNativeWindow(), &size_x, &size_y);
-//		WindowResizeEvent event(size_x, size_y);
-//		OnEvent(event);
-//	}
-
-
-//	void Application::PushOverlay(Layer* layer)
-//	{
-//		m_LayerStack.PushOverlay(layer);
-//		layer->OnAttach();
-//
-//		int size_x, size_y;
-//		glfwGetWindowSize((GLFWwindow*)DeviceManager::GetMainWindow()->GetNativeWindow(), &size_x, &size_y);
-//		WindowResizeEvent event(size_x, size_y);
-//		OnEvent(event);
-//	}
 
 
 	void Application::CreateAppWindow()
@@ -312,27 +286,24 @@ namespace Helios::Engine {
 
 	void Application::Run()
 	{
-//		Timer RunLoopTimer;
+		TimerSec RunLoopTimer;
 		while (m_Running)
 		{
-//			Timestep timestep = RunLoopTimer.Elapsed();
-//			RunLoopTimer.Reset();
+			Timestep timestep = RunLoopTimer.Elapsed();
+			RunLoopTimer.Reset();
 
-#if 0
+#if 1
 			{ // tempoary for debuging
 				static int fps = 0;
-				static int fps_cnt = 0;
 				static float fps_ts = 0;
-				fps += (int)(1.0f / timestep);
-				fps_cnt++;
+				fps++;
 				fps_ts += timestep;
 				if (fps_ts >= 1.0f)
 				{
 					std::ostringstream title;
-					title << "FPS: " << fps / fps_cnt << " (" << 1000 * fps_ts / fps_cnt << " ms)";
+					title << "FPS: " << fps << " (" << (fps_ts / fps) << "s)";
 					glfwSetWindowTitle((GLFWwindow*)m_Window->GetNativeWindow(), title.str().c_str());
 					fps = 0;
-					fps_cnt = 0;
 					fps_ts = 0;
 				}
 			} // tempoary for debuging
@@ -359,18 +330,18 @@ namespace Helios::Engine {
 //			}
 #endif
 
+			// Updating
+			{
+				for (Layer* layer : m_LayerStack)
+					layer->OnUpdate(timestep);
+			}
+
 			// Rendering
 			if (!m_Minimized)
 			{
-				// Update
-//				for (Layer* layer : m_LayerStack)
-//					layer->OnUpdate(timestep);
+				for (Layer* layer : m_LayerStack)
+					layer->OnRender();
 
-				// Render
-//				for (Layer* layer : m_LayerStack)
-//					layer->OnRender(timestep);
-
-				// Render
 //				Renderer::Get()->Render();
 
 //				// ImGui rendering
@@ -386,19 +357,108 @@ namespace Helios::Engine {
 
 			// Poll events and so on
 			m_Window->OnUpdate();
-			Events::Dispatch();
+			ProcessEvents();
 		}
 	}
 
 
-	void Application::OnWindowClose(const Events::WindowCloseEvent& e)
+	void Application::SubmitEvent(Scope<Event> event)
 	{
-		LOG_CORE_INFO("Window close event received.");
-		m_Running = false;
+		if (!event) return;
+		std::lock_guard<std::mutex> lock(m_EventQueueMutex);
+		m_EventQueue.push_back(std::move(event));
 	}
 
 
-//	bool Application::OnWindowResize(WindowResizeEvent& e)
+	void Application::ProcessEvents()
+	{
+		std::vector<std::unique_ptr<Event>> events;
+		{
+			std::lock_guard<std::mutex> lock(m_EventQueueMutex);
+			events.swap(m_EventQueue);
+		}
+
+		// Coalesce rapid WindowResizeEvent instances.
+		// Keep the last resize event and only dispatch it when a non-resize event
+		// arrives or when the queue is drained.
+		Scope<WindowResizeEvent> pendingWindowResize;
+		Scope<FramebufferResizeEvent> pendingFramebufferResize;
+
+		for (auto& e : events)
+		{
+			if (!e) continue;
+
+			// If this is a WindowResizeEvent, capture it and drop any previous one.
+			if (e->GetEventType() == EventType::WindowResize)
+			{
+				// Transfer ownership of this specific window resize event into pendingWindowResize.
+				pendingWindowResize.reset(static_cast<WindowResizeEvent*>(e.release()));
+				// Do not dispatch now - wait for a stable moment or next non-resize event.
+				continue;
+			}
+
+			// If this is a FramebufferResizeEvent, capture it and drop any previous one.
+			if (e->GetEventType() == EventType::FramebufferResize)
+			{
+				// Transfer ownership of this specific framebuffer resize event into pendingFramebufferResize.
+				pendingFramebufferResize.reset(static_cast<FramebufferResizeEvent*>(e.release()));
+				// Do not dispatch now - wait for a stable moment or next non-resize event.
+				continue;
+			}
+
+			// Before handling any non-resize event, flush the pending/coalesced resize (if any).
+			if (pendingWindowResize)
+			{
+				if (!pendingWindowResize->Handled)
+					OnEvent(*pendingWindowResize);
+				pendingWindowResize.reset();
+			}
+			if (pendingFramebufferResize)
+			{
+				if (!pendingFramebufferResize->Handled)
+					OnEvent(*pendingFramebufferResize);
+				pendingFramebufferResize.reset();
+			}
+
+			// Dispatch the current non-resize event as usual.
+			if (!e->Handled)
+				OnEvent(*e);
+		}
+
+		// If the queue ended with resize events, dispatch the last one now.
+		if (pendingWindowResize && !pendingWindowResize->Handled)
+			OnEvent(*pendingWindowResize);
+		if (pendingFramebufferResize && !pendingFramebufferResize->Handled)
+			OnEvent(*pendingFramebufferResize);
+	}
+
+
+	void Application::OnEvent(Event& e)
+	{
+//		LOG_CORE_TRACE("Event received: {}", e.ToString());
+
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<WindowCloseEvent>(HE_BIND_EVENT_FN(Application::OnWindowClose));
+//		dispatcher.Dispatch<WindowResizeEvent>(HE_BIND_EVENT_FN(Application::OnWindowResize));
+
+		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
+		{
+			if (e.Handled)
+				break;
+			(*it)->OnEvent(e);
+		}
+	}
+
+
+	bool Application::OnWindowClose(const WindowCloseEvent& e)
+	{
+		LOG_CORE_DEBUG("Window close event received.");
+		m_Running = false;
+		return false;
+	}
+
+
+//	bool Application::OnWindowResize(const WindowResizeEvent& e)
 //	{
 //		if (e.GetWidth() == 0 || e.GetHeight() == 0)
 //		{
@@ -413,7 +473,7 @@ namespace Helios::Engine {
 //	}
 
 
-//	bool Application::OnFramebufferResize(FramebufferResizeEvent& e)
+//	bool Application::OnFramebufferResize(const FramebufferResizeEvent& e)
 //	{
 //		if (e.GetWidth() == 0 || e.GetHeight() == 0)
 //		{
