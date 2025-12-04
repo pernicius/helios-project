@@ -16,6 +16,9 @@ namespace Helios::Engine::Spec {
 
 		static int posX;
 		static int posY;
+		static int sizeX;
+		static int sizeY;
+		static int refreshRate;
 
 		static std::string windowTitle;
 	};

@@ -15,6 +15,10 @@ namespace Helios::Engine::Spec {
 
 	int         Window::posX                         = -1;
 	int         Window::posY                         = -1;
+	int         Window::sizeX                        = 800;
+	int         Window::sizeY                        = 600;
+
+	int         Window::refreshRate                  = 60;
 
 	std::string Window::windowTitle                  = "DummyTitle";
 
