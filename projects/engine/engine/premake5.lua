@@ -13,7 +13,7 @@ function Lib_HeliosEngine()
 	Lib_HeliosShared{}
 
 	-- Renderer
-	Lib_RendererOpenGL{}
+--	Lib_RendererOpenGL{}
 	Lib_RendererVulkan{}
 
 	-- vendor/header
@@ -54,7 +54,7 @@ project "Helios-Engine"
 		"src/Helios/**.hpp",
 		"src/Helios/**.cpp",
 	}
-	Src_RendererOpenGL{}
+--	Src_RendererOpenGL{}
 	Src_RendererVulkan{}
 
 	filter "platforms:Windows"

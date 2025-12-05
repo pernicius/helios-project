@@ -6,4 +6,4 @@ namespace Helios::Engine::Vulkan {
 	bool IsAPISupported();
 
 
-}// namespace Helios::Engine::Vulkan
+} // namespace Helios::Engine::Vulkan

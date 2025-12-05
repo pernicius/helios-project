@@ -17,6 +17,17 @@ namespace Helios::Engine::Vulkan
 		{
 			try
 			{
+				uint32_t version = 0;
+				vk::Result result = vk::enumerateInstanceVersion(&version);
+				if (result != vk::Result::eSuccess) {
+					s_result = false;
+					LOG_RENDER_INFO("Vulkan is not supported.");
+					return s_result;
+				}
+				s_result = true;
+				LOG_RENDER_INFO("Vulkan {}.{}.{} is supported.", VK_VERSION_MAJOR(version), VK_VERSION_MINOR(version), VK_VERSION_PATCH(version));
+
+#if 0
 				vk::ApplicationInfo appInfo{};
 				appInfo.pApplicationName = "VulkanSupportCheck";
 				appInfo.applicationVersion = 1;
@@ -33,6 +44,7 @@ namespace Helios::Engine::Vulkan
 				vk::UniqueInstance instance = vk::createInstanceUnique(createInfo);
 				s_result = true;
 				LOG_RENDER_INFO("Vulkan is supported.");
+#endif
 			}
 			catch (const vk::SystemError&) {
 				s_result = false;

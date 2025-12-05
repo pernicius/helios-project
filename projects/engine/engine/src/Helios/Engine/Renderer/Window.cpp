@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Helios/Engine/Renderer/Window.h"
 
-#include "Helios/Engine/Core/Log.h"
 #include "Helios/Engine/Renderer/RendererAPI.h"
 
 #include "Helios/Engine/Core/Application.h"
@@ -24,7 +23,7 @@
 
 #include <memory>
 
-namespace Helios::Engine {
+namespace Helios::Engine::Renderer {
 
 
 	Scope<Window> Window::Create()
@@ -150,4 +149,4 @@ namespace Helios::Engine {
 	}
 
 
-} // namespace Helios::Engine
+} // namespace Helios::Engine::Renderer

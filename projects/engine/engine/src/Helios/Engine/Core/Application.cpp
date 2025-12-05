@@ -172,7 +172,7 @@ namespace Helios::Engine {
 
 	void Application::CreateAppWindow()
 	{
-		m_Window = Window::Create();
+		m_Window = Renderer::Window::Create();
 		m_Window->Show();
 
 //		CreateDevice()

@@ -38,8 +38,8 @@ constexpr auto LOG_LEVEL_DEBUG = 1;
 constexpr auto LOG_LEVEL_INFO  = 2;
 constexpr auto LOG_LEVEL_WARN  = 3;
 constexpr auto LOG_LEVEL_ERROR = 4;
-constexpr auto LOG_LEVEL_FATAL = 5;
-constexpr auto LOG_LEVEL_OFF   = 6;
+constexpr auto LOG_LEVEL_FATAL = 5; // should never be used
+constexpr auto LOG_LEVEL_OFF   = 6; // should never be used
 
 // minimal log level
 #if !defined(LOG_LEVEL)
@@ -49,6 +49,10 @@ constexpr auto LOG_LEVEL_OFF   = 6;
 #		define LOG_LEVEL LOG_LEVEL_INFO
 #	endif
 #endif
+
+//---------------------------------------
+// TODO: halt application on FATAL errors
+//---------------------------------------
 
 // Logging macros for HeliosEngine
 #define LOG_CORE_TRACE(...)   (LOG_LEVEL <= LOG_LEVEL_TRACE) ? ::Helios::Engine::Log::GetCoreLogger()->trace(__VA_ARGS__)      : (void)0

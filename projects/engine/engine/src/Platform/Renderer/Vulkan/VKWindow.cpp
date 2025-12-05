@@ -10,12 +10,12 @@
 #	pragma comment(lib, "shcore.lib")
 #endif
 
-namespace Helios::Engine {
+namespace Helios::Engine::Renderer {
 
 
 	VKWindow::VKWindow()
 	{
-		LOG_RENDER_DEBUG("Creating VKWindow.");
+		LOG_RENDER_DEBUG("VKWindow: Creating window.");
 
 #		ifdef TARGET_PLATFORM_WINDOWS
 			if (!Spec::Window::enablePerMonitorDPI)
@@ -85,7 +85,7 @@ namespace Helios::Engine {
 
 	VKWindow::~VKWindow()
 	{
-		LOG_RENDER_DEBUG("Destroying VKWindow.");
+		LOG_RENDER_DEBUG("VKWindow: Destroying window.");
 		glfwDestroyWindow(m_Window);
 		glfwTerminate();
 	}
@@ -117,4 +117,4 @@ namespace Helios::Engine {
 	}
 
 
-}// namespace Helios::Engine
+} // namespace Helios::Engine::Renderer

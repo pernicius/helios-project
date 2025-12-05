@@ -39,7 +39,7 @@ namespace Helios::Engine {
 		void Run();
 
 	private:
-		Scope<Window> m_Window;
+		Scope<Renderer::Window> m_Window;
 		bool m_Running = true;
 		bool m_Minimized = false;
 		LayerStack m_LayerStack;

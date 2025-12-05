@@ -4,7 +4,7 @@
 
 #include <GLFW/glfw3.h>
 
-namespace Helios::Engine {
+namespace Helios::Engine::Renderer {
 
 
 	class Window
@@ -29,4 +29,4 @@ namespace Helios::Engine {
 	};
 
 
-} // namespace Helios::Engine
+} // namespace Helios::Engine::Renderer

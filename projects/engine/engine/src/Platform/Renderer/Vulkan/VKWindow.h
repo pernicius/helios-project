@@ -2,7 +2,7 @@
 
 #include "Helios/Engine/Renderer/Window.h"
 
-namespace Helios::Engine
+namespace Helios::Engine::Renderer
 {
 
 
@@ -19,4 +19,4 @@ namespace Helios::Engine
 	};
 
 
-}// namespace Helios::Engine
+} // namespace Helios::Engine::Renderer
