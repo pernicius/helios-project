@@ -22,7 +22,7 @@ namespace Helios::Engine::Vulkan
 				if (result != vk::Result::eSuccess) {
 					s_result = false;
 					LOG_RENDER_INFO("Vulkan is not supported.");
-					return s_result;
+					return;
 				}
 				s_result = true;
 				LOG_RENDER_INFO("Vulkan {}.{}.{} is supported.", VK_VERSION_MAJOR(version), VK_VERSION_MINOR(version), VK_VERSION_PATCH(version));

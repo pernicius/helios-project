@@ -174,8 +174,6 @@ namespace Helios::Engine::Renderer {
 			throw std::runtime_error("Failed to create Vulkan instance!");
 		}
 
-		auto xyz = vk::detail::getDispatchLoaderStatic();
-
 		// build dispatch loader using vkGetInstanceProcAddr so extension entry points are resolved
 		m_DispatchLoader = vk::detail::DispatchLoaderDynamic(m_Instance, vkGetInstanceProcAddr);
 
