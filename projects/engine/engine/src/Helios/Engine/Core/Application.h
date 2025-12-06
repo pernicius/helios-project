@@ -3,7 +3,9 @@
 #include "Helios/Engine/Core/LayerStack.h"
 #include "Helios/Engine/Events/Event.h"
 #include "Helios/Engine/Events/Types/Window.h"
+
 #include "Helios/Engine/Renderer/Window.h"
+#include "Helios/Engine/Renderer/DeviceManager.h"
 
 #include <mutex>
 #include <memory>
@@ -39,13 +41,15 @@ namespace Helios::Engine {
 		void Run();
 
 	private:
-		Scope<Renderer::Window> m_Window;
 		bool m_Running = true;
 		bool m_Minimized = false;
 		LayerStack m_LayerStack;
 
 		std::mutex m_EventQueueMutex;
 		std::vector<Scope<Event>> m_EventQueue;
+
+		Scope<Renderer::Window> m_Window;
+		Scope<Renderer::DeviceManager> m_DeviceManager;
 
 	private:
 		static inline Application* s_Instance = nullptr;

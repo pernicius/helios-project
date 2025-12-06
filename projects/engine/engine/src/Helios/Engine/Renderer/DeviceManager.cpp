@@ -1,25 +1,25 @@
 #include "pch.h"
-#include "Helios/Engine/Renderer/Context.h"
+#include "Helios/Engine/Renderer/DeviceManager.h"
 
 #include "Helios/Engine/Renderer/RendererAPI.h"
 
 #ifdef HE_RENDERER_OPENGL
-#	include "Platform/Renderer/OpenGL/GLContext.h"
+#	include "Platform/Renderer/OpenGL/GLDeviceManager.h"
 #endif
 #ifdef HE_RENDERER_VULKAN
-#	include "Platform/Renderer/Vulkan/VKContext.h"
+#	include "Platform/Renderer/Vulkan/VKDeviceManager.h"
 #endif
 #ifdef HE_RENDERER_DIRECTX
-#	include "Platform/Renderer/DirectX/DX12Context.h"
+#	include "Platform/Renderer/DirectX/DX12DeviceManager.h"
 #endif
 #ifdef HE_RENDERER_METAL
-#	include "Platform/Renderer/Metal/MTContext.h"
+#	include "Platform/Renderer/Metal/MTDeviceManager.h"
 #endif
 
 namespace Helios::Engine::Renderer {
 
 
-	Scope<Context> Context::Create()
+	Scope<DeviceManager> DeviceManager::Create()
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -28,16 +28,16 @@ namespace Helios::Engine::Renderer {
 			return nullptr;
 
 #		ifdef HE_RENDERER_OPENGL
-			case RendererAPI::API::OpenGL: return CreateScope<GLContext>();
+		case RendererAPI::API::OpenGL: return CreateScope<GLDeviceManager>();
 #		endif
 #		ifdef HE_RENDERER_VULKAN
-			case RendererAPI::API::Vulkan: return CreateScope<VKContext>();
+		case RendererAPI::API::Vulkan: return CreateScope<VKDeviceManager>();
 #		endif
 #		ifdef HE_RENDERER_DIRECTX
-			case RendererAPI::API::DirectX: return CreateScope<DXContext>();
+		case RendererAPI::API::DirectX: return CreateScope<DXDeviceManager>();
 #		endif
 #		ifdef HE_RENDERER_METAL
-			case RendererAPI::API::Metal: return CreateScope<MTContext>();
+		case RendererAPI::API::Metal: return CreateScope<MTDeviceManager>();
 #		endif
 		}
 

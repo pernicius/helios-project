@@ -2,8 +2,6 @@
 namespace HE = Helios::Engine;
 #include <Helios/Engine/Spec/Spec.h>
 
-#include <Helios/Engine/Renderer/Context.h>
-
 
 class App : public HE::Application
 {
@@ -39,9 +37,6 @@ App::App()
 //	HE::DeviceManager::SetSpecification(rendererSpec);
 
 	CreateAppWindow();
-
-	auto m_Context = HE::Renderer::Context::Create();
-	m_Context->Init();
 
 //	PushLayer(new SandboxLayer3D());
 //	PushOverlay(new ClientUILayer());

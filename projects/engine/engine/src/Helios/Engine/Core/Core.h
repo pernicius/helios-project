@@ -7,12 +7,14 @@
 
 // C++ includes
 #include <array>
+#include <algorithm>
 #include <filesystem>
 #include <functional>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <unordered_set>
 #include <vector>
 
 // Platform related includes

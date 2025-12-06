@@ -60,9 +60,8 @@ namespace Helios::Engine {
 	Application::Application()
 	{
 		// Check singleton
-		if (s_Instance) {
+		if (s_Instance)
 			LOG_CORE_EXCEPT("Application already exists!");
-		}
 		s_Instance = this;
 
 		// Init working directory
@@ -161,9 +160,11 @@ namespace Helios::Engine {
 
 //		Config::Save();
 
-//		Renderer::Shutdown();
+		// Shutdown Renderer
+		m_DeviceManager.reset();
 		m_Window.reset();
 		
+		// Shutdown application components
 		Log::Shutdown();
 
 		s_Instance = nullptr;
@@ -175,8 +176,9 @@ namespace Helios::Engine {
 		m_Window = Renderer::Window::Create();
 		m_Window->Show();
 
-//		CreateDevice()
-//		CreateSwapChain()
+		m_DeviceManager = Renderer::DeviceManager::Create();
+		m_DeviceManager->Init();
+
 		// TODO...
 		// TODO...
 		// TODO...

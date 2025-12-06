@@ -3,11 +3,11 @@
 namespace Helios::Engine::Renderer {
 
 
-	class Context
+	class DeviceManager
 	{
 	public:
-		static Scope<Context> Create();
-		virtual ~Context() = default;
+		static Scope<DeviceManager> Create();
+		virtual ~DeviceManager() = default;
 
 		virtual void Init() = 0;
 	};
