@@ -15,13 +15,29 @@ namespace Helios::Engine::Vulkan
 
 		std::call_once(s_flag, []()
 		{
+			// Initialize GLFW and check for Vulkan support
+			if (!glfwInit()) {
+				s_result = false;
+				return;
+			}
+			if (!glfwVulkanSupported()) {
+				s_result = false;
+				LOG_RENDER_INFO("Vulkan is not supported (GLFW reports no support).");
+				return;
+			}
+
+			// Try to enumerate Vulkan instance version
 			try
 			{
+				//----------------------------------------------------------------------------
+				// TODO: check minimal required version
+				// TODO: check API variant (VK_API_VERSION_VARIANT / enumerateInstanceVersion)
+				//----------------------------------------------------------------------------
 				uint32_t version = 0;
 				vk::Result result = vk::enumerateInstanceVersion(&version);
 				if (result != vk::Result::eSuccess) {
 					s_result = false;
-					LOG_RENDER_INFO("Vulkan is not supported.");
+					LOG_RENDER_INFO("Vulkan is not supported (enumerateInstanceVersion failed).");
 					return;
 				}
 				s_result = true;
@@ -48,8 +64,12 @@ namespace Helios::Engine::Vulkan
 			}
 			catch (const vk::SystemError&) {
 				s_result = false;
-				LOG_RENDER_INFO("Vulkan is not supported.");
+				LOG_RENDER_INFO("Vulkan is not supported (SystemError).");
 			}
+			
+			//----------------------------------------
+			// TODO: check extensions required by GLFW
+			//----------------------------------------
 		});
 
 		return s_result;
