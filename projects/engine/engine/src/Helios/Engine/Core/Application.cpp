@@ -121,32 +121,32 @@ namespace Helios::Engine {
 		}
 
 		// Init renderer
-		RendererAPI::CheckAPISupport();
+		Renderer::RendererAPI::CheckAPISupport();
 #		ifdef HE_RENDERER_VULKAN
 			if (Spec::App::CmdLineArgs.Check("vulkan")) {
 //				Config::Override("RendererAPI", "Vulkan");
 				LOG_CORE_INFO("Overriding renderer API to Vulkan by command-line-switch");
-				RendererAPI::SetAPI(RendererAPI::API::Vulkan);
+				Renderer::RendererAPI::SetAPI(Renderer::RendererAPI::API::Vulkan);
 			}
 #		endif
 #		ifdef HE_RENDERER_OPENGL
 			if (Spec::App::CmdLineArgs.Check("opengl")) {
 				LOG_CORE_INFO("Overriding renderer API to OpenGL by command-line-switch");
-				RendererAPI::SetAPI(RendererAPI::API::OpenGL);
+				Renderer::RendererAPI::SetAPI(Renderer::RendererAPI::API::OpenGL);
 //				Config::Override("RendererAPI", "OpenGL");
 			}
 #		endif
 #		ifdef HE_RENDERER_METAL
 			if (Spec::App::CmdLineArgs.Check("metal")) {
 				LOG_CORE_INFO("Overriding renderer API to Metal by command-line-switch");
-				RendererAPI::SetAPI(RendererAPI::API::Metal);
+				Renderer::RendererAPI::SetAPI(Renderer::RendererAPI::API::Metal);
 //				Config::Override("RendererAPI", "Metal");
 			}
 #		endif
 #		ifdef HE_RENDERER_DIRECTX
 			if (Spec::App::CmdLineArgs.Check("directx")) {
 				LOG_CORE_INFO("Overriding renderer API to DirectX by command-line-switch");
-				RendererAPI::SetAPI(RendererAPI::API::DirectX);
+				Renderer::RendererAPI::SetAPI(Renderer::RendererAPI::API::DirectX);
 //				Config::Override("RendererAPI", "DirectX");
 			}
 #		endif
@@ -177,7 +177,6 @@ namespace Helios::Engine {
 		m_Window->Show();
 
 		m_DeviceManager = Renderer::DeviceManager::Create();
-		m_DeviceManager->Init();
 
 		// TODO...
 		// TODO...

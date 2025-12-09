@@ -10,7 +10,7 @@ namespace Helios::Engine::Renderer {
 	class Window
 	{
 	public:
-		static Scope<Window> Create();
+		static Ref<Window> Create();
 		virtual ~Window() = default;
 
 		GLFWwindow* GetNativeWindow() { return m_Window; }

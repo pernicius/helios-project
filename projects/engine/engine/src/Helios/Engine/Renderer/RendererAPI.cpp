@@ -14,7 +14,7 @@
 #	include "Platform/Renderer/Metal/MTSupport.h"
 #endif
 
-namespace Helios::Engine
+namespace Helios::Engine::Renderer
 {
 
 	bool RendererAPI::SetAPI(API api)
@@ -88,4 +88,4 @@ namespace Helios::Engine
 		}
 	}
 
-} // namespace Helios::Engine
+} // namespace Helios::Engine::Renderer

@@ -88,11 +88,10 @@ namespace Helios::Engine {
 
 	void Log::Shutdown()
 	{
-		// log shutdown start; after we remove the GLFW callback no further GLFW errors will be forwarded here
-		LOG_CORE_DEBUG("Shutting down log.");
-
 		// Unregister GLFW error callback to avoid it invoking logging while we're tearing down
 		glfwSetErrorCallback(nullptr);
+
+		LOG_CORE_INFO("Logging stopped.");
 
 		// flush existing loggers
 		if (s_CoreLogger)   s_CoreLogger->flush();

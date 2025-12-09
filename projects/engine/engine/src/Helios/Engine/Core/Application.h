@@ -37,6 +37,9 @@ namespace Helios::Engine {
 		void ProcessEvents();
 		void OnEvent(Event& e);
 
+		Ref<Renderer::Window>& GetAppWindow() { return m_Window; }
+		Ref<Renderer::DeviceManager>& GetDeviceManager() { return m_DeviceManager; }
+
 	private:
 		void Run();
 
@@ -48,8 +51,8 @@ namespace Helios::Engine {
 		std::mutex m_EventQueueMutex;
 		std::vector<Scope<Event>> m_EventQueue;
 
-		Scope<Renderer::Window> m_Window;
-		Scope<Renderer::DeviceManager> m_DeviceManager;
+		Ref<Renderer::Window> m_Window;
+		Ref<Renderer::DeviceManager> m_DeviceManager;
 
 	private:
 		static inline Application* s_Instance = nullptr;

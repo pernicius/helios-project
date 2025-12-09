@@ -26,7 +26,7 @@
 namespace Helios::Engine::Renderer {
 
 
-	Scope<Window> Window::Create()
+	Ref<Window> Window::Create()
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -35,16 +35,16 @@ namespace Helios::Engine::Renderer {
 			return nullptr;
 
 #		ifdef HE_RENDERER_OPENGL
-			case RendererAPI::API::OpenGL: return CreateScope<GLWindow>();
+			case RendererAPI::API::OpenGL: return CreateRef<GLWindow>();
 #		endif
 #		ifdef HE_RENDERER_VULKAN
-			case RendererAPI::API::Vulkan: return CreateScope<VKWindow>();
+			case RendererAPI::API::Vulkan: return CreateRef<VKWindow>();
 #		endif
 #		ifdef HE_RENDERER_DIRECTX
-			case RendererAPI::API::DirectX: return CreateScope<DXWindow>();
+			case RendererAPI::API::DirectX: return CreateRef<DXWindow>();
 #		endif
 #		ifdef HE_RENDERER_METAL
-			case RendererAPI::API::Metal: return CreateScope<MTWindow>();
+			case RendererAPI::API::Metal: return CreateRef<MTWindow>();
 #		endif
 		}
 

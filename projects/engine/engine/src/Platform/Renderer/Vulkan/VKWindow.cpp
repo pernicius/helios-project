@@ -85,9 +85,9 @@ namespace Helios::Engine::Renderer {
 
 	VKWindow::~VKWindow()
 	{
-		LOG_RENDER_DEBUG("VKWindow: Destroying window.");
 		glfwDestroyWindow(m_Window);
 		glfwTerminate();
+		LOG_RENDER_DEBUG("VKWindow: Destroyed window.");
 	}
 
 

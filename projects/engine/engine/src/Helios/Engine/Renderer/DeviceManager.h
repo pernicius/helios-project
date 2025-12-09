@@ -6,10 +6,8 @@ namespace Helios::Engine::Renderer {
 	class DeviceManager
 	{
 	public:
-		static Scope<DeviceManager> Create();
+		static Ref<DeviceManager> Create();
 		virtual ~DeviceManager() = default;
-
-		virtual void Init() = 0;
 	};
 
 

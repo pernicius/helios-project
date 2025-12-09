@@ -19,7 +19,7 @@
 namespace Helios::Engine::Renderer {
 
 
-	Scope<DeviceManager> DeviceManager::Create()
+	Ref<DeviceManager> DeviceManager::Create()
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -28,16 +28,16 @@ namespace Helios::Engine::Renderer {
 			return nullptr;
 
 #		ifdef HE_RENDERER_OPENGL
-		case RendererAPI::API::OpenGL: return CreateScope<GLDeviceManager>();
+		case RendererAPI::API::OpenGL: return CreateRef<OpenGL::GLDeviceManager>();
 #		endif
 #		ifdef HE_RENDERER_VULKAN
-		case RendererAPI::API::Vulkan: return CreateScope<VKDeviceManager>();
+		case RendererAPI::API::Vulkan: return CreateRef<Vulkan::VKDeviceManager>();
 #		endif
 #		ifdef HE_RENDERER_DIRECTX
-		case RendererAPI::API::DirectX: return CreateScope<DXDeviceManager>();
+		case RendererAPI::API::DirectX: return CreateRef<DirectX::DXDeviceManager>();
 #		endif
 #		ifdef HE_RENDERER_METAL
-		case RendererAPI::API::Metal: return CreateScope<MTDeviceManager>();
+		case RendererAPI::API::Metal: return CreateRef<Metal::MTDeviceManager>();
 #		endif
 		}
 

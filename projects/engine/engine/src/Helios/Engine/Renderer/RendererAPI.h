@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Helios::Engine {
+namespace Helios::Engine::Renderer {
 
 
 	class RendererAPI
@@ -66,4 +66,4 @@ namespace Helios::Engine {
 	};
 
 
-}// namespace Helios::Engine
+}// namespace Helios::Engine::Renderer

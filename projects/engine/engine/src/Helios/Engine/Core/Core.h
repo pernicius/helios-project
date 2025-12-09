@@ -1,5 +1,10 @@
 #pragma once
 
+// Library includes
+#include <vulkan/vulkan.hpp>
+#include <GLFW/glfw3.h>
+#undef APIENTRY // undefine GLFW's APIENTRY to avoid conflicts
+
 // C includes
 #include <cctype>
 #include <cstdint>
@@ -38,7 +43,4 @@
 #include "Helios/Engine/Core/Log.h"
 #include "Helios/Engine/Core/Application.h"
 #include "Helios/Engine/Core/Version.h"
-
-// Library includes
-#include <GLFW/glfw3.h>
 
