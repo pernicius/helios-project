@@ -23,7 +23,6 @@ namespace Helios::Engine {
 		~Application();
 
 		static Application& Get() { return *s_Instance; }
-		void CreateAppWindow();
 //		void Close();
 
 		bool NeedRestart(bool setRestart = false);
@@ -37,6 +36,7 @@ namespace Helios::Engine {
 		void ProcessEvents();
 		void OnEvent(Event& e);
 
+		void InitRenderer();
 		Ref<Renderer::Window>& GetAppWindow() { return m_Window; }
 		Ref<Renderer::DeviceManager>& GetDeviceManager() { return m_DeviceManager; }
 

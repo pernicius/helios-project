@@ -16,7 +16,10 @@ namespace Helios::Engine::Renderer::Vulkan
 		~VKInstance();
 
 	public:
-		const vk::Instance& Get() const { return m_Instance; }
+		// accessorss, overloads, and conversions
+		const vk::Instance& GetInstance() const { return m_Instance; }
+		VkInstance GetVkInstance() const noexcept { return static_cast<VkInstance>(m_Instance); }
+
 		const vk::detail::DispatchLoaderDynamic& GetDispatchLoader() const { return m_DispatchLoader; }
 
 		const ExtensionStruct& GetExtensions() const { return m_Extensions.instance; }

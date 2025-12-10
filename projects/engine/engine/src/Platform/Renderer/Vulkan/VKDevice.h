@@ -13,27 +13,49 @@ namespace Helios::Engine::Renderer::Vulkan
 	{
 	public:
 		VKDevice() = delete;
-		VKDevice(Ref<VKInstance> instance, ExtensionStruct& extensions);
+		VKDevice(Ref<VKInstance> instance, ExtensionStruct& extensions, vk::SurfaceKHR surface);
 		~VKDevice();
 
 	public:
-		const vk::Device& Get() const { return m_LogicalDevice; }
+		// accessorss, overloads, and conversions
+		const vk::Device& GetDevice() const { return m_LogicalDevice; }
+		VkDevice GetVkDevice() const noexcept { return static_cast<VkDevice>(m_LogicalDevice); }
+		const vk::PhysicalDevice& GetPhysicalDevice() const { return m_PhysicalDevice; }
+		VkPhysicalDevice GetVkPhysicalDevice() const noexcept { return static_cast<VkPhysicalDevice>(m_PhysicalDevice); }
+		const vk::SurfaceKHR& GetSurface() const { return m_Surface; }
+		VkSurfaceKHR GetVkSurface() const noexcept { return static_cast<VkSurfaceKHR>(m_Surface); }
+
 		const vk::detail::DispatchLoaderDynamic& GetDispatchLoader() const { return m_DispatchLoader; }
 		
 		const ExtensionStruct& GetExtensions() const { return m_Extensions.device; }
 
+		// queues
+		const vk::Queue& GetGraphicsQueue() const { return m_Queues.graphics; }
+		const vk::Queue& GetPresentQueue() const { return m_Queues.present; }
+		const vk::Queue& GetComputeQueue() const { return m_Queues.compute; }
+		const vk::Queue& GetTransferQueue() const { return m_Queues.transfer; }
+
+		// device helpers
+//		void WaitIdle();
+
+		// convenience resource-creation helpers
+//		vk::UniqueCommandPool CreateCommandPool(uint32_t queueFamilyIndex, vk::CommandPoolCreateFlags flags = {}) const;
+//		std::vector<vk::UniqueCommandBuffer> AllocateCommandBuffers(const vk::CommandPool& pool, vk::CommandBufferLevel level, uint32_t count) const;
+//		vk::UniqueFence CreateFence(vk::FenceCreateFlags flags = {}) const;
+//		vk::UniqueSemaphore CreateSemaphore(vk::SemaphoreCreateFlags flags = {}) const;
+
 	private:
-		// Simple, configurable criteria used when choosing a physical device.
+		// simple, configurable criteria used when choosing a physical device.
 		struct DeviceSelectionCriteria
 		{
-			// Require swapchain support (useful when creating a present-capable device).
-			// Default true for typical windowed applications.
+			// require swapchain support (useful when creating a present-capable device).
+			// default true for typical windowed applications.
 			bool requireSwapchain = true;
 
-			// Prefer discrete GPUs when scoring.
+			// prefer discrete GPUs when scoring.
 			bool preferDiscrete = true;
 
-			// Weights used while scoring devices (tweakable).
+			// weights used while scoring devices (tweakable).
 			int discreteWeight = 1000;
 			int imageDimWeight = 1;            // multiplier for maxImageDimension2D / 1024
 			int optionalExtensionWeight = 50;  // bonus per optional extension present
@@ -65,12 +87,12 @@ namespace Helios::Engine::Renderer::Vulkan
 			}
 		};
 
-		// ----- Physical device selection and enumeration
+		// ----- physical device selection and enumeration
 		void PickPhysicalDevice();
 		QueueFamilyIndices FindQueueFamilies(vk::PhysicalDevice physicalDevice, vk::SurfaceKHR surface = nullptr);
 //		void EnumeratePhysicalDevices();
 
-		// ----- Logical device creation
+		// ----- logical device creation
 		void CreateLogicalDevice();
 
 	private:

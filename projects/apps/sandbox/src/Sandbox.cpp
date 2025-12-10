@@ -36,7 +36,7 @@ App::App()
 //	rendererSpec.Window.windowTitle = appSpec.Name;
 //	HE::DeviceManager::SetSpecification(rendererSpec);
 
-	CreateAppWindow();
+	InitRenderer();
 
 //	PushLayer(new SandboxLayer3D());
 //	PushOverlay(new ClientUILayer());

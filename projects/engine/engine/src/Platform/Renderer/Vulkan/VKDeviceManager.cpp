@@ -94,11 +94,23 @@ namespace Helios::Engine::Renderer::Vulkan {
 	{
 		m_Window = Application::Get().GetAppWindow();
 
+		// create vulkan instance
 		m_Instance = CreateRef<VKInstance>(m_Extensions.instance, m_Extensions.layer);
 		m_Extensions.instance = m_Instance->GetExtensions();
 		m_Extensions.layer = m_Instance->GetLayers();
 
-		m_Device = CreateRef<VKDevice>(m_Instance, m_Extensions.device);
+		// create vulkan window surface
+		LOG_RENDER_DEBUG("VKDeviceManager: Creating window surface.");
+		vk::SurfaceKHR surface{};
+		VkSurfaceKHR cSurf = VK_NULL_HANDLE;
+		if (glfwCreateWindowSurface(static_cast<VkInstance>(m_Instance->GetInstance()), m_Window->GetNativeWindow(), nullptr, &cSurf) != VK_SUCCESS) {
+			LOG_RENDER_FATAL("VKDeviceManager: Failed to create GLFW window surface.");
+			throw std::runtime_error("Failed to create GLFW window surface.");
+		}
+		surface = static_cast<vk::SurfaceKHR>(cSurf);
+
+		// create vulkan device
+		m_Device = CreateRef<VKDevice>(m_Instance, m_Extensions.device, surface);
 		m_Extensions.device = m_Device->GetExtensions();
 	}
 

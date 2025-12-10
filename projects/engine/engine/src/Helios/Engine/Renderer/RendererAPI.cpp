@@ -39,7 +39,7 @@ namespace Helios::Engine::Renderer
 
 		if (supported) {
 			s_API = api;
-			LOG_RENDER_INFO("Set RendererAPI to {}", GetAPIName(api));
+			LOG_RENDER_INFO("Selected RendererAPI: {}", GetAPIName(api));
 		}
 		else {
 			LOG_RENDER_EXCEPT("The requested RendererAPI::{} is not supported!", GetAPIName(api));

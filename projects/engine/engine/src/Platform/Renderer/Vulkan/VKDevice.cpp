@@ -38,11 +38,14 @@ namespace Helios::Engine::Renderer::Vulkan {
 	// VKDevice constructor and destructor
 	//-------------------------------------
 
-	VKDevice::VKDevice(Ref<VKInstance> instance, ExtensionStruct& extensions)
+	VKDevice::VKDevice(Ref<VKInstance> instance, ExtensionStruct& extensions, vk::SurfaceKHR surface)
 		: m_Instance(instance)
 	{
 		// store requested extensions and layers
 		m_Extensions.device = extensions;
+		// store the surface early so pick/queries can use it
+		m_Surface = surface;
+
 		// update with extensions required by SelectionCriteria
 		if (m_SelectionCriteria.requireSwapchain && !m_Extensions.device.required.contains("VK_KHR_swapchain")) {
 			m_Extensions.device.required.insert("VK_KHR_swapchain");
@@ -74,6 +77,17 @@ namespace Helios::Engine::Renderer::Vulkan {
 			m_PhysicalDevice = vk::PhysicalDevice();
 			LOG_RENDER_DEBUG("VKDevice: Unselected physical device.");
 		}
+
+		if (m_Surface) {
+			try {
+				m_Instance->GetInstance().destroySurfaceKHR(m_Surface, nullptr, m_Instance->GetDispatchLoader());
+				LOG_RENDER_DEBUG("VKDevice: Destroyed surface.");
+			}
+			catch (const vk::SystemError& e) {
+				LOG_RENDER_WARN("VKDevice: Failed to destroy surface: {}", e.what());
+			}
+			m_Surface = vk::SurfaceKHR();
+		}
 	}
 
 
@@ -93,7 +107,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		}
 		else {
 			try {
-				devices = m_Instance->Get().enumeratePhysicalDevices();
+				devices = m_Instance->GetInstance().enumeratePhysicalDevices();
 			}
 			catch (const vk::SystemError& err) {
 				LOG_RENDER_FATAL("VKDevice: Failed to enumerate physical devices: {}", err.what());
@@ -183,7 +197,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 				score += 10;
 			}
 
-			LOG_RENDER_DEBUG("VKDevice: Device {} (score: {}, type: {})", std::string_view(props.deviceName), score, DeviceTypeToString(props.deviceType));
+			LOG_RENDER_DEBUG("VKDevice: Device found: {} (score: {}, type: {})", std::string_view(props.deviceName), score, DeviceTypeToString(props.deviceType));
 
 			if (score > bestScore) {
 				bestScore = score;
@@ -254,12 +268,12 @@ namespace Helios::Engine::Renderer::Vulkan {
 				}
 				catch (const vk::SystemError&) {
 					// fallback to glfw if dispatch isn't available
-					presentSupported = static_cast<bool>(glfwGetPhysicalDevicePresentationSupport(m_Instance->Get(), physicalDevice, i));
+					presentSupported = static_cast<bool>(glfwGetPhysicalDevicePresentationSupport(m_Instance->GetInstance(), physicalDevice, i));
 				}
 			}
 			else {
 				// if no surface provided, use glfw helper as we have no surface to query against
-				presentSupported = static_cast<bool>(glfwGetPhysicalDevicePresentationSupport(m_Instance->Get(), physicalDevice, i));
+				presentSupported = static_cast<bool>(glfwGetPhysicalDevicePresentationSupport(m_Instance->GetInstance(), physicalDevice, i));
 			}
 			info.presentSupport = presentSupported;
 
@@ -382,17 +396,25 @@ namespace Helios::Engine::Renderer::Vulkan {
 		}
 
 		// retrieve queues we care about (may be same handle for multiple roles)
-		if (m_QueueFamilyIndices.graphics.index.has_value())
+		if (m_QueueFamilyIndices.graphics.index.has_value()) {
 			m_Queues.graphics = m_LogicalDevice.getQueue(m_QueueFamilyIndices.graphics.index.value(), 0);
-		if (m_QueueFamilyIndices.present.index.has_value())
+			LOG_RENDER_DEBUG("VKDevice: Using queue index {} for graphics", m_QueueFamilyIndices.graphics.index.value());
+		}
+		if (m_QueueFamilyIndices.present.index.has_value()) {
 			m_Queues.present = m_LogicalDevice.getQueue(m_QueueFamilyIndices.present.index.value(), 0);
-		if (m_QueueFamilyIndices.compute.index.has_value())
+			LOG_RENDER_DEBUG("VKDevice: Using queue index {} for present", m_QueueFamilyIndices.present.index.value());
+		}
+		if (m_QueueFamilyIndices.compute.index.has_value()) {
 			m_Queues.compute = m_LogicalDevice.getQueue(m_QueueFamilyIndices.compute.index.value(), 0);
-		if (m_QueueFamilyIndices.transfer.index.has_value())
+			LOG_RENDER_DEBUG("VKDevice: Using queue index {} for compute", m_QueueFamilyIndices.compute.index.value());
+		}
+		if (m_QueueFamilyIndices.transfer.index.has_value()) {
 			m_Queues.transfer = m_LogicalDevice.getQueue(m_QueueFamilyIndices.transfer.index.value(), 0);
+			LOG_RENDER_DEBUG("VKDevice: Using queue index {} for transfer", m_QueueFamilyIndices.transfer.index.value());
+		}
 
 		// get dispatch loader using vkGetInstanceProcAddr so extension entry points are resolved
-		m_DispatchLoader = vk::detail::DispatchLoaderDynamic(m_Instance->Get(), vkGetInstanceProcAddr, m_LogicalDevice, vkGetDeviceProcAddr);
+		m_DispatchLoader = vk::detail::DispatchLoaderDynamic(m_Instance->GetInstance(), vkGetInstanceProcAddr, m_LogicalDevice, vkGetDeviceProcAddr);
 	}
 
 
