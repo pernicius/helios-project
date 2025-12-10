@@ -26,11 +26,10 @@ namespace Helios::Engine::Renderer::Vulkan {
 		vk::Format GetFormat() const { return m_Format; }
 		vk::Extent2D GetExtent() const { return m_Extent; }
 
-		// Recreate swapchain (useful on resize). Caller should ensure device is idle before destroying old resources if needed.
 		void Recreate();
 
 	private:
-		void Create();
+		void Create(vk::SwapchainKHR oldSwapchain = VK_NULL_HANDLE);
 		void Destroy();
 
 	private:

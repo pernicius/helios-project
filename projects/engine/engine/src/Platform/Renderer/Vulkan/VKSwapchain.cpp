@@ -83,9 +83,9 @@ namespace Helios::Engine::Renderer::Vulkan {
 	}
 
 
-	void VKSwapchain::Create()
+	void VKSwapchain::Create(vk::SwapchainKHR oldSwapchain)
 	{
-		LOG_RENDER_DEBUG("VKSwapchain: Creating swapchain.");
+		LOG_RENDER_DEBUG("VKSwapchain: (Re-)Creating swapchain.");
 
 		auto physical = m_Device->GetPhysicalDevice();
 		auto device = m_Device->GetDevice();
@@ -147,26 +147,30 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 		createInfo.presentMode = presentMode;
 		createInfo.clipped = VK_TRUE;
-		createInfo.oldSwapchain = VK_NULL_HANDLE;
+		createInfo.oldSwapchain = static_cast<VkSwapchainKHR>(oldSwapchain);
 
-		auto resultCreate = device.createSwapchainKHR(&createInfo, nullptr, &m_Swapchain);
+		// Create the new swapchain into a local handle first so we can keep the current swapchain alive
+		// until new swapchain and views are created successfully.
+		vk::SwapchainKHR newSwapchain = VK_NULL_HANDLE;
+		auto resultCreate = device.createSwapchainKHR(&createInfo, nullptr, &newSwapchain);
 		if (resultCreate != vk::Result::eSuccess) {
 			throw std::runtime_error("VKSwapchain: failed to create swapchain.");
 		}
 
-		m_Format = surfaceFormat.format;
-		m_Extent = extent;
+		vk::Format newFormat = surfaceFormat.format;
+		vk::Extent2D newExtent = extent;
 
-		// retrieve images
-		m_Images = device.getSwapchainImagesKHR(m_Swapchain);
+		// retrieve images for new swapchain
+		auto newImages = device.getSwapchainImagesKHR(newSwapchain);
 
-		// create image views
-		m_ImageViews.resize(m_Images.size());
-		for (size_t i = 0; i < m_Images.size(); ++i) {
+		// create image views for new swapchain
+		std::vector<vk::ImageView> newImageViews;
+		newImageViews.resize(newImages.size());
+		for (size_t i = 0; i < newImages.size(); ++i) {
 			vk::ImageViewCreateInfo viewInfo{};
-			viewInfo.image = m_Images[i];
+			viewInfo.image = newImages[i];
 			viewInfo.viewType = vk::ImageViewType::e2D;
-			viewInfo.format = m_Format;
+			viewInfo.format = newFormat;
 			viewInfo.components.r = vk::ComponentSwizzle::eIdentity;
 			viewInfo.components.g = vk::ComponentSwizzle::eIdentity;
 			viewInfo.components.b = vk::ComponentSwizzle::eIdentity;
@@ -177,14 +181,39 @@ namespace Helios::Engine::Renderer::Vulkan {
 			viewInfo.subresourceRange.baseArrayLayer = 0;
 			viewInfo.subresourceRange.layerCount = 1;
 
-			auto res = device.createImageView(&viewInfo, nullptr, &m_ImageViews[i]);
+			auto res = device.createImageView(&viewInfo, nullptr, &newImageViews[i]);
 			if (res != vk::Result::eSuccess) {
-				// cleanup created views + swapchain
-				for (size_t j = 0; j < i; ++j) device.destroyImageView(m_ImageViews[j]);
-				device.destroySwapchainKHR(m_Swapchain);
-				throw std::runtime_error("VKSwapchain: failed to create image view.");
+				// cleanup created new views and new swapchain, leave existing swapchain untouched
+				for (size_t j = 0; j < i; ++j) device.destroyImageView(newImageViews[j]);
+				device.destroySwapchainKHR(newSwapchain);
+				throw std::runtime_error("VKSwapchain: failed to create image view for new swapchain.");
 			}
 		}
+
+		// At this point new swapchain and its image views were created successfully.
+		// Now destroy old image views and old swapchain (if provided).
+		if (oldSwapchain != VK_NULL_HANDLE) {
+			// destroy old image views
+			for (auto& view : m_ImageViews) {
+				if (view) device.destroyImageView(view);
+			}
+			m_ImageViews.clear();
+			m_Images.clear();
+
+			// destroy old swapchain handle
+			if (m_Swapchain) {
+				device.destroySwapchainKHR(m_Swapchain);
+
+				LOG_RENDER_DEBUG("VKSwapchain: Destroyed old swapchain.");
+			}
+		}
+
+		// Commit new swapchain
+		m_Swapchain = newSwapchain;
+		m_Images = std::move(newImages);
+		m_ImageViews = std::move(newImageViews);
+		m_Format = newFormat;
+		m_Extent = newExtent;
 	}
 
 
@@ -192,6 +221,8 @@ namespace Helios::Engine::Renderer::Vulkan {
 	{
 		if (!m_Device) return;
 		auto device = m_Device->GetDevice();
+
+		device.waitIdle();
 
 		for (auto& view : m_ImageViews) {
 			if (view) device.destroyImageView(view);
@@ -210,9 +241,17 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 	void VKSwapchain::Recreate()
 	{
-		// Caller responsibility: device idle / wait before calling if required.
-		Destroy();
-		Create();
+		if (!m_Device) return;
+
+		m_Device->GetDevice().waitIdle();
+
+		if (m_Swapchain == VK_NULL_HANDLE) {
+			Create();
+			return;
+		}
+
+		// Create new swapchain using current swapchain as oldSwapchain ( will be destroyed in Create() )
+		Create(m_Swapchain);
 	}
 
 
