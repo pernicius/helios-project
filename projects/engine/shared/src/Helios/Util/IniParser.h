@@ -4,13 +4,13 @@
 #include <cctype>
 #include <charconv>
 #include <cerrno>
-#include <cmath>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <limits>
 #include <sstream>
 #include <string>
+#include <system_error>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
@@ -107,8 +107,9 @@ namespace Helios::Util {
 		}
 
 
-		// String getter (existing API kept for backward compatibility)
-		std::string get(const std::string& section, const std::string& key, const std::string& def = "") const
+		// Template-based getter: strong typed conversion with default
+		template<typename T>
+		T get(const std::string& section, const std::string& key, const T& def) const
 		{
 			auto sit = data_.find(section);
 			if (sit == data_.end())
@@ -116,36 +117,15 @@ namespace Helios::Util {
 			auto kit = sit->second.find(key);
 			if (kit == sit->second.end())
 				return def;
-			return kit->second;
-		}
 
-
-		// Template-based getter: strong typed conversion with default
-		template<typename T>
-		T get(const std::string& section, const std::string& key, const T& def) const
-			requires (!std::is_same_v<T, std::string>)
-		{
-			std::string s = get(section, key, std::string());
+			const std::string& s = kit->second;
 			if (s.empty())
 				return def;
+
 			T out{};
 			if (from_string(s, out))
 				return out;
 			return def;
-		}
-
-
-		// Specialization-like overload for std::string (kept to be explicit)
-		std::string get_string(const std::string& section, const std::string& key, const std::string& def = "") const
-		{
-			return get(section, key, def);
-		}
-
-
-		// String setter (existing API)
-		void set(const std::string& section, const std::string& key, const std::string& value)
-		{
-			data_[section][key] = value;
 		}
 
 
@@ -181,13 +161,6 @@ namespace Helios::Util {
 				static_assert(always_false<T>, "IniParser::set<T> unsupported type - provide a string or numeric/bool type");
 			}
 		}
-
-
-		// Backwards-compatible typed setters (kept, they call the template set)
-		void set(const std::string& section, const std::string& key, int value) { set<int>(section, key, value); }
-		void set(const std::string& section, const std::string& key, long long value) { set<long long>(section, key, value); }
-		void set(const std::string& section, const std::string& key, double value) { set<double>(section, key, value); }
-		void set(const std::string& section, const std::string& key, bool value) { set<bool>(section, key, value); }
 
 
 		bool has(const std::string& section, const std::string& key) const
