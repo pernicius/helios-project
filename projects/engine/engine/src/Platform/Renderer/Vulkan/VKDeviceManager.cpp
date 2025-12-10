@@ -81,6 +81,9 @@ namespace Helios::Engine::Renderer::Vulkan {
 	
 	VKDeviceManager::~VKDeviceManager()
 	{
+		if (m_Swapchain) {
+			m_Swapchain.reset();
+		}
 		if (m_Device) {
 			m_Device.reset();
 		}
@@ -112,6 +115,9 @@ namespace Helios::Engine::Renderer::Vulkan {
 		// create vulkan device
 		m_Device = CreateRef<VKDevice>(m_Instance, m_Extensions.device, surface);
 		m_Extensions.device = m_Device->GetExtensions();
+
+		// create swapchain
+		m_Swapchain = CreateRef<VKSwapchain>(m_Device, surface, m_Window);
 	}
 
 

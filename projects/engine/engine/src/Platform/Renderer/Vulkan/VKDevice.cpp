@@ -38,13 +38,11 @@ namespace Helios::Engine::Renderer::Vulkan {
 	// VKDevice constructor and destructor
 	//-------------------------------------
 
-	VKDevice::VKDevice(Ref<VKInstance> instance, ExtensionStruct& extensions, vk::SurfaceKHR surface)
-		: m_Instance(instance)
+	VKDevice::VKDevice(Ref<VKInstance>& instance, ExtensionStruct& extensions, vk::SurfaceKHR& surface)
+		: m_Instance(instance), m_Surface(surface)
 	{
 		// store requested extensions and layers
 		m_Extensions.device = extensions;
-		// store the surface early so pick/queries can use it
-		m_Surface = surface;
 
 		// update with extensions required by SelectionCriteria
 		if (m_SelectionCriteria.requireSwapchain && !m_Extensions.device.required.contains("VK_KHR_swapchain")) {

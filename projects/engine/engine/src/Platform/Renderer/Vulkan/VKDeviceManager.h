@@ -4,6 +4,7 @@
 
 #include "Platform/Renderer/Vulkan/VKInstance.h"
 #include "Platform/Renderer/Vulkan/VKDevice.h"
+#include "Platform/Renderer/Vulkan/VKSwapchain.h"
 
 #include <vulkan/vulkan.hpp>
 
@@ -16,6 +17,10 @@ namespace Helios::Engine::Renderer::Vulkan
 	public:
 		VKDeviceManager();
 		~VKDeviceManager();
+
+		// Non-copyable
+		VKDeviceManager(const VKDeviceManager&) = delete;
+		VKDeviceManager& operator=(const VKDeviceManager&) = delete;
 
 	public:
 		Ref<VKInstance> GetInstance() const { return m_Instance; }
@@ -35,10 +40,11 @@ namespace Helios::Engine::Renderer::Vulkan
 		void Init();
 
 	private:
-		Ref<Window> m_Window;
+		Ref<Window> m_Window{};
 
-		Ref<VKInstance> m_Instance;
-		Ref<VKDevice> m_Device;
+		Ref<VKInstance> m_Instance{};
+		Ref<VKDevice> m_Device{};
+		Ref<VKSwapchain> m_Swapchain{};
 
 		// extensions and layers
 		struct {

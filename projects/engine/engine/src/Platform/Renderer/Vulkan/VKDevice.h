@@ -5,16 +5,19 @@
 
 #include <vulkan/vulkan.hpp>
 
-namespace Helios::Engine::Renderer::Vulkan
-{
+namespace Helios::Engine::Renderer::Vulkan {
 
 
 	class VKDevice
 	{
 	public:
 		VKDevice() = delete;
-		VKDevice(Ref<VKInstance> instance, ExtensionStruct& extensions, vk::SurfaceKHR surface);
+		VKDevice(Ref<VKInstance>& instance, ExtensionStruct& extensions, vk::SurfaceKHR& surface);
 		~VKDevice();
+
+		// Non-copyable
+		VKDevice(const VKDevice&) = delete;
+		VKDevice& operator=(const VKDevice&) = delete;
 
 	public:
 		// accessorss, overloads, and conversions
@@ -34,6 +37,10 @@ namespace Helios::Engine::Renderer::Vulkan
 		const vk::Queue& GetPresentQueue() const { return m_Queues.present; }
 		const vk::Queue& GetComputeQueue() const { return m_Queues.compute; }
 		const vk::Queue& GetTransferQueue() const { return m_Queues.transfer; }
+		const uint32_t GetGraphicsQueueIndex() const { return m_QueueFamilyIndices.graphics.index.value_or(0u); }
+		const uint32_t GetPresentQueueIndex() const { return m_QueueFamilyIndices.present.index.value_or(0u); }
+		const uint32_t GetComputeQueueIndex() const { return m_QueueFamilyIndices.compute.index.value_or(0u); }
+		const uint32_t GetTransferQueueIndex() const { return m_QueueFamilyIndices.transfer.index.value_or(0u); }
 
 		// device helpers
 //		void WaitIdle();

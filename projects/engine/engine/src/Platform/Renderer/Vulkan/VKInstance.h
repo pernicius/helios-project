@@ -15,6 +15,10 @@ namespace Helios::Engine::Renderer::Vulkan
 		VKInstance(ExtensionStruct& extensions, ExtensionStruct& layers);
 		~VKInstance();
 
+		// Non-copyable
+		VKInstance(const VKInstance&) = delete;
+		VKInstance& operator=(const VKInstance&) = delete;
+
 	public:
 		// accessorss, overloads, and conversions
 		const vk::Instance& GetInstance() const { return m_Instance; }
