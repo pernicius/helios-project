@@ -91,6 +91,16 @@ namespace Helios::Util {
 
 		bool save(const std::filesystem::path& path) const
 		{
+			// Ensure parent directory exists (no-op if path has no parent)
+			std::error_code ec;
+			auto dir = path.parent_path();
+			if (!dir.empty())
+			{
+				std::filesystem::create_directories(dir, ec);
+				if (ec)
+					return false;
+			}
+
 			std::ofstream ofs(path, std::ios::binary | std::ios::trunc);
 			if (!ofs)
 				return false;
@@ -107,24 +117,50 @@ namespace Helios::Util {
 		}
 
 
-		// Template-based getter: strong typed conversion with default
+		// Template-based getter: strong typed conversion with default.
+		// If the requested key/section is missing or invalid, the default value
+		// is stored in-memory so a subsequent save() will persist it.
 		template<typename T>
-		T get(const std::string& section, const std::string& key, const T& def) const
+		T get(const std::string& section, const std::string& key, const T& def, bool dontStore = false) const
 		{
 			auto sit = data_.find(section);
 			if (sit == data_.end())
+			{
+				if (dontStore)
+					return def;
+				// create section and store default
+				data_[section][key] = stringify_value(def);
 				return def;
+			}
 			auto kit = sit->second.find(key);
 			if (kit == sit->second.end())
+			{
+				if (dontStore)
+					return def;
+				// store default for missing key
+				data_[section][key] = stringify_value(def);
 				return def;
+			}
 
 			const std::string& s = kit->second;
 			if (s.empty())
+			{
+				if (dontStore)
+					return def;
+				// empty value -> replace with default
+				data_[section][key] = stringify_value(def);
 				return def;
+			}
 
 			T out{};
 			if (from_string(s, out))
 				return out;
+
+			// parse failed...
+			if (dontStore)
+				return def;
+			// overwrite with default so save() persists a valid value
+			data_[section][key] = stringify_value(def);
 			return def;
 		}
 
@@ -195,7 +231,7 @@ namespace Helios::Util {
 		}
 
 	private:
-		std::unordered_map<std::string, Section> data_;
+		mutable std::unordered_map<std::string, Section> data_;
 
 		template<typename T>
 		inline static constexpr bool always_false = false;
@@ -253,6 +289,41 @@ namespace Helios::Util {
 			{
 				// unsupported type
 				return false;
+			}
+		}
+
+
+		// Convert a typed value to the string representation used for storage
+		template<typename T>
+		static std::string stringify_value(const T& value)
+		{
+			if constexpr (std::is_same_v<T, std::string>)
+			{
+				return value;
+			}
+			else if constexpr (std::is_same_v<T, const char*>)
+			{
+				return std::string(value);
+			}
+			else if constexpr (std::is_same_v<T, bool>)
+			{
+				return value ? "true" : "false";
+			}
+			else if constexpr (std::is_integral_v<T>)
+			{
+				return std::to_string(value);
+			}
+			else if constexpr (std::is_floating_point_v<T>)
+			{
+				std::ostringstream ss;
+				ss.precision(std::numeric_limits<T>::digits10 + 1);
+				ss << value;
+				return ss.str();
+			}
+			else
+			{
+				static_assert(always_false<T>, "IniParser::stringify_value unsupported type - provide a string or numeric/bool type");
+				return std::string{};
 			}
 		}
 
