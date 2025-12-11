@@ -106,7 +106,6 @@ namespace Helios::Engine::Renderer::Vulkan {
 		}
 
 		// queue family indices
-//		auto [graphicsIndex, presentIndex] = FindQueueFamilies(physical, m_Surface);
 		uint32_t graphicsIndex = m_Device->GetGraphicsQueueIndex();
 		uint32_t presentIndex = m_Device->GetPresentQueueIndex();
 		uint32_t queueFamilyIndicesArr[2] = { graphicsIndex, presentIndex };

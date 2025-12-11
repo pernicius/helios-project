@@ -2,6 +2,8 @@
 
 #include "Helios/Engine/Events/Event.h"
 
+#include "Helios/Util/IniParser.h"
+
 #include <GLFW/glfw3.h>
 
 namespace Helios::Engine::Renderer {
@@ -11,7 +13,8 @@ namespace Helios::Engine::Renderer {
 	{
 	public:
 		static Ref<Window> Create();
-		virtual ~Window() = default;
+		Window();
+		~Window();
 
 		GLFWwindow* GetNativeWindow() { return m_Window; }
 
@@ -30,6 +33,12 @@ namespace Helios::Engine::Renderer {
 
 //		void SaveWindowPosition();
 //		void LoadWindowPosition();
+
+	protected:
+		void LoadConfig();
+		void SaveConfig();
+
+		Util::IniParser m_Config;
 
 	protected:
 		void RaiseEvent(Scope<Event> event);

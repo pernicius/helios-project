@@ -10,7 +10,39 @@
 #	pragma comment(lib, "shcore.lib")
 #endif
 
-namespace Helios::Engine::Renderer {
+namespace Helios::Engine::Renderer::Vulkan {
+
+
+//------------------------------------------------------------------------------
+// Configuration value shortcuts
+
+// Update-Rule: when changed (requires recreate window)
+#define CFG_StartBorderless        m_Config.get<bool>("Window", "StartBorderless",              false)
+// Update-Rule: when changed (requires recreate window)
+#define CFG_StartFullscreen        m_Config.get<bool>("Window", "StartFullscreen",              false)
+// Update-Rule: framebuffer resize events
+#define CFG_SizeX                  m_Config.get<int>( "Window", "SizeX",                        800)
+#define CFG_SizeY                  m_Config.get<int>( "Window", "SizeY",                        600)
+// Update-Rule: window move events / -1 if in fullscreen
+#define CFG_PosX                   m_Config.get<int>( "Window", "PosX",                         -1)
+#define CFG_PosY                   m_Config.get<int>( "Window", "PosY",                         -1)
+// Update-Rule: never
+#define CFG_AllowResizing          m_Config.get<bool>("Window", "AllowResizing",                true)
+
+#define CFG_DisableDPIAwareness    m_Config.get<bool>("Window", "DisableDPIAwareness",          false) /* Windows only */
+#define CFG_SwapChainSampleCount   m_Config.get<int>( "Window", "SwapChainSampleCount",         1)
+#define CFG_RefreshRate            m_Config.get<int>( "Window", "RefreshRate",                  60)
+#define CFG_ResizeWithDisplayScale m_Config.get<bool>("Window", "ResizeWindowWithDisplayScale", false)
+
+//------------------------------------------------------------------------------
+// Configuration value shortcuts (Vulkan specific)
+
+#define CFG_SwapChainFormat        Format::SBGRA8_UNORM
+
+// TODO: convert to config value
+#define CFG_Title                  Spec::Window::windowTitle.c_str()
+
+//------------------------------------------------------------------------------
 
 
 	VKWindow::VKWindow()
@@ -18,7 +50,7 @@ namespace Helios::Engine::Renderer {
 		LOG_RENDER_DEBUG("VKWindow: Creating window.");
 
 #		ifdef TARGET_PLATFORM_WINDOWS
-			if (!Spec::Window::enablePerMonitorDPI)
+			if (CFG_DisableDPIAwareness)
 			{
 				// glfwInit enables the maximum supported level of DPI awareness unconditionally.
 				// If the app doesn't need it, we have to call this function before glfwInit to override that behavior.
@@ -32,14 +64,14 @@ namespace Helios::Engine::Renderer {
 		glfwDefaultWindowHints();
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
-		if (Spec::Device::swapChainFormat == Renderer::Format::UNKNOWN) {
+/*TODO*/		if (Spec::Device::swapChainFormat == Format::UNKNOWN) {
 			LOG_RENDER_WARN("Swap chain format is UNKNOWN! Using default GLFW window hints for color and depth/stencil bits.");
 		} else {
 			//--------------------------------------------------------------------------------------
 			// TODO: Verify that the requested format is compatible with GLFW window hints
 			// TODO: Verify that the requested format is supported by the physical device surface
 			//--------------------------------------------------------------------------------------
-			const Renderer::FormatInfo& formatInfo = Renderer::GetFormatInfo(Spec::Device::swapChainFormat);
+			const Renderer::FormatInfo& formatInfo = Renderer::GetFormatInfo(CFG_SwapChainFormat);
 			glfwWindowHint(GLFW_RED_BITS,   formatInfo.redBits);
 			glfwWindowHint(GLFW_GREEN_BITS, formatInfo.greenBits);
 			glfwWindowHint(GLFW_BLUE_BITS,  formatInfo.blueBits);
@@ -48,36 +80,36 @@ namespace Helios::Engine::Renderer {
 			glfwWindowHint(GLFW_STENCIL_BITS, formatInfo.stencilBits);
 		}
 
-		glfwWindowHint(GLFW_SAMPLES, Spec::Device::swapChainSampleCount);
-		glfwWindowHint(GLFW_REFRESH_RATE, Spec::Window::refreshRate);
-		glfwWindowHint(GLFW_SCALE_TO_MONITOR, Spec::Window::resizeWindowWithDisplayScale);
+		glfwWindowHint(GLFW_SAMPLES, CFG_SwapChainSampleCount);
+		glfwWindowHint(GLFW_REFRESH_RATE, CFG_RefreshRate);
+		glfwWindowHint(GLFW_SCALE_TO_MONITOR, CFG_ResizeWithDisplayScale);
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // Ignored for fullscreen
 
-		if (Spec::Window::startBorderless)
-			glfwWindowHint(GLFW_DECORATED, GLFW_FALSE); // Borderless window
-		if (Spec::Window::allowResizing)
+		if (CFG_StartBorderless)
+			glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+		if (CFG_AllowResizing)
 			glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
 		// finally create the window
-		m_Window = glfwCreateWindow(Spec::Window::sizeX, Spec::Window::sizeY,
-			Spec::Window::windowTitle.c_str(),
-			Spec::Window::startFullscreen ? glfwGetPrimaryMonitor() : nullptr,
+		m_Window = glfwCreateWindow(CFG_SizeX, CFG_SizeY,
+			CFG_Title,
+			CFG_StartFullscreen ? glfwGetPrimaryMonitor() : nullptr,
 			nullptr);
 		LOG_GLFW_ASSERT(m_Window, "Could not create the window!");
 //		s_GLFWWindowCount++;
 
-		if (Spec::Window::startFullscreen) {
+		if (CFG_StartFullscreen) {
 			glfwSetWindowMonitor(m_Window, glfwGetPrimaryMonitor(), 0, 0,
-				Spec::Window::sizeX, Spec::Window::sizeY, Spec::Window::refreshRate);
+				CFG_SizeX, CFG_SizeY, CFG_RefreshRate);
 		} else {
 			int fbWidth = 0, fbHeight = 0;
 			glfwGetFramebufferSize(m_Window, &fbWidth, &fbHeight);
-			Spec::Window::sizeX = fbWidth;
-			Spec::Window::sizeY = fbHeight;
+			m_Config.set<int>("Window", "SizeX", fbWidth);
+			m_Config.set<int>("Window", "SizeY", fbHeight);
 		}
 
-		if (Spec::Window::posX != -1 && Spec::Window::posY != -1)
-			glfwSetWindowPos(m_Window, Spec::Window::posX, Spec::Window::posY);
+		if (CFG_PosX != -1 || CFG_PosY != -1)
+			glfwSetWindowPos(m_Window, CFG_PosX, CFG_PosY);
 
 		InitCallbacks();
 	}
@@ -117,4 +149,4 @@ namespace Helios::Engine::Renderer {
 	}
 
 
-} // namespace Helios::Engine::Renderer
+} // namespace Helios::Engine::Renderer::Vulkan

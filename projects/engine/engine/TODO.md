@@ -4,4 +4,12 @@ Make use of VKExtensionManager in
 - VKDevice
 
 Make use of Utils::IniParser in
-- Window
+- Window ... nearly done
+
+Find a better way for the Spec system
+
+Next steps in vulkan:
+- pipeline
+- basic rendering
+- multithreaded rendering
+- ....

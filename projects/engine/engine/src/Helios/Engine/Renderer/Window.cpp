@@ -7,6 +7,7 @@
 #include "Helios/Engine/Events/Types/Key.h"
 #include "Helios/Engine/Events/Types/Mouse.h"
 #include "Helios/Engine/Events/Types/Window.h"
+#include "Helios/Engine/Spec/SpecApp.h"
 
 #ifdef HE_RENDERER_OPENGL
 #	include "Platform/Renderer/OpenGL/GLWindow.h"
@@ -35,21 +36,47 @@ namespace Helios::Engine::Renderer {
 			return nullptr;
 
 #		ifdef HE_RENDERER_OPENGL
-			case RendererAPI::API::OpenGL: return CreateRef<GLWindow>();
+		case RendererAPI::API::OpenGL: return CreateRef<OpenGL::GLWindow>();
 #		endif
 #		ifdef HE_RENDERER_VULKAN
-			case RendererAPI::API::Vulkan: return CreateRef<VKWindow>();
+			case RendererAPI::API::Vulkan: return CreateRef<Vulkan::VKWindow>();
 #		endif
 #		ifdef HE_RENDERER_DIRECTX
-			case RendererAPI::API::DirectX: return CreateRef<DXWindow>();
+			case RendererAPI::API::DirectX: return CreateRef<DirectX::DXWindow>();
 #		endif
 #		ifdef HE_RENDERER_METAL
-			case RendererAPI::API::Metal: return CreateRef<MTWindow>();
+			case RendererAPI::API::Metal: return CreateRef<Metal::MTWindow>();
 #		endif
 		}
 
 		LOG_RENDER_ERROR("Unknown RendererAPI!");
 		return nullptr;
+	}
+
+
+	Window::Window()
+	{
+		LoadConfig();
+	}
+
+
+	Window::~Window()
+	{
+		SaveConfig();
+	}
+
+
+	void Window::LoadConfig()
+	{
+		std::filesystem::path filepath = Spec::App::WorkingDirectory + "/config/window.ini";
+		m_Config.load(filepath);
+	}
+
+
+	void Window::SaveConfig()
+	{
+		std::filesystem::path filepath = Spec::App::WorkingDirectory + "/config/window.ini";
+		m_Config.save(filepath);
 	}
 
 

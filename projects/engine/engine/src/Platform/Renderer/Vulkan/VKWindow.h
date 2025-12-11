@@ -2,7 +2,7 @@
 
 #include "Helios/Engine/Renderer/Window.h"
 
-namespace Helios::Engine::Renderer
+namespace Helios::Engine::Renderer::Vulkan
 {
 
 
@@ -24,4 +24,4 @@ namespace Helios::Engine::Renderer
 	};
 
 
-} // namespace Helios::Engine::Renderer
+} // namespace Helios::Engine::Renderer::Vulkan

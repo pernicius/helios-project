@@ -12,7 +12,7 @@ namespace Helios::Engine::Renderer {
 
 	// Format mapping table. Rows must be in the exact same order as Format enum members.
 	static const FormatInfo c_FormatInfo[] = {
-		//  Format                     Name              Bpb  Bs    Kind                      R  G  B  A  D  S   Flags
+		//  Format                   Name                Bpb  Bs  Kind                      R  G  B  A  D  S   Flags
 		{ Format::UNKNOWN,           "UNKNOWN",           0,   0, FormatKind::Integer,      0, 0, 0, 0, 0, 0,  0 },
 
 		{ Format::R8_UINT,           "R8_UINT",           1,   1, FormatKind::Integer,      8, 0, 0, 0, 0, 0,  MakeFlags(FormatInfoFlags::HasRed) },
