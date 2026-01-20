@@ -21,9 +21,9 @@ project "vendor.glad"
 	staticruntime "On"
 	targetname    "glad"
 	
-	dir_project = "%{string.lower(prj.name)}"
-	targetdir (dir_bin   .. dir_group .. dir_config .. dir_project)
-	objdir    (dir_build .. dir_group .. dir_config .. dir_project)
+	dir_project = ("%{string.lower(prj.name)}")
+	targetdir   (dir_bin   .. dir_group .. dir_config .. dir_project)
+	objdir      (dir_build .. dir_group .. dir_config .. dir_project)
 
 	-- move project in the correct dir
 	basedir("glad")
@@ -41,11 +41,9 @@ project "vendor.glad"
 	}
 
 	filter "configurations:Debug"
-		runtime "Debug"
-		symbols "On"
-		
+		runtime  "Debug"
+		symbols  "On"
 	filter "configurations:Release"
-		runtime "Release"
+		runtime  "Release"
 		optimize "On"
-		
 	filter {}

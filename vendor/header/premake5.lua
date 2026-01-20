@@ -1,1 +1,1 @@
-include "premake5_spdlog"
+include "premake5_spdlog.lua"

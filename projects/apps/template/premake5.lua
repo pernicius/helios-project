@@ -6,9 +6,9 @@ project "Template"
 	cppdialect    "C++20"
 	staticruntime "On"
 
-	dir_project = "%{string.lower(prj.name)}"
-	targetdir (dir_bin   .. dir_group .. dir_config .. dir_project)
-	objdir    (dir_build .. dir_group .. dir_config .. dir_project)
+	dir_project = ("%{string.lower(prj.name)}" .. "/")
+	targetdir   (dir_bin   .. dir_group .. dir_config .. dir_project)
+	objdir      (dir_build .. dir_group .. dir_config .. dir_project)
 
 	pchheader "pch.h"
 	pchsource "pch.cpp"
@@ -27,23 +27,18 @@ project "Template"
 	}
 
 	-- Dependencies
+	Lib_Platform{}
 	Lib_HeliosEngine{}
 	
+	-- Debug/Release configuration
 	filter "configurations:Debug"
-
 		kind "ConsoleApp"
-
 		defines {
 		}
-		
 		debugargs {
 		}
-
 	filter "configurations:Release"
-
 		kind "WindowedApp"
-
 		defines {
 		}
-
 	filter {}

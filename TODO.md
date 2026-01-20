@@ -1,0 +1,6 @@
+> [!NOTE]
+> This is just a reminder for myself where i'm at and what are the next steps i want to do.
+
+implement platform scripts:
+ - scripts/linux/...
+ - scripts/macos/...

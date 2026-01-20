@@ -88,7 +88,7 @@ goto _error_exit
 :_git_run
 echo ===== Fetching vendor repos
 pushd ..\..\
-rem git submodule update --init --recursive
+git submodule update --init --recursive
 popd
 if %ERRORLEVEL% == 0 goto _git_end
 echo ERROR: Error during fetching!

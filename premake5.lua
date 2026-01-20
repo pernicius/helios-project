@@ -1,3 +1,6 @@
+printf("Premake version: '%s'", _PREMAKE_VERSION)
+printf("Premake target:  '%s'", _TARGET_OS)
+
 ---------------------------------
 -- [ WORKSPACE CONFIGURATION ] --
 ---------------------------------
@@ -8,8 +11,6 @@ workspace "Helios-Project"
 	configurations {
 		"Debug",
 		"Release"
-		-- TODO: do we need more? like "Relese-Candidate", "Alpha", "Beta"....
-		-- TODO: do we need more? like "Relese-Candidate", "Alpha", "Beta"....
 		-- TODO: do we need more? like "Relese-Candidate", "Alpha", "Beta"....
 	}
 
@@ -39,6 +40,8 @@ workspace "Helios-Project"
 		-- required by spdlog
 		buildoptions "/utf-8"
 
+	filter {}
+
 	-------------------------------------
 	-- [ DEBUG/RELEASE CONFIGURATION ] --
 	-------------------------------------
@@ -49,6 +52,8 @@ workspace "Helios-Project"
 		}
 		symbols  "On"
 		runtime  "Debug"
+		fatalwarnings "All"
+
 		optimize "Off"
 
 	filter "configurations:Release"
@@ -58,8 +63,7 @@ workspace "Helios-Project"
 		}
 		symbols  "Off"
 		runtime  "Release"
-		
-		fatalwarnings{ "All" }
+		fatalwarnings "All"
 
 		optimize "Off"
 --		optimize "On"
@@ -71,25 +75,21 @@ workspace "Helios-Project"
 	-------------------------------
 	-- [ PROJECT CONFIGURATION ] --
 	-------------------------------
+	dir_bin    = (path.join("%{wks.location}", "_bin") .. "/")
+	dir_build  = (path.join("%{wks.location}", "_build") .. "/")
+	dir_config = ("%{string.lower(cfg.platform)}-%{string.lower(cfg.buildcfg)}" .. "/")
 
-	dir_bin     = "%{wks.location}/_bin/"
-	dir_build   = "%{wks.location}/_build/"
-	dir_config  = "%{string.lower(cfg.platform)}-%{string.lower(cfg.buildcfg)}/"
-
+	include("premake5_misc.lua")
 	group "Vendor"
-		dir_group = "Helios-Vendor/"
+		dir_group = ("vendor" .. "/")
 		include("vendor/dev-tools/premake/")
 		include("vendor/header/")
 		include("vendor/libs/")
-
-	group "Helios/Engine"
-		dir_group = "Helios-Engine/"
-		include("projects/engine/shared/")
-		include("projects/engine/engine/")
+	group "Helios"
+		dir_group = ("helios" .. "/")
+		include("projects/helios-engine/")
 		include("projects/apps/sandbox/")
-
-	group "Helios/Apps"
-		dir_group = "Helios-Apps/"
+	group "Apps"
+		dir_group = ("apps" .. "/")
 		include("projects/apps/template/")
-
 	group ""

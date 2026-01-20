@@ -1,2 +1,2 @@
-include "premake5_glad"
-include "premake5_glfw"
+include "premake5_glad.lua"
+include "premake5_glfw.lua"
