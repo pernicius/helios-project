@@ -92,4 +92,7 @@ workspace "Helios-Project"
 	group "Apps"
 		dir_group = ("apps" .. "/")
 		include("projects/apps/template/")
+	group "Docs"
+		dir_group = ("docs" .. "/")
+		include("premake5_docs.lua")
 	group ""
