@@ -17,6 +17,7 @@
 //   thread when possible.
 // 
 // Version history:
+// - 2026.01: Added directory creation support
 // - 2026.01: Initial version
 //==============================================================================
 #pragma once
@@ -37,13 +38,21 @@ namespace Helios::Engine::VFS {
 		explicit PhysicalFileBackend(const std::string& rootPath);
 		virtual ~PhysicalFileBackend() = default;
 
+		// Basic file operations
 		bool Exists(const std::string& path) const override;
 		FileHandle GetFileHandle(const std::string& path) const override;
 		Scope<FileStream> OpenStream(const std::string& path, FileMode mode) override;
 		std::vector<std::string> ListFiles(const std::string& directory, bool recursive = false) const override;
+		
+		// Directory operations
 		bool IsDirectory(const std::string& path) const override;
+		bool CreateDirectory(const std::string& path) override;
+		bool CreateDirectories(const std::string& path) override;
+		bool RemoveDirectory(const std::string& path, bool recursive = false) override;
+
 	private:
 		std::string ResolvePath(const std::string& path) const;
+
 	private:
 		std::string m_RootPath;
 	};

@@ -4,11 +4,7 @@
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
-// Version history:
-// - 2026.01: Added lookup cache with LRU eviction
-//            Added overlapping alias support (wildcard matching)
-//            Fixed overlapping mount point resolution (hierarchical fallback)
-// - 2026.01: Initial version
+// Further information in the corresponding header file VFS.h
 //==============================================================================
 #include "pch.h"
 #include "Helios/Engine/VFS/VFS.h"
@@ -25,16 +21,16 @@ namespace Helios::Engine::VFS {
 	// VirtualFileSystem Implementation
 	//------------------------------------------------------------------------------
 
-	VirtualFileSystem& VirtualFileSystem::Get()
+	VirtualFileSystem::VirtualFileSystem()
 	{
-		static VirtualFileSystem* s_Instance = nullptr;
+		LOG_CORE_DEBUG("VFS: Virtual File System initialized.");
+	}
 
-		if (!s_Instance) {
-			s_Instance = new VirtualFileSystem();
-			LOG_CORE_DEBUG("VFS: Virtual File System initialized.");
-		}
 
-		return *s_Instance;
+	VirtualFileSystem& VirtualFileSystem::GetInstance()
+	{
+		static VirtualFileSystem instance;
+		return instance;
 	}
 
 
@@ -438,6 +434,105 @@ namespace Helios::Engine::VFS {
 	}
 
 
+	bool VirtualFileSystem::CreateDirectory(const std::string& virtualPath)
+	{
+		std::lock_guard<std::mutex> lock(m_Mutex);
+
+		std::string resolvedPath = ResolvePath(virtualPath);
+		auto mountPoints = FindMountPointsCached(resolvedPath);
+
+		if (mountPoints.empty()) {
+			LOG_CORE_ERROR("VFS: No mount point found for '{}'", virtualPath);
+			return false;
+		}
+
+		// Use the highest-priority writable mount point
+		for (auto* mp : mountPoints) {
+			if (mp->ReadOnly) {
+				continue;
+			}
+
+			std::string relativePath = StripMountPrefix(resolvedPath, mp->VirtualPath);
+			bool result = mp->Backend->CreateDirectory(relativePath);
+
+			if (result) {
+				LOG_CORE_DEBUG("VFS: Created directory '{}'", virtualPath);
+			}
+
+			return result;
+		}
+
+		LOG_CORE_ERROR("VFS: No writable mount point found for '{}'", virtualPath);
+		return false;
+	}
+
+
+	bool VirtualFileSystem::CreateDirectories(const std::string& virtualPath)
+	{
+		std::lock_guard<std::mutex> lock(m_Mutex);
+
+		std::string resolvedPath = ResolvePath(virtualPath);
+		auto mountPoints = FindMountPointsCached(resolvedPath);
+
+		if (mountPoints.empty()) {
+			LOG_CORE_ERROR("VFS: No mount point found for '{}'", virtualPath);
+			return false;
+		}
+
+		// Use the highest-priority writable mount point
+		for (auto* mp : mountPoints) {
+			if (mp->ReadOnly) {
+				continue;
+			}
+
+			std::string relativePath = StripMountPrefix(resolvedPath, mp->VirtualPath);
+			bool result = mp->Backend->CreateDirectories(relativePath);
+
+			if (result) {
+				LOG_CORE_DEBUG("VFS: Created directories '{}'", virtualPath);
+			}
+
+			return result;
+		}
+
+		LOG_CORE_ERROR("VFS: No writable mount point found for '{}'", virtualPath);
+		return false;
+	}
+
+
+	bool VirtualFileSystem::RemoveDirectory(const std::string& virtualPath, bool recursive)
+	{
+		std::lock_guard<std::mutex> lock(m_Mutex);
+
+		std::string resolvedPath = ResolvePath(virtualPath);
+		auto mountPoints = FindMountPointsCached(resolvedPath);
+
+		if (mountPoints.empty()) {
+			LOG_CORE_ERROR("VFS: No mount point found for '{}'", virtualPath);
+			return false;
+		}
+
+		// Use the highest-priority writable mount point
+		for (auto* mp : mountPoints) {
+			if (mp->ReadOnly) {
+				continue;
+			}
+
+			std::string relativePath = StripMountPrefix(resolvedPath, mp->VirtualPath);
+			bool result = mp->Backend->RemoveDirectory(relativePath, recursive);
+
+			if (result) {
+				LOG_CORE_DEBUG("VFS: Removed directory '{}'", virtualPath);
+			}
+
+			return result;
+		}
+
+		LOG_CORE_ERROR("VFS: No writable mount point found for '{}'", virtualPath);
+		return false;
+	}
+
+
 	//------------------------------------------------------------------------------
 	// Path utilities
 	//------------------------------------------------------------------------------
@@ -501,6 +596,20 @@ namespace Helios::Engine::VFS {
 	}
 
 
+	std::string VirtualFileSystem::GetParentPath(const std::string& path)
+	{
+		auto [parent, filename] = SplitPath(path);
+		return parent;
+	}
+
+
+	std::string VirtualFileSystem::GetFileName(const std::string& path)
+	{
+		auto [parent, filename] = SplitPath(path);
+		return filename;
+	}
+
+
 	//------------------------------------------------------------------------------
 	// Cache management
 	//------------------------------------------------------------------------------
@@ -518,7 +627,7 @@ namespace Helios::Engine::VFS {
 	}
 
 
-	void VirtualFileSystem::SetCacheMaxSize(size_t maxSize)
+	void VirtualFileSystem::SetCacheMaxEntries(size_t maxSize)
 	{
 		std::lock_guard<std::mutex> lock(m_Mutex);
 

@@ -10,6 +10,8 @@
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
 // Version history:
+// - 2026.01: Switched to 'Meyer's Singleton' pattern
+//            Added directory creation support
 // - 2026.01: Added lookup cache with LRU eviction
 //            Added overlapping alias support (wildcard matching)
 //            Fixed overlapping mount point resolution (hierarchical fallback)
@@ -27,7 +29,7 @@
 #include <vector>
 
 // Singleton access macro
-#define VirtFS Helios::Engine::VFS::VirtualFileSystem::Get()
+#define VirtFS Helios::Engine::VFS::VirtualFileSystem::GetInstance()
 
 namespace Helios::Engine::VFS {
 
@@ -81,11 +83,17 @@ namespace Helios::Engine::VFS {
 	public:
 		virtual ~VFSBackend() = default;
 
+		// Basic file operations
 		virtual bool Exists(const std::string& path) const = 0;
 		virtual FileHandle GetFileHandle(const std::string& path) const = 0;
 		virtual Scope<FileStream> OpenStream(const std::string& path, FileMode mode) = 0;
 		virtual std::vector<std::string> ListFiles(const std::string& directory, bool recursive = false) const = 0;
+
+		// Directory operations
 		virtual bool IsDirectory(const std::string& path) const = 0;
+		virtual bool CreateDirectory(const std::string& path) = 0;
+		virtual bool CreateDirectories(const std::string& path) = 0;
+		virtual bool RemoveDirectory(const std::string& path, bool recursive = false) = 0;
 	};
 
 
@@ -128,11 +136,11 @@ namespace Helios::Engine::VFS {
 	class VirtualFileSystem
 	{
 	public:
-		VirtualFileSystem() = default;
+		VirtualFileSystem();
 		~VirtualFileSystem() = default;
 
 		// Singleton access...
-		static VirtualFileSystem& Get();
+		static VirtualFileSystem& GetInstance();
 
 		// Mount management...
 		bool Mount(const std::string& virtualPath, const std::string& physicalPath, int priority = 0, const std::string& id = "default");
@@ -165,14 +173,19 @@ namespace Helios::Engine::VFS {
 		// Directory...
 		std::vector<std::string> ListFiles(const std::string& virtualPath, bool recursive = false) const;
 		bool IsDirectory(const std::string& virtualPath) const;
+		bool CreateDirectory(const std::string& virtualPath);
+		bool CreateDirectories(const std::string& virtualPath);
+		bool RemoveDirectory(const std::string& virtualPath, bool recursive = false);
 
 		// Path...
 		static std::string NormalizePath(const std::string& path);
 		static std::pair<std::string, std::string> SplitPath(const std::string& path);
+		static std::string GetParentPath(const std::string& path);
+		static std::string GetFileName(const std::string& path);
 
 		// Cache management...
 		void ClearCache();
-		void SetCacheMaxSize(size_t maxSize);
+		void SetCacheMaxEntries(size_t maxSize);
 		size_t GetCacheSize() const;
 		size_t GetCacheHits() const;
 		size_t GetCacheMisses() const;

@@ -4,8 +4,7 @@
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
-// Version history:
-// - 2026.01: Initial version
+// Further information in the corresponding header file VFS_PhysFS.h
 //==============================================================================
 #include "pch.h"
 #include "Helios/Engine/VFS/VFS_PhysFS.h"
@@ -35,7 +34,7 @@ namespace Helios::Engine::VFS {
 			m_RootPath += '/';
 		}
 		
-		LOG_CORE_TRACE("VFS: PhysicalFileBackend created with root: '{}'", m_RootPath);
+		LOG_CORE_DEBUG("VFS: PhysicalFileBackend created with root: '{}'", m_RootPath);
 	}
 
 
@@ -115,6 +114,94 @@ namespace Helios::Engine::VFS {
 	{
 		std::string fullPath = ResolvePath(path);
 		return fs::exists(fullPath) && fs::is_directory(fullPath);
+	}
+
+
+	bool PhysicalFileBackend::CreateDirectory(const std::string& path)
+	{
+		std::string fullPath = ResolvePath(path);
+
+		try {
+			std::error_code ec;
+			bool result = fs::create_directory(fullPath, ec);
+
+			if (ec) {
+				LOG_CORE_ERROR("VFS: Failed to create directory '{}': {}", path, ec.message());
+				return false;
+			}
+
+			return result || fs::exists(fullPath); // Return true if directory was created or already exists
+		}
+		catch (const fs::filesystem_error& e) {
+			LOG_CORE_ERROR("VFS: Failed to create directory '{}': {}", path, e.what());
+			return false;
+		}
+	}
+
+
+	bool PhysicalFileBackend::CreateDirectories(const std::string& path)
+	{
+		std::string fullPath = ResolvePath(path);
+
+		try {
+			std::error_code ec;
+			bool result = fs::create_directories(fullPath, ec);
+
+			if (ec) {
+				LOG_CORE_ERROR("VFS: Failed to create directories '{}': {}", path, ec.message());
+				return false;
+			}
+
+			return result || fs::exists(fullPath); // Return true if directories were created or already exist
+		}
+		catch (const fs::filesystem_error& e) {
+			LOG_CORE_ERROR("VFS: Failed to create directories '{}': {}", path, e.what());
+			return false;
+		}
+	}
+
+
+	bool PhysicalFileBackend::RemoveDirectory(const std::string& path, bool recursive)
+	{
+		std::string fullPath = ResolvePath(path);
+
+		if (!fs::exists(fullPath)) {
+			LOG_CORE_WARN("VFS: Directory '{}' does not exist", path);
+			return false;
+		}
+
+		if (!fs::is_directory(fullPath)) {
+			LOG_CORE_ERROR("VFS: Path '{}' is not a directory", path);
+			return false;
+		}
+
+		try {
+			std::error_code ec;
+
+			if (recursive) {
+				// Remove directory and all its contents
+				std::uintmax_t removed = fs::remove_all(fullPath, ec);
+				if (ec) {
+					LOG_CORE_ERROR("VFS: Failed to remove directory '{}' recursively: {}", path, ec.message());
+					return false;
+				}
+				LOG_CORE_DEBUG("VFS: Removed directory '{}' and {} items", path, removed);
+				return removed > 0;
+			}
+			else {
+				// Remove only if directory is empty
+				bool result = fs::remove(fullPath, ec);
+				if (ec) {
+					LOG_CORE_ERROR("VFS: Failed to remove directory '{}': {}", path, ec.message());
+					return false;
+				}
+				return result;
+			}
+		}
+		catch (const fs::filesystem_error& e) {
+			LOG_CORE_ERROR("VFS: Failed to remove directory '{}': {}", path, e.what());
+			return false;
+		}
 	}
 
 
