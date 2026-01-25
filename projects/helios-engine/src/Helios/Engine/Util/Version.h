@@ -1,3 +1,18 @@
+//==============================================================================
+// Version Encoding Utilities
+//
+// Provides a compact version encoding scheme that packs version information
+// into a single uint32_t: 3 bits for type (Debug/Release), 7 bits for major,
+// 10 bits for minor, 12 bits for patch. Includes macros for encoding
+// (HE_MAKE_VERSION) and decoding (HE_VERSION_MAJOR, etc.) version numbers.
+// Automatically sets version type based on BUILD_DEBUG flag.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 
 #include <cstdint>

@@ -1,3 +1,17 @@
+//==============================================================================
+// Timestep Wrapper
+//
+// Provides a lightweight wrapper for delta time values passed to layer update
+// callbacks. Stores time in seconds as a float and provides implicit conversion
+// to float for convenient arithmetic operations. Designed for use with frame
+// timing and fixed timestep game loops.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 
 namespace Helios::Engine {

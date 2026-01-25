@@ -1,3 +1,18 @@
+//==============================================================================
+// Layer Stack
+//
+// Manages an ordered collection of Layer objects with a two-tier system:
+// regular layers (bottom half) and overlays (top half, always rendered last).
+// Layers are inserted at m_LayerInsertIndex, overlays are always pushed to
+// the end. Provides bidirectional iteration for forward (rendering) and
+// reverse (event propagation) traversal. Owns the lifetime of all layers.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 
 #include "Helios/Engine/Core/Layer.h"

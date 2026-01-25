@@ -1,3 +1,18 @@
+//==============================================================================
+// Vulkan Window Implementation
+//
+// Provides a Vulkan-specific window implementation derived from the base
+// Window class. Configures GLFW window hints for Vulkan compatibility
+// (including disabling OpenGL context creation). Manages Vulkan surface
+// creation and integration with the GLFW windowing system. Non-copyable to
+// ensure unique ownership of window resources.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 
 #include "Helios/Engine/Renderer/Window.h"

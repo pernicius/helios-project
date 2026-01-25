@@ -1,3 +1,18 @@
+//==============================================================================
+// Layer System
+//
+// Provides an abstract base class for application layers in the layer stack.
+// Layers receive lifecycle callbacks (OnAttach/OnDetach), per-frame updates
+// (OnUpdate with timestep), rendering callbacks (OnRender), and event
+// notifications (OnEvent). Enables modular composition of application
+// functionality with well-defined execution order.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 
 namespace Helios::Engine {

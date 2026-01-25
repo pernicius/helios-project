@@ -1,3 +1,11 @@
+//==============================================================================
+// Application Specification (implementation)
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Further information in the corresponding header file AppSpec.h
+//==============================================================================
 #include "pch.h"
 #include "Helios/Engine/Core/AppSpec.h"
 

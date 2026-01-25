@@ -1,3 +1,18 @@
+//==============================================================================
+// Mouse Event Types
+//
+// Defines concrete mouse event classes derived from the Event base class.
+// Includes MouseMovedEvent (cursor position), MouseScrolledEvent (wheel delta),
+// MouseButtonPressedEvent, and MouseButtonReleasedEvent (with modifier keys).
+// Uses fmt for string formatting. Part of the engine's event system for
+// mouse input handling.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 #include "Helios/Engine/Core/Events.h"
 

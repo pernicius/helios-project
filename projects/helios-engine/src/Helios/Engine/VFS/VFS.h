@@ -15,7 +15,7 @@
 // - 2026.01: Added lookup cache with LRU eviction
 //            Added overlapping alias support (wildcard matching)
 //            Fixed overlapping mount point resolution (hierarchical fallback)
-// - 2026.01: Initial version
+// - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once
 

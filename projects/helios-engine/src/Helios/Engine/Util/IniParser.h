@@ -1,3 +1,19 @@
+//==============================================================================
+// INI File Parser
+//
+// Provides a lightweight INI file parser with type-safe templated accessors.
+// Supports sections, key-value pairs, and comment preservation (file-level,
+// section-level, key-level). Features automatic type conversion for common
+// types (int, float, double, bool, string), case-insensitive boolean parsing,
+// and auto-storage of default values. Used for configuration persistence
+// throughout the engine.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 
 #include <filesystem>

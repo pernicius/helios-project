@@ -1,3 +1,17 @@
+//==============================================================================
+// Application Specification
+//
+// Defines the configuration structure for initializing Helios Engine
+// applications. Contains application metadata (name, version), filesystem
+// paths (working directory, log file, config file), command-line argument
+// handling, and initialization hints for engine behavior.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 
 namespace Helios::Engine {

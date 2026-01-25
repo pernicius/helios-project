@@ -1,3 +1,11 @@
+//==============================================================================
+// Window Management (implementation)
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Further information in the corresponding header file Window.h
+//==============================================================================
 #include "pch.h"
 #include "Helios/Engine/Renderer/Window.h"
 
@@ -71,7 +79,7 @@ namespace Helios::Engine::Renderer {
 			s.posX  = m_Config.Get<int>("Last", "posX",  s.posX);
 			s.posY  = m_Config.Get<int>("Last", "posY",  s.posY);
 			s.sizeX = m_Config.Get<int>("Last", "sizeX", s.sizeX);
-			s.sizeY = m_Config.Get<int>("Last", "sizeY", s.sizeY);
+		 s.sizeY = m_Config.Get<int>("Last", "sizeY", s.sizeY);
 
 			s.isMaximized  = m_Config.Get<bool>("State", "isMaximized",  s.isMaximized);
 			s.isMinimized  = m_Config.Get<bool>("State", "isMinimized",  s.isMinimized);

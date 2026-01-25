@@ -1,3 +1,11 @@
+//==============================================================================
+// Windows Platform Main Entry Point (implementation)
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Further information in the corresponding header file WinMain.h
+//==============================================================================
 #include "pch.h"
 #include "Helios/Platform/System/Windows/WinMain.h"
 

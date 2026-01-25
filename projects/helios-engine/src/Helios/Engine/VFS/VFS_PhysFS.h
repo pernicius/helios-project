@@ -18,7 +18,7 @@
 // 
 // Version history:
 // - 2026.01: Added directory creation support
-// - 2026.01: Initial version
+// - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once
 #include "Helios/Engine/VFS/VFS.h"

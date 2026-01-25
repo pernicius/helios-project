@@ -37,6 +37,108 @@ These guidelines describe the coding style and contribution process used across 
 - **Blank lines**: Add blank lines around function implementations for readability. Keep template instantiations grouped at the end of implementation files.
 - **Templates**: For template classes/functions, provide explicit instantiations at the end of the `.cpp` file for commonly-used types.
 
+## File Headers
+All source files must include a standardized header comment block at the top of the file. This ensures consistent documentation and copyright information across the project.
+
+### Header Files (.h)
+Use the full header format with double-line separators (`==============================================================================`):
+
+```cpp
+//==============================================================================
+// Brief Title (e.g., "Application Core")
+//
+// Detailed description of the file's purpose, functionality, and key features.
+// This section should explain what the file provides, how it fits into the
+// engine architecture, and any important implementation details or usage notes.
+// Multiple paragraphs are acceptable for complex modules.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
+#pragma once
+```
+
+**Guidelines:**
+- **Title**: Short, descriptive name of the component (e.g., "Application Core", "INI File Parser", "Debugger Break Utility")
+- **Description**: Comprehensive explanation of purpose, features, and architecture. Describe what problems it solves and how it integrates with other systems.
+- **Copyright**: Use current year and standard copyright notice format
+- **Project URL**: Always include the GitHub repository link
+- **Version history**: Start with initial version entry; add new entries for major changes
+- **Separator lines**: Exactly 78 equal signs (`=`)
+
+### Implementation Files (.cpp)
+Use the simplified header format that references the corresponding header:
+
+```cpp
+//==============================================================================
+// Brief Title (implementation)
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Further information in the corresponding header file FileName.h
+//==============================================================================
+#include "pch.h"
+```
+
+**Guidelines:**
+- Add "(implementation)" suffix to the title
+- No detailed description needed (refer to header file instead)
+- Include reference line pointing to the header file
+- First `#include` after header must be `"pch.h"` when PCH is enabled
+
+### Special Cases
+
+#### Third-party Code
+When integrating third-party code, preserve original license information and add Helios Project context:
+
+```cpp
+//==============================================================================
+// Component Name
+//
+// Brief description of functionality.
+//
+// Third-party code: [source URL]
+// Licensed under [License Name] (see below)
+// Modified for integration into Helios Project
+//
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+//==============================================================================
+// [Original copyright and license text follows]
+```
+
+#### Platform-Specific Headers
+Platform headers should note their platform scope in the title:
+
+```cpp
+//==============================================================================
+// Windows Platform Main Header
+//
+// Description of platform-specific functionality...
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
+```
+
+### Version History Format
+Maintain a chronological version history (newest first) with brief descriptions:
+
+```cpp
+// Version history:
+// - 2026.03: Performance improvements, bug fixes
+// - 2026.02: Added feature X, refactored Y
+// - 2026.01: Initial version / start of version history
+```
+
+Use year.month format for version entries. Keep descriptions concise but informative.
+
 ## Code Organization
 - Use forward declarations and friend classes where appropriate to maintain encapsulation while allowing necessary access.
 - Keep helper functions and compile-time constants in private sections.

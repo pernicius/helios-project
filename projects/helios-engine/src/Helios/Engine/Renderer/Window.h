@@ -1,3 +1,19 @@
+//==============================================================================
+// Window Management
+//
+// Provides cross-platform window creation and management using GLFW. Supports
+// windowed, fullscreen, and borderless modes with automatic monitor detection
+// and video mode selection. Handles window state persistence (position, size,
+// fullscreen) via INI configuration. Integrates with the event system for
+// window callbacks (resize, move, focus, minimize, maximize). Thread-safe
+// state tracking with GLFW state validation.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 
 #include "Helios/Engine/Core/Events.h"

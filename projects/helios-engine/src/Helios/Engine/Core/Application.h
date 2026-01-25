@@ -1,3 +1,18 @@
+//==============================================================================
+// Application Core
+//
+// Provides the central application management system for the Helios Engine.
+// Handles application lifecycle (initialization, main loop, shutdown), window
+// creation, event processing and dispatch, layer stack management, and
+// renderer initialization. Implements a singleton pattern with entry point
+// integration through AppMain.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 
 #include "Helios/Engine/Core/AppSpec.h"

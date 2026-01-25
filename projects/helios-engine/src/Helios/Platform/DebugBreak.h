@@ -1,3 +1,18 @@
+//==============================================================================
+// Debugger Break Utility
+//
+// Provides cross-platform debugger breakpoint triggering via the debug_break()
+// function (aliased as DebugBreak). Uses platform-specific mechanisms: MSVC
+// __debugbreak intrinsic, inline assembly trap instructions (x86, ARM, RISC-V,
+// PowerPC), or SIGTRAP signal as fallback. Integrated with assertion macros
+// for debug-time error handling with debugger attachment support.
+//
+// Third-party code: https://github.com/biojppm/debugbreak
+// Licensed under BSD 2-Clause License (see below)
+// Modified for integration into Helios Project
+//
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+//==============================================================================
 // Sorce: https://github.com/biojppm/debugbreak/blob/master/debugbreak.h
 #define DebugBreak debug_break
 

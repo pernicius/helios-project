@@ -1,3 +1,18 @@
+//==============================================================================
+// Renderer API Abstraction
+//
+// Provides platform-agnostic renderer API selection and management. Supports
+// multiple graphics APIs (DirectX, Metal, Vulkan) with runtime detection of
+// platform capabilities. Maintains a global API state and provides named
+// enumeration for API types. Used by the renderer subsystem to abstract
+// graphics backend selection.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 
 namespace Helios::Engine::Renderer {

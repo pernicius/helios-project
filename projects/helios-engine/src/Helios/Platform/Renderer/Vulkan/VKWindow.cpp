@@ -1,3 +1,11 @@
+//==============================================================================
+// Vulkan Window Implementation
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Further information in the corresponding header file VKWindow.h
+//==============================================================================
 #include "pch.h"
 #include "Helios/Platform/Renderer/Vulkan/VKWindow.h"
 

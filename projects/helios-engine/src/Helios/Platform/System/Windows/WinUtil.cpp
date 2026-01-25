@@ -1,3 +1,11 @@
+//==============================================================================
+// Windows Platform Utilities (implementation)
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Further information in the corresponding header file WinUtil.h
+//==============================================================================
 #include "pch.h"
 #include "Helios/Platform/System/Windows/WinUtil.h"
 

@@ -1,3 +1,18 @@
+//==============================================================================
+// Smart Pointer Aliases
+//
+// Provides convenient type aliases and factory functions for std::unique_ptr
+// (Scope/CreateScope) and std::shared_ptr (Ref/CreateRef). Uses perfect
+// forwarding for efficient construction. Simplifies smart pointer usage
+// throughout the engine with shorter, more expressive names that clarify
+// ownership semantics (Scope for exclusive ownership, Ref for shared).
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 
 #include <memory>

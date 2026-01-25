@@ -1,3 +1,18 @@
+//==============================================================================
+// Engine Master Include Header
+//
+// Provides a single-include entry point for the Helios Engine. Aggregates all
+// essential headers: standard library, third-party dependencies (Vulkan, GLFW),
+// platform-specific utilities, core engine systems (Application, Logging,
+// Events, Layers), and utility classes (smart pointers, version encoding).
+// Include this header in application code to access the full engine API.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 
 // Library includes

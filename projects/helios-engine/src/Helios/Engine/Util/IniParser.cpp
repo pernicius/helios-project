@@ -1,3 +1,11 @@
+//==============================================================================
+// INI File Parser (implementation)
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Further information in the corresponding header file IniParser.h
+//==============================================================================
 #include "pch.h"
 #include "Helios/Engine/Util/IniParser.h"
 

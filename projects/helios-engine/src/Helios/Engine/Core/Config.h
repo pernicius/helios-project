@@ -1,14 +1,18 @@
-/**
- * Thread-safe configuration management system
- *
- * Threading Model:
- * - All methods are thread-safe for concurrent access
- * - Reads use shared locks (multiple readers allowed)
- * - Writes use exclusive locks (blocks all access)
- * - Recommended usage: Load at startup, mostly read during runtime
- *
- * @note For best performance, minimize Set() calls during runtime
- */
+//==============================================================================
+// Configuration Management System
+//
+// Provides a thread-safe, hierarchical configuration system with three levels:
+// ConfigManager (singleton) -> ConfigDomain (file-based) -> ConfigSection
+// (key-value pairs). Supports loading/saving INI-style files, type-safe
+// templated accessors, and per-level comment preservation. Uses shared_mutex
+// for concurrent read access with exclusive write locking.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 
 //#include <string>

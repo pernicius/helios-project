@@ -1,14 +1,19 @@
+//==============================================================================
+// Platform Detection
+//
+// Provides compile-time platform detection macros for conditional compilation.
+// Defines TARGET_PLATFORM_* macros for Windows (x64 only), Linux, and macOS.
+// Detects but explicitly rejects unsupported platforms (iOS, Android, x86
+// Windows) with compile-time errors. Ensures consistent platform identification
+// across the engine codebase.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
-// ============================================================================
-// Platform Detection Header
-// Defines platform-specific macros for conditional compilation.
-// Supported platforms:
-//   - Windows (x64)
-//   - Linux
-//   - MacOS
-// Detected but not supported (will trigger compile error):
-//   - iOS, iOS Simulator, Android
-// ============================================================================
 
 // Undefine all platform macros to avoid accidental redefinition
 #undef TARGET_PLATFORM_WINDOWS

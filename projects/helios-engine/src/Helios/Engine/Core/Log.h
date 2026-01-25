@@ -1,3 +1,18 @@
+//==============================================================================
+// Logging System
+//
+// Provides a multi-category logging facade built on spdlog with compile-time
+// log level filtering. Supports four logger categories (Core, GLFW, App,
+// Renderer) with standard log levels (TRACE, DEBUG, INFO, WARN, ERROR, FATAL).
+// Includes assertion macros with debugger break support and exception macros
+// that log and throw. Configurable output to file and console.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 
 #include <Helios/Platform/DebugBreak.h>

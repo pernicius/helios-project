@@ -1,3 +1,17 @@
+//==============================================================================
+// Event System
+//
+// Provides a polymorphic event handling framework with type-safe dispatching.
+// Supports multiple events types and event categories for filtering.
+// Uses the EventDispatcher for type-safe callback invocation with automatic
+// event type matching and handling state management.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 
 namespace Helios::Engine {

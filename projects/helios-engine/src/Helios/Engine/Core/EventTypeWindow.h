@@ -1,3 +1,19 @@
+//==============================================================================
+// Window Event Types
+//
+// Defines concrete window event classes derived from the Event base class.
+// Includes lifecycle events (WindowClose, WindowMinimize, WindowMaximize,
+// WindowRestore, WindowRefresh), state events (WindowFocus with focus state),
+// position events (WindowMoved), and size events (WindowResize,
+// FramebufferResize). Uses fmt for string formatting. Part of the engine's
+// event system for window management.
+//
+// Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
+// Part of the Helios Project - https://github.com/pernicius/helios-project
+// 
+// Version history:
+// - 2026.01: Initial version / start of version history
+//==============================================================================
 #pragma once
 #include "Helios/Engine/Core/Events.h"
 
