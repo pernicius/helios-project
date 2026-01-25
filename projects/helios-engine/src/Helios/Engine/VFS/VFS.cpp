@@ -5,6 +5,9 @@
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
 // Version history:
+// - 2026.01: Added lookup cache with LRU eviction
+//            Added overlapping alias support (wildcard matching)
+//            Fixed overlapping mount point resolution (hierarchical fallback)
 // - 2026.01: Initial version
 //==============================================================================
 #include "pch.h"
@@ -74,6 +77,9 @@ namespace Helios::Engine::VFS {
 				return a.VirtualPath.length() > b.VirtualPath.length();
 			});
 
+		// Invalidate cache when mount points change
+		InvalidateCache();
+
 		LOG_CORE_DEBUG("VFS: Mounted '{}' with ID '{}' and priority {}", virtualPath, id, priority);
 		return true;
 	}
@@ -92,6 +98,10 @@ namespace Helios::Engine::VFS {
 
 		if (it != m_MountPoints.end()) {
 			m_MountPoints.erase(it, m_MountPoints.end());
+			
+			// Invalidate cache when mount points change
+			InvalidateCache();
+			
 			LOG_CORE_DEBUG("VFS: Unmounted '{}' with ID '{}'", virtualPath, id);
 		}
 	}
@@ -102,6 +112,10 @@ namespace Helios::Engine::VFS {
 		std::lock_guard<std::mutex> lock(m_Mutex);
 
 		m_MountPoints.clear();
+		
+		// Invalidate cache when mount points change
+		InvalidateCache();
+		
 		LOG_CORE_DEBUG("VFS: All mount points cleared");
 	}
 
@@ -117,6 +131,10 @@ namespace Helios::Engine::VFS {
 
 		if (it != m_MountPoints.end()) {
 			m_MountPoints.erase(it, m_MountPoints.end());
+			
+			// Invalidate cache when mount points change
+			InvalidateCache();
+			
 			LOG_CORE_DEBUG("VFS: Unmounted all with ID '{}'", id);
 		}
 	}
@@ -150,6 +168,10 @@ namespace Helios::Engine::VFS {
 		}
 
 		m_Aliases[normalizedAlias] = normalizedTarget;
+		
+		// Invalidate cache when aliases change
+		InvalidateCache();
+		
 		LOG_CORE_DEBUG("VFS: Created alias '{}' -> '{}'", normalizedAlias, normalizedTarget);
 		return true;
 	}
@@ -162,6 +184,10 @@ namespace Helios::Engine::VFS {
 		auto it = m_Aliases.find(alias);
 		if (it != m_Aliases.end()) {
 			m_Aliases.erase(it);
+			
+			// Invalidate cache when aliases change
+			InvalidateCache();
+			
 			LOG_CORE_DEBUG("VFS: Removed alias '{}'", alias);
 			return true;
 		}
@@ -176,6 +202,10 @@ namespace Helios::Engine::VFS {
 		std::lock_guard<std::mutex> lock(m_Mutex);
 
 		m_Aliases.clear();
+		
+		// Invalidate cache when aliases change
+		InvalidateCache();
+		
 		LOG_CORE_DEBUG("VFS: All aliases removed");
 	}
 
@@ -218,7 +248,7 @@ namespace Helios::Engine::VFS {
 		std::lock_guard<std::mutex> lock(m_Mutex);
 
 		std::string resolvedPath = ResolvePath(virtualPath);
-		auto mountPoints = FindMountPoints(resolvedPath);
+		auto mountPoints = FindMountPointsCached(resolvedPath);
 
 		// Check all matching mount points (higher priority first due to sorting)
 		for (const auto* mp : mountPoints) {
@@ -237,7 +267,7 @@ namespace Helios::Engine::VFS {
 		std::lock_guard<std::mutex> lock(m_Mutex);
 
 		std::string resolvedPath = ResolvePath(virtualPath);
-		auto mountPoints = FindMountPoints(resolvedPath);
+		auto mountPoints = FindMountPointsCached(resolvedPath);
 
 		// Check all matching mount points (higher priority first)
 		for (const auto* mp : mountPoints) {
@@ -258,7 +288,7 @@ namespace Helios::Engine::VFS {
 		std::lock_guard<std::mutex> lock(m_Mutex);
 
 		std::string resolvedPath = ResolvePath(virtualPath);
-		auto mountPoints = FindMountPoints(resolvedPath);
+		auto mountPoints = FindMountPointsCached(resolvedPath);
 
 		if (mountPoints.empty()) {
 			LOG_CORE_ERROR("VFS: No mount point found for '{}'", virtualPath);
@@ -368,7 +398,7 @@ namespace Helios::Engine::VFS {
 		std::lock_guard<std::mutex> lock(m_Mutex);
 
 		std::string resolvedPath = ResolvePath(virtualPath);
-		auto mountPoints = FindMountPoints(resolvedPath);
+		auto mountPoints = FindMountPointsCached(resolvedPath);
 
 		std::vector<std::string> allFiles;
 
@@ -394,7 +424,7 @@ namespace Helios::Engine::VFS {
 		std::lock_guard<std::mutex> lock(m_Mutex);
 
 		std::string resolvedPath = ResolvePath(virtualPath);
-		auto mountPoints = FindMountPoints(resolvedPath);
+		auto mountPoints = FindMountPointsCached(resolvedPath);
 
 		// Check all matching mount points
 		for (const auto* mp : mountPoints) {
@@ -472,6 +502,68 @@ namespace Helios::Engine::VFS {
 
 
 	//------------------------------------------------------------------------------
+	// Cache management
+	//------------------------------------------------------------------------------
+
+	void VirtualFileSystem::ClearCache()
+	{
+		std::lock_guard<std::mutex> lock(m_Mutex);
+
+		m_LookupCache.clear();
+		m_LRUList.clear();
+		m_CacheHits = 0;
+		m_CacheMisses = 0;
+
+		LOG_CORE_DEBUG("VFS: Lookup cache cleared");
+	}
+
+
+	void VirtualFileSystem::SetCacheMaxSize(size_t maxSize)
+	{
+		std::lock_guard<std::mutex> lock(m_Mutex);
+
+		m_CacheMaxSize = maxSize;
+
+		// Evict excess entries if new size is smaller
+		while (m_LookupCache.size() > m_CacheMaxSize) {
+			EvictOldestCacheEntry();
+		}
+
+		LOG_CORE_DEBUG("VFS: Cache max size set to {}", maxSize);
+	}
+
+
+	size_t VirtualFileSystem::GetCacheSize() const
+	{
+		std::lock_guard<std::mutex> lock(m_Mutex);
+
+		return m_LookupCache.size();
+	}
+
+
+	size_t VirtualFileSystem::GetCacheHits() const
+	{
+		std::lock_guard<std::mutex> lock(m_Mutex);
+
+		return m_CacheHits;
+	}
+
+
+	size_t VirtualFileSystem::GetCacheMisses() const
+	{
+		std::lock_guard<std::mutex> lock(m_Mutex);
+
+		return m_CacheMisses;
+	}
+
+
+	size_t VirtualFileSystem::GetCacheEvictions() const
+	{
+		return m_CacheEvictions;
+	}
+
+
+	//------------------------------------------------------------------------------
 	// Private helper methods
 	//------------------------------------------------------------------------------
 
@@ -480,13 +572,17 @@ namespace Helios::Engine::VFS {
 		std::string normalizedPath = NormalizePath(virtualPath);
 		std::vector<MountPoint*> matches;
 
-		// Collect all mount points that match the virtual path
-		// Mount points are already sorted by priority and specificity
+		// Collect all mount points that match the virtual path hierarchically
+		// Mount points are already sorted by priority and specificity (length)
 		for (auto& mp : m_MountPoints) {
-			if (normalizedPath.find(mp.VirtualPath) == 0) {
-				// Ensure we match at a path boundary
-				if (normalizedPath.length() == mp.VirtualPath.length() ||
-					normalizedPath[mp.VirtualPath.length()] == '/') {
+			// Check if the mount point is a prefix of the path (or exact match)
+			if (normalizedPath == mp.VirtualPath) {
+				// Exact match
+				matches.push_back(&mp);
+			} else if (normalizedPath.find(mp.VirtualPath) == 0) {
+				// Prefix match - ensure it's at a path boundary
+				size_t prefixLen = mp.VirtualPath.length();
+				if (normalizedPath[prefixLen] == '/') {
 					matches.push_back(&mp);
 				}
 			}
@@ -502,15 +598,52 @@ namespace Helios::Engine::VFS {
 		std::vector<const MountPoint*> matches;
 
 		for (const auto& mp : m_MountPoints) {
-			if (normalizedPath.find(mp.VirtualPath) == 0) {
-				if (normalizedPath.length() == mp.VirtualPath.length() ||
-					normalizedPath[mp.VirtualPath.length()] == '/') {
+			// Check if the mount point is a prefix of the path (or exact match)
+			if (normalizedPath == mp.VirtualPath) {
+				// Exact match
+				matches.push_back(&mp);
+			} else if (normalizedPath.find(mp.VirtualPath) == 0) {
+				// Prefix match - ensure it's at a path boundary
+				size_t prefixLen = mp.VirtualPath.length();
+				if (normalizedPath[prefixLen] == '/') {
 					matches.push_back(&mp);
 				}
 			}
 		}
 
 		return matches;
+	}
+
+
+	std::vector<const MountPoint*> VirtualFileSystem::FindMountPointsCached(const std::string& virtualPath) const
+	{
+		// Check if we have a cached result
+		auto cacheIt = m_LookupCache.find(virtualPath);
+		if (cacheIt != m_LookupCache.end() && cacheIt->second.Valid) {
+			// Cache hit - update LRU and return cached result
+			++m_CacheHits;
+			UpdateLRU(virtualPath);
+			return cacheIt->second.MountPoints;
+		}
+
+		// Cache miss - perform actual lookup
+		++m_CacheMisses;
+		auto mountPoints = FindMountPoints(virtualPath);
+
+		// Store result in cache
+		if (m_LookupCache.size() >= m_CacheMaxSize) {
+			EvictOldestCacheEntry();
+		}
+
+		LookupCacheEntry entry;
+		entry.VirtualPath = virtualPath;
+		entry.MountPoints = mountPoints;
+		entry.Valid = true;
+
+		m_LookupCache[virtualPath] = entry;
+		m_LRUList.push_front(virtualPath);
+
+		return mountPoints;
 	}
 
 
@@ -544,16 +677,68 @@ namespace Helios::Engine::VFS {
 
 				auto it = m_Aliases.find(aliasName);
 				if (it != m_Aliases.end()) {
+					// Alias found - resolve to target path
 					path = it->second;
-					if (!remainder.empty() && remainder[0] != '/') {
-						path += "/";
+					
+					// Handle remainder (the part after the alias)
+					if (!remainder.empty()) {
+						// If remainder starts with '/', we're explicitly specifying a sub-path
+						// Example: @textures:/ui/button.png -> textures/ui/button.png
+						if (remainder[0] == '/') {
+							remainder = remainder.substr(1); // Strip leading slash
+						}
+						
+						// Append remainder to alias target
+						if (!path.empty() && path.back() != '/') {
+							path += "/";
+						}
+						path += remainder;
 					}
-					path += remainder;
+					// else: No remainder means we're accessing the alias root directly
+					//       Example: @textures: -> textures/
 				}
+				// else: Alias not found - leave path unchanged for error handling
 			}
 		}
 
 		return NormalizePath(path);
+	}
+
+
+	void VirtualFileSystem::InvalidateCache()
+	{
+		// Mark all cache entries as invalid (will be cleared on next access)
+		m_LookupCache.clear();
+		m_LRUList.clear();
+		
+		LOG_CORE_TRACE("VFS: Lookup cache invalidated");
+	}
+
+
+	void VirtualFileSystem::UpdateLRU(const std::string& key) const
+	{
+		// Remove key from its current position in LRU list
+		auto it = std::find(m_LRUList.begin(), m_LRUList.end(), key);
+		if (it != m_LRUList.end()) {
+			m_LRUList.erase(it);
+		}
+
+		// Add key to front (most recently used)
+		m_LRUList.push_front(key);
+	}
+
+
+	void VirtualFileSystem::EvictOldestCacheEntry() const
+	{
+		if (m_LRUList.empty()) {
+			return;
+		}
+
+		// Remove least recently used entry (back of list)
+		const std::string& oldestKey = m_LRUList.back();
+		m_LookupCache.erase(oldestKey);
+		m_LRUList.pop_back();
+		++m_CacheEvictions;
 	}
 
 

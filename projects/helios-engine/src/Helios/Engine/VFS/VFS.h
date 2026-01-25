@@ -10,15 +10,20 @@
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
 // Version history:
+// - 2026.01: Added lookup cache with LRU eviction
+//            Added overlapping alias support (wildcard matching)
+//            Fixed overlapping mount point resolution (hierarchical fallback)
 // - 2026.01: Initial version
 //==============================================================================
 #pragma once
 
 #include "Helios/Engine/Util/ScopeRef.h"
 
+#include <list>
 #include <map>
 #include <mutex>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 // Singleton access macro
@@ -103,6 +108,19 @@ namespace Helios::Engine::VFS {
 
 
 	//------------------------------------------------------------------------------
+	// Lookup Cache Entry
+	//------------------------------------------------------------------------------
+
+
+	struct LookupCacheEntry
+	{
+		std::string VirtualPath;                     // Resolved virtual path (after alias resolution)
+		std::vector<const MountPoint*> MountPoints;  // Matching mount points (in priority order)
+		bool Valid = true;                           // Is this cache entry still valid?
+	};
+
+
+	//------------------------------------------------------------------------------
 	// Virtual File System
 	//------------------------------------------------------------------------------
 
@@ -152,16 +170,38 @@ namespace Helios::Engine::VFS {
 		static std::string NormalizePath(const std::string& path);
 		static std::pair<std::string, std::string> SplitPath(const std::string& path);
 
+		// Cache management...
+		void ClearCache();
+		void SetCacheMaxSize(size_t maxSize);
+		size_t GetCacheSize() const;
+		size_t GetCacheHits() const;
+		size_t GetCacheMisses() const;
+		size_t GetCacheEvictions() const;
+
 	private:
 		std::vector<MountPoint*> FindMountPoints(const std::string& virtualPath);
 		std::vector<const MountPoint*> FindMountPoints(const std::string& virtualPath) const;
+		std::vector<const MountPoint*> FindMountPointsCached(const std::string& virtualPath) const;
 		std::string StripMountPrefix(const std::string& virtualPath, const std::string& mountPath) const;
 		std::string ResolvePath(const std::string& virtualPath) const;
+
+		// Cache helpers...
+		void InvalidateCache();
+		void UpdateLRU(const std::string& key) const;
+		void EvictOldestCacheEntry() const;
 
 	private:
 		std::vector<MountPoint> m_MountPoints;
 		std::map<std::string, std::string> m_Aliases;
 		mutable std::mutex m_Mutex;
+
+		// Lookup cache (LRU)...
+		mutable std::unordered_map<std::string, LookupCacheEntry> m_LookupCache;
+		mutable std::list<std::string> m_LRUList;  // Most recently used at front
+		mutable size_t m_CacheMaxSize = 256;       // Default: cache up to 256 lookups
+		mutable size_t m_CacheHits = 0;
+		mutable size_t m_CacheMisses = 0;
+		mutable size_t m_CacheEvictions = 0;
 	};
 
 
