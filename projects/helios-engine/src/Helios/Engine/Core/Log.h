@@ -33,9 +33,9 @@ namespace Helios::Engine {
 
 
 // log levels
-constexpr auto LOG_LEVEL_TRACE = 0;
+constexpr auto LOG_LEVEL_TRACE = 0; // should be used for Debug builds
 constexpr auto LOG_LEVEL_DEBUG = 1;
-constexpr auto LOG_LEVEL_INFO  = 2;
+constexpr auto LOG_LEVEL_INFO  = 2; // should be used for Release builds
 constexpr auto LOG_LEVEL_WARN  = 3;
 constexpr auto LOG_LEVEL_ERROR = 4;
 constexpr auto LOG_LEVEL_FATAL = 5; // should never be used

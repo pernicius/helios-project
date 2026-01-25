@@ -5,6 +5,8 @@ namespace HE = Helios::Engine;
 //#include "Platform/Renderer/Vulkan/VKRenderPass.h"
 //#include "Platform/Renderer/Vulkan/VKPipeline.h"
 
+#include "Helios/Engine/VFS/VFS.h"
+
 class App : public HE::Application
 {
 public:
@@ -45,6 +47,10 @@ void App::OnInit()
 	LOG_INFO("Sandbox: Init.");
 
 	InitRenderer();
+
+	VirtFS.Mount("assets", ".");
+	VirtFS.CreateAlias("@assets:", "assets/");
+	VirtFS.CreateAlias("@textures:", "assets/textures/");
 
 	// Create a simple render pass + pipeline now that renderer (window/device/swapchain) exists.
 //	try {
