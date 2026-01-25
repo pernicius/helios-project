@@ -50,12 +50,15 @@ namespace Helios::Engine {
 
 		// console logger
 		logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
+
 		// basic file logger
 //		logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(file, true));
+		
 		// rotating file logger
 		constexpr int log_max_size = 1024 * 1024 * 10; // 10 MB
 		constexpr int log_max_files = 10;
 		logSinks.emplace_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(file, log_max_size, log_max_files, true));
+		
 		// MSVC debug output sink (visible in Visual Studio Output -> Debug)
 #		ifdef USE_MSVC_SINK
 			logSinks.emplace_back(std::make_shared<spdlog::sinks::msvc_sink_mt>());
