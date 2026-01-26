@@ -9,6 +9,14 @@
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
+// Main Features:
+// - Mount points with priority & overlay support
+// - Path aliases (@prefix: syntax)
+// - Backend abstraction (filesystem/archives)
+// - Thread-safe with LRU cache
+// - Stream-based I/O
+// - Directory management 
+// 
 // Version history:
 // - 2026.01: Added file read/write stream abstraction
 // - 2026.01: Switched to 'Meyer's Singleton' pattern

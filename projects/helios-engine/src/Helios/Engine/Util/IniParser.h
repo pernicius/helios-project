@@ -11,6 +11,17 @@
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
+// Main Features:
+// - INI format parser with section/key/value structure
+// - Type-safe templated Get/Set with automatic type conversion
+// - Common type support (int, float, double, bool, string, long long)
+// - Case-insensitive boolean parsing
+// - Three-level comment preservation (file/section/key)
+// - Auto-storage of defaults on missing keys
+// - VFS integration for file I/O
+// - Section/key enumeration and existence checking
+// - Type-aware value formatting
+// 
 // Version history:
 // - 2026.01: Converted to use Virtual File System (VFS) for file access
 // - 2026.01: Initial version / start of version history

@@ -10,6 +10,14 @@
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
+// Main Features:
+// - Hierarchical config system (Manager->Domain->Section->Key)
+// - Thread-safe concurrent reads with shared_mutex
+// - Type-safe templated Get/Set with defaults
+// - Multi-level comment preservation
+// - INI file persistence via VFS
+// - Singleton pattern with auto-creation
+// 
 // Version history:
 // - 2026.01: Initial version / start of version history
 //==============================================================================

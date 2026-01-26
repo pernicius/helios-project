@@ -39,7 +39,6 @@ central configuration solution
 
 better comments:
  - descriptive file headers
-   - key features
    - usage
  - in general more comments
  - doxygen style comments for all (public) classes and functions

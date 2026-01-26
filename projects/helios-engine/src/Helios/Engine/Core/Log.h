@@ -10,6 +10,15 @@
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
+// Main Features:
+// - Multi-category logging (Core/GLFW/App/Renderer)
+// - Compile-time log level filtering (zero overhead)
+// - spdlog backend with fmt formatting
+// - Assertion macros with debugger break
+// - Exception macros (log + throw)
+// - Build-aware level defaults (TRACE/INFO)
+// - File and console output
+// 
 // Version history:
 // - 2026.01: Initial version / start of version history
 //==============================================================================

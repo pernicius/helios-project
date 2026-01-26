@@ -9,6 +9,16 @@
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
+// Main Features:
+// - Type-safe polymorphic event dispatching
+// - Event category filtering with bitfield flags
+// - Automatic handling state tracking
+// - Comprehensive window and input event types
+// - Modifier key support
+// - Macro-based event class generation
+// - Lambda callback binding
+// - Lambda binding helper (HE_BIND_EVENT_FN)
+// 
 // Version history:
 // - 2026.01: Initial version / start of version history
 //==============================================================================

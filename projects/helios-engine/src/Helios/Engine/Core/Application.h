@@ -10,6 +10,16 @@
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
+// Main Features:
+// - Singleton application management with lifecycle control
+// - Thread-safe event queue with dispatch to layer stack
+// - Layer/overlay management system (push/pop operations)
+// - Window creation and event handling integration
+// - Renderer initialization coordination
+// - Application restart support
+// - Configuration management via AppSpec
+// - Entry point integration (AppMain) and factory pattern
+// 
 // Version history:
 // - 2026.01: Added use of ConfigManager
 // - 2026.01: Initial version / start of version history

@@ -10,6 +10,13 @@
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
+// Main Features:
+// - Two-tier system: regular layers (bottom) + overlays (top)
+// - Bidirectional iteration (forward for rendering, reverse for events)
+// - Dynamic layer insertion/removal with lifetime management
+// - Overlays always processed last for UI/debug priority
+// - STL-compatible iterator interface
+// 
 // Version history:
 // - 2026.01: Initial version / start of version history
 //==============================================================================

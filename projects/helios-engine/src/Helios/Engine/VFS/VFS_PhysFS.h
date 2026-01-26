@@ -9,12 +9,13 @@
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 //
-// Thread Safety:
-// - PhysicalFileBackend: Thread-safe (stateless operations)
-// - PhysicalFileStream: Thread-safe (mutex-protected operations)
-//   All stream operations are synchronized and safe for concurrent access.
-//   However, for optimal performance, use separate stream instances per
-//   thread when possible.
+// Main Features:
+// - Physical filesystem VFSBackend implementation
+// - Root path isolation with std::filesystem integration
+// - Thread-safe operations (stateless backend, mutex-protected streams)
+// - Full directory operations (create/list/remove/recursive)
+// - Binary stream I/O with positioning support
+// - Automatic resource management and error handling
 // 
 // Version history:
 // - 2026.01: Added directory creation support

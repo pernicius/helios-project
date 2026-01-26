@@ -10,6 +10,16 @@
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
+// Main Features:
+// - Multi-API support (DirectX, Metal, Vulkan)
+// - Platform capability detection and validation
+// - Automatic API selection based on platform support
+// - Global API state with runtime switching
+// - Compile-time API name mapping (zero-copy string_view)
+// - Extensible enumeration with sentinel value
+// - Platform-agnostic backend abstraction
+// - Named API access for debugging
+// 
 // Version history:
 // - 2026.01: Initial version / start of version history
 //==============================================================================

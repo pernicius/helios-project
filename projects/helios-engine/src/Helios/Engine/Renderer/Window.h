@@ -11,6 +11,16 @@
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
+// Main Features:
+// - GLFW-based cross-platform window management
+// - Multi-mode support (windowed/fullscreen/borderless)
+// - Automatic monitor and video mode selection
+// - State persistence and restoration via ConfigManager
+// - Event system integration for window callbacks
+// - Fullscreen toggle with state preservation
+// - Dual validation (cached + GLFW queries)
+// - Multi-window support
+// 
 // Version history:
 // - 2026.01: Reworked to use ConfigManager insead of IniParser directly
 // - 2026.01: Initial version / start of version history
