@@ -12,13 +12,13 @@
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
 // Version history:
+// - 2026.01: Reworked to use ConfigManager insead of IniParser directly
 // - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once
 
 #include "Helios/Engine/Core/Events.h"
 //#include "Helios/Engine/Renderer/MonitorUtils.h"
-#include "Helios/Engine/Util/IniParser.h"
 
 namespace Helios::Engine::Renderer {
 
@@ -87,8 +87,6 @@ namespace Helios::Engine::Renderer {
 		std::tuple<const GLFWvidmode*, bool> DetermineTargetVideoMode(GLFWmonitor* monitor);
 		GLFWmonitor* GetCurrentMonitor();
 		const char* GetCurrentMonitorName();
-
-		Util::IniParser m_Config;
 
 	protected:
 		void InitCallbacks();

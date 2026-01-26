@@ -12,14 +12,18 @@
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
 // Version history:
+// - 2026.01: Converted to use Virtual File System (VFS) for file access
 // - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once
 
-#include <filesystem>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+namespace Helios::Engine::VFS {
+	class FileStream;
+}
 
 namespace Helios::Util {
 
@@ -32,8 +36,8 @@ namespace Helios::Util {
 		IniParser() = default;
 
 	public:
-		bool Load(const std::filesystem::path& path);
-		bool Save(const std::filesystem::path& path) const;
+		bool Load(const std::string& virtualPath);
+		bool Save(const std::string& virtualPath) const;
 
 		// Comment management
 		void SetFileComment(const std::string& comment);
@@ -70,7 +74,6 @@ namespace Helios::Util {
 		static void TrimInPlace(std::string& s);
 		static std::string ToLowerCopy(const std::string& s);
 		static std::string JoinComments(const std::vector<std::string>& comments);
-		static void WriteComment(std::ofstream& ofs, const std::string& comment);
 
 		template<typename T>
 		static bool ParseValue(const std::string& s, T& out);

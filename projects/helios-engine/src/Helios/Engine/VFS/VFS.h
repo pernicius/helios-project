@@ -10,6 +10,7 @@
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
 // Version history:
+// - 2026.01: Added file read/write stream abstraction
 // - 2026.01: Switched to 'Meyer's Singleton' pattern
 //            Added directory creation support
 // - 2026.01: Added lookup cache with LRU eviction
@@ -105,13 +106,13 @@ namespace Helios::Engine::VFS {
 	struct MountPoint
 	{
 		std::string VirtualPath;    // e.g., "assets"
-		std::string ID;             // Unique identifier (for that path) for the mount point (optional, defaults to "default")
 		Scope<VFSBackend> Backend;
 		int Priority = 0;           // Higher priority checked first
+		std::string ID;             // Unique identifier (for that path) for the mount point (optional, defaults to "default")
 		bool ReadOnly = true;       // Reject write operations if true
 
-		MountPoint(const std::string& virtualPath, Scope<VFSBackend> backend, int priority = 0, const std::string& id = "default")
-			: VirtualPath(virtualPath), ID(id), Backend(std::move(backend)), Priority(priority) {}
+		MountPoint(const std::string& virtualPath, Scope<VFSBackend> backend, int priority = 0, const std::string& id = "default", bool readOnly = true)
+			: VirtualPath(virtualPath), Backend(std::move(backend)), Priority(priority), ID(id), ReadOnly(readOnly) {}
 	};
 
 
@@ -143,8 +144,8 @@ namespace Helios::Engine::VFS {
 		static VirtualFileSystem& GetInstance();
 
 		// Mount management...
-		bool Mount(const std::string& virtualPath, const std::string& physicalPath, int priority = 0, const std::string& id = "default");
-		bool Mount(const std::string& virtualPath, Scope<VFSBackend> backend, int priority = 0, const std::string& id = "default");
+		bool Mount(const std::string& virtualPath, const std::string& physicalPath, int priority = 0, const std::string& id = "default", bool readOnly = true);
+		bool Mount(const std::string& virtualPath, Scope<VFSBackend> backend, int priority = 0, const std::string& id = "default", bool readOnly = true);
 		void Unmount(const std::string& virtualPath, const std::string& id = "default");
 		void UnmountAll();
 		void UnmountAllWithID(const std::string& id);

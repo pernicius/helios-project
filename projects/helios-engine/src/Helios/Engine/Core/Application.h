@@ -11,6 +11,7 @@
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
 // Version history:
+// - 2026.01: Added use of ConfigManager
 // - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once

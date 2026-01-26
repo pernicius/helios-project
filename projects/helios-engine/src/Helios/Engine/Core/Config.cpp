@@ -15,7 +15,7 @@
 #include <limits>
 #include <charconv>
 
-namespace Helios::Engine::Core {
+namespace Helios::Engine {
 
 
 	//------------------------------------------------------------------------------
@@ -328,6 +328,12 @@ namespace Helios::Engine::Core {
 	//------------------------------------------------------------------------------
 	// ConfigManager Implementation
 	//------------------------------------------------------------------------------
+
+
+	ConfigManager::ConfigManager()
+	{
+		LOG_CORE_DEBUG("ConfigManager initialized.");
+	}
 
 
 	ConfigManager& ConfigManager::GetInstance()

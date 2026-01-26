@@ -9,6 +9,7 @@
 #include "pch.h"
 #include "Helios/Platform/Renderer/Vulkan/VKWindow.h"
 
+#include "Helios/Engine/Core/Config.h"
 //#include "Helios/Engine/Renderer/Format.h"
 //#include "Helios/Engine/Spec/SpecWindow.h"
 //#include "Helios/Engine/Spec/SpecDevice.h"
@@ -24,16 +25,12 @@ namespace Helios::Engine::Renderer::Vulkan {
 //------------------------------------------------------------------------------
 // Configuration value shortcuts
 
-// Update-Rule: manual (requires recreate window)
-#define CFG_StartBorderless        m_Config.Get<bool>("Config", "StartBorderless",              false)
-#define CFG_StartFullscreen        m_Config.Get<bool>("Config", "StartFullscreen",              false)
-#define CFG_AllowResizing          m_Config.Get<bool>("Config", "AllowResizing",                true)
-// Update-Rule: window move events / -1 if in fullscreen
-
-#define CFG_DisableDPIAwareness    m_Config.Get<bool>("Config", "DisableDPIAwareness",          false) /* Windows only */
-#define CFG_SwapChainSampleCount   m_Config.Get<int>( "Config", "SwapChainSampleCount",         1)
-#define CFG_RefreshRate            m_Config.Get<int>( "Config", "RefreshRate",                  60)
-#define CFG_ResizeWithDisplayScale m_Config.Get<bool>("Config", "ResizeWindowWithDisplayScale", false)
+#define CFG_SwapChainSampleCount   ConfigManager::GetInstance().Get<int>( "HeliosEngine/Window", "Config", "SwapChainSampleCount",   1)
+#define CFG_ResizeWithDisplayScale ConfigManager::GetInstance().Get<bool>("HeliosEngine/Window", "Config", "ResizeWithDisplayScale", false)
+#define CFG_StartBorderless        ConfigManager::GetInstance().Get<bool>("HeliosEngine/Window", "Config", "StartBorderless",        false)
+#define CFG_AllowResizing          ConfigManager::GetInstance().Get<bool>("HeliosEngine/Window", "Config", "AllowResizing",          true)
+#define CFG_RefreshRate            ConfigManager::GetInstance().Get<int>( "HeliosEngine/Window", "Config", "RefreshRate",            60)
+#define CFG_DisableDPIAwareness    ConfigManager::GetInstance().Get<bool>("HeliosEngine/Window", "Config", "DisableDPIAwareness",    false) /* Windows only */
 
 //------------------------------------------------------------------------------
 // Configuration value shortcuts (Vulkan specific)

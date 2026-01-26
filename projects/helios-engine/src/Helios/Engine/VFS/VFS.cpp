@@ -38,14 +38,14 @@ namespace Helios::Engine::VFS {
 	// Mount management
 	//------------------------------------------------------------------------------
 
-	bool VirtualFileSystem::Mount(const std::string& virtualPath, const std::string& physicalPath, int priority, const std::string& id)
+	bool VirtualFileSystem::Mount(const std::string& virtualPath, const std::string& physicalPath, int priority, const std::string& id, bool readOnly)
 	{
 		auto backend = CreateScope<PhysicalFileBackend>(physicalPath);
-		return Mount(virtualPath, std::move(backend), priority, id);
+		return Mount(virtualPath, std::move(backend), priority, id, readOnly);
 	}
 
 
-	bool VirtualFileSystem::Mount(const std::string& virtualPath, Scope<VFSBackend> backend, int priority, const std::string& id)
+	bool VirtualFileSystem::Mount(const std::string& virtualPath, Scope<VFSBackend> backend, int priority, const std::string& id, bool readOnly)
 	{
 		std::lock_guard<std::mutex> lock(m_Mutex);
 
@@ -62,7 +62,7 @@ namespace Helios::Engine::VFS {
 			m_MountPoints.erase(it);
 		}
 
-		m_MountPoints.emplace_back(normalizedPath, std::move(backend), priority, id);
+		m_MountPoints.emplace_back(normalizedPath, std::move(backend), priority, id, readOnly);
 
 		// Sort by priority (higher first), then by path length (longer first for specificity)
 		std::sort(m_MountPoints.begin(), m_MountPoints.end(),
@@ -76,7 +76,7 @@ namespace Helios::Engine::VFS {
 		// Invalidate cache when mount points change
 		InvalidateCache();
 
-		LOG_CORE_DEBUG("VFS: Mounted '{}' with ID '{}' and priority {}", virtualPath, id, priority);
+		LOG_CORE_DEBUG("VFS: Mounted '{}' with ID '{}' and priority {} ({})", virtualPath, id, priority, readOnly ? "read only" : "read/write");
 		return true;
 	}
 

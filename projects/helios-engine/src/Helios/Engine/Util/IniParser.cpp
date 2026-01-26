@@ -8,13 +8,13 @@
 //==============================================================================
 #include "pch.h"
 #include "Helios/Engine/Util/IniParser.h"
+#include "Helios/Engine/VFS/VFS.h"
 
 #include <algorithm>
 #include <cctype>
 #include <charconv>
 #include <cerrno>
 #include <cstdlib>
-#include <fstream>
 #include <limits>
 #include <sstream>
 #include <system_error>
@@ -23,30 +23,44 @@
 namespace Helios::Util {
 
 
-	bool IniParser::Load(const std::filesystem::path& path)
+	bool IniParser::Load(const std::string& virtualPath)
 	{
 		m_data.clear();
 		m_keyComments.clear();
 		m_sectionComments.clear();
 		m_fileComment.clear();
 
-		std::ifstream ifs(path, std::ios::binary);
-		if (!ifs)
-			return false;
+		// Read entire file content via VFS
+		std::string content = VirtFS.ReadText(virtualPath);
+		if (content.empty()) {
+			// Check if file exists but is empty, or doesn't exist
+			if (!VirtFS.Exists(virtualPath)) {
+				LOG_CORE_ERROR("IniParser: Failed to load '{}' - file not found", virtualPath);
+				return false;
+			}
+			// File exists but is empty - that's valid
+			return true;
+		}
 
+		// Parse line by line
+		std::istringstream stream(content);
 		std::string line;
 		std::string currentSection;
 		std::vector<std::string> pendingComments;
 		bool isFileHeader = true;
+		bool firstLine = true;
 
-		while (std::getline(ifs, line)) {
+		while (std::getline(stream, line)) {
 			// Remove BOM on first line if present
-			if (!line.empty() && static_cast<unsigned char>(line[0]) == 0xEF) {
-				if (line.size() >= 3 &&
-					static_cast<unsigned char>(line[0]) == 0xEF &&
-					static_cast<unsigned char>(line[1]) == 0xBB &&
-					static_cast<unsigned char>(line[2]) == 0xBF) {
-					line.erase(0, 3);
+			if (firstLine) {
+				firstLine = false;
+				if (!line.empty() && static_cast<unsigned char>(line[0]) == 0xEF) {
+					if (line.size() >= 3 &&
+						static_cast<unsigned char>(line[0]) == 0xEF &&
+						static_cast<unsigned char>(line[1]) == 0xBB &&
+						static_cast<unsigned char>(line[2]) == 0xBF) {
+						line.erase(0, 3);
+					}
 				}
 			}
 
@@ -124,25 +138,15 @@ namespace Helios::Util {
 	}
 
 
-	bool IniParser::Save(const std::filesystem::path& path) const
+	bool IniParser::Save(const std::string& virtualPath) const
 	{
-		// Ensure parent directory exists
-		std::error_code ec;
-		auto dir = path.parent_path();
-		if (!dir.empty()) {
-			std::filesystem::create_directories(dir, ec);
-			if (ec)
-				return false;
-		}
-
-		std::ofstream ofs(path, std::ios::binary | std::ios::trunc);
-		if (!ofs)
-			return false;
+		// Build complete file content in memory
+		std::ostringstream oss;
 
 		// Write file header comment
 		if (!m_fileComment.empty()) {
-			WriteComment(ofs, m_fileComment);
-			ofs << "\n";
+			oss << m_fileComment << "\n";
+			oss << "\n";
 		}
 
 		for (const auto& [section, kv] : m_data) {
@@ -153,9 +157,9 @@ namespace Helios::Util {
 			if (!section.empty()) {
 				auto scIt = m_sectionComments.find(section);
 				if (scIt != m_sectionComments.end() && !scIt->second.empty()) {
-					WriteComment(ofs, scIt->second);
+					oss << scIt->second << "\n";
 				}
-				ofs << "[" << section << "]\n";
+				oss << "[" << section << "]\n";
 			}
 
 			// Write key-value pairs with their comments
@@ -163,13 +167,22 @@ namespace Helios::Util {
 				std::string fullKey = section + "." + k;
 				auto kcIt = m_keyComments.find(fullKey);
 				if (kcIt != m_keyComments.end() && !kcIt->second.empty()) {
-					WriteComment(ofs, kcIt->second);
+					oss << kcIt->second << "\n";
 				}
-				ofs << k << " = " << v << "\n";
+				oss << k << " = " << v << "\n";
 			}
-			ofs << "\n";
+			oss << "\n";
 		}
-		return true;
+
+		// Write to VFS
+		std::string content = oss.str();
+		bool result = VirtFS.WriteText(virtualPath, content);
+
+		if (!result) {
+			LOG_CORE_ERROR("IniParser: Failed to save to '{}'", virtualPath);
+		}
+
+		return result;
 	}
 
 
@@ -293,16 +306,6 @@ namespace Helios::Util {
 				result += "\n";
 		}
 		return result;
-	}
-
-
-	void IniParser::WriteComment(std::ofstream& ofs, const std::string& comment)
-	{
-		std::istringstream iss(comment);
-		std::string line;
-		while (std::getline(iss, line)) {
-			ofs << line << "\n";
-		}
 	}
 
 

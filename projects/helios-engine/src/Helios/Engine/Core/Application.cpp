@@ -11,7 +11,8 @@
 
 #include "Helios/Engine/Core/Timer.h"
 #include "Helios/Engine/Core/Timestep.h"
-
+#include "Helios/Engine/Core/Config.h"
+#include "Helios/Engine/VFS/VFS.h"
 #include "Helios/Engine/Renderer/RendererAPI.h"
 
 #include <Helios/Platform/PlatformDetection.h>
@@ -116,6 +117,13 @@ namespace Helios::Engine {
 
 		// Read config
 //		Config::Read(m_Spec.configfile, m_Spec.WorkingDirectory);
+
+		// Init VFS
+		VirtFS.Mount("config", m_Spec.WorkingDirectory + "/config", 0, "HeliosEngine", false);
+		VirtFS.CreateAlias("@config:", "config");
+
+		// Init ConfigManager
+//		ConfigManager::GetInstance().LoadDomain("HeliosEngine/Window", "window_app.ini");
 
 		// Log and "parse" CmdArgs
 		if (m_Spec.CmdLineArgs.Count > 1)
@@ -341,8 +349,10 @@ namespace Helios::Engine {
 
 	void Application::OnEvent(Event& e)
 	{
-		if (e.GetCategoryFlags() & EventCategory::Window)
-			LOG_CORE_TRACE("Application: OnEvent: {}", e.ToString());
+		if (e.GetCategoryFlags() & EventCategory::Window) {
+			if (e.GetEventType() != EventType::WindowMoved)
+				LOG_CORE_TRACE("Application: OnEvent: {}", e.ToString());
+		}
 
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(HE_BIND_EVENT_FN(Application::OnWindowClose));

@@ -34,7 +34,7 @@ namespace Helios::Engine::VFS {
 			m_RootPath += '/';
 		}
 		
-		LOG_CORE_DEBUG("VFS: PhysicalFileBackend created with root: '{}'", m_RootPath);
+		LOG_CORE_TRACE("VFS: PhysicalFileBackend created with root: '{}'", m_RootPath);
 	}
 
 

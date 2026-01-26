@@ -19,7 +19,7 @@
 //#include <unordered_map>
 //#include <shared_mutex>
 
-namespace Helios::Engine::Core {
+namespace Helios::Engine {
 
 
 	class ConfigDomain; // Forward declaration
@@ -139,7 +139,7 @@ namespace Helios::Engine::Core {
 	class ConfigManager
 	{
 	public:
-		ConfigManager() = default;
+		ConfigManager();
 		~ConfigManager() = default;
 		// Prevent copying
 		ConfigManager(const ConfigManager&) = delete;

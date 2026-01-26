@@ -14,6 +14,7 @@
 #include "Helios/Engine/Core/EventTypeKey.h"
 #include "Helios/Engine/Core/EventTypeMouse.h"
 #include "Helios/Engine/Core/EventTypeWindow.h"
+#include "Helios/Engine/Core/Config.h"
 
 #ifdef HE_RENDERER_VULKAN
 #	include "Helios/Platform/Renderer/Vulkan/VKWindow.h"
@@ -24,6 +25,8 @@
 #ifdef HE_RENDERER_METAL
 #	include "Helios/Platform/Renderer/Metal/MTWindow.h"
 #endif
+
+#define Config ConfigManager::GetInstance()
 
 namespace Helios::Engine::Renderer {
 
@@ -69,92 +72,93 @@ namespace Helios::Engine::Renderer {
 
 	void Window::LoadState()
 	{
-		std::filesystem::path filepath = Application::Get().GetAppSpec().WorkingDirectory + "/config/window_" + m_WindowName + ".ini";
-		if (!m_Config.Load(filepath))
-			return;
+//		std::filesystem::path filepath = Application::Get().GetAppSpec().WorkingDirectory + "/config/window_" + m_WindowName + ".ini";
+//		if (!m_Config.Load(filepath))
+//			return;
+		Config.LoadDomain("HeliosEngine/Window", "@config:/window_" + m_WindowName + ".ini");
+
 
 		// Load last pos and size / state
 		{
 			WindowState& s = m_currentState;
-			s.posX  = m_Config.Get<int>("Last", "posX",  s.posX);
-			s.posY  = m_Config.Get<int>("Last", "posY",  s.posY);
-			s.sizeX = m_Config.Get<int>("Last", "sizeX", s.sizeX);
-		 s.sizeY = m_Config.Get<int>("Last", "sizeY", s.sizeY);
+			s.posX  = Config.Get<int>("HeliosEngine/Window", "Last", "posX",  s.posX);
+			s.posY  = Config.Get<int>("HeliosEngine/Window", "Last", "posY",  s.posY);
+			s.sizeX = Config.Get<int>("HeliosEngine/Window", "Last", "sizeX", s.sizeX);
+			s.sizeY = Config.Get<int>("HeliosEngine/Window", "Last", "sizeY", s.sizeY);
 
-			s.isMaximized  = m_Config.Get<bool>("State", "isMaximized",  s.isMaximized);
-			s.isMinimized  = m_Config.Get<bool>("State", "isMinimized",  s.isMinimized);
-			s.isFullscreen = m_Config.Get<bool>("State", "isFullscreen", s.isFullscreen);
+			s.isMaximized  = Config.Get<bool>("HeliosEngine/Window", "State", "isMaximized",  s.isMaximized);
+			s.isMinimized  = Config.Get<bool>("HeliosEngine/Window", "State", "isMinimized",  s.isMinimized);
+			s.isFullscreen = Config.Get<bool>("HeliosEngine/Window", "State", "isFullscreen", s.isFullscreen);
 		}
 		
 		// Load fullscreen monitor-mode
 		{
 			WindowMonitor& m = m_monitorState;
 			m.monitor = nullptr; // pointer cannot be reconstructed across sessions; DetermineTargetMonitor() will try by name and vidmode
-			m.monitorName  = m_Config.Get<std::string>("Monitor", "MonitorName", "");
-			m.posX         = m_Config.Get<int>( "Monitor", "posX",         m.posX);
-			m.posY         = m_Config.Get<int>( "Monitor", "posY",         m.posY);
-			m.sizeX        = m_Config.Get<int>( "Monitor", "sizeX",        m.sizeX);
-			m.sizeY        = m_Config.Get<int>( "Monitor", "sizeY",        m.sizeY);
-			m.redBits      = m_Config.Get<int>( "Monitor", "redBits",      m.redBits);
-			m.greenBits    = m_Config.Get<int>( "Monitor", "greenBits",    m.greenBits);
-			m.blueBits     = m_Config.Get<int>( "Monitor", "blueBits",     m.blueBits);
-			m.refreshRate  = m_Config.Get<int>( "Monitor", "refreshRate",  m.refreshRate);
-			m.isNonDefault = m_Config.Get<bool>("Monitor", "isNonDefault", m.isNonDefault);
+			m.monitorName  = Config.Get<std::string>("HeliosEngine/Window", "Monitor", "MonitorName", "");
+			m.posX         = Config.Get<int>( "HeliosEngine/Window", "Monitor", "posX",         m.posX);
+			m.posY         = Config.Get<int>( "HeliosEngine/Window", "Monitor", "posY",         m.posY);
+			m.sizeX        = Config.Get<int>( "HeliosEngine/Window", "Monitor", "sizeX",        m.sizeX);
+			m.sizeY        = Config.Get<int>( "HeliosEngine/Window", "Monitor", "sizeY",        m.sizeY);
+			m.redBits      = Config.Get<int>( "HeliosEngine/Window", "Monitor", "redBits",      m.redBits);
+			m.greenBits    = Config.Get<int>( "HeliosEngine/Window", "Monitor", "greenBits",    m.greenBits);
+			m.blueBits     = Config.Get<int>( "HeliosEngine/Window", "Monitor", "blueBits",     m.blueBits);
+			m.refreshRate  = Config.Get<int>( "HeliosEngine/Window", "Monitor", "refreshRate",  m.refreshRate);
+			m.isNonDefault = Config.Get<bool>("HeliosEngine/Window", "Monitor", "isNonDefault", m.isNonDefault);
 		}
 
 		// Load windowd pos and size
 		{
 			WindowState& s = m_windowedState;
-			s.posX  = m_Config.Get<int>("Windowed", "posX",  s.posX);
-			s.posY  = m_Config.Get<int>("Windowed", "posY",  s.posY);
-			s.sizeX = m_Config.Get<int>("Windowed", "sizeX", s.sizeX);
-			s.sizeY = m_Config.Get<int>("Windowed", "sizeY", s.sizeY);
+			s.posX  = Config.Get<int>("HeliosEngine/Window", "Windowed", "posX",  s.posX);
+			s.posY  = Config.Get<int>("HeliosEngine/Window", "Windowed", "posY",  s.posY);
+			s.sizeX = Config.Get<int>("HeliosEngine/Window", "Windowed", "sizeX", s.sizeX);
+			s.sizeY = Config.Get<int>("HeliosEngine/Window", "Windowed", "sizeY", s.sizeY);
 		}
 	}
 
 
 	void Window::SaveState()
 	{
-		std::filesystem::path filepath = Application::Get().GetAppSpec().WorkingDirectory + "/config/window_" + m_WindowName + ".ini";
-
 		// Save current pos and size / state
-		m_Config.Set<int>("Last", "posX", m_currentState.posX);
-		m_Config.Set<int>("Last", "posY", m_currentState.posY);
-		m_Config.Set<int>("Last", "sizeX", m_currentState.sizeX);
-		m_Config.Set<int>("Last", "sizeY", m_currentState.sizeY);
+		Config.Set<int>("HeliosEngine/Window", "Last", "posX", m_currentState.posX);
+		Config.Set<int>("HeliosEngine/Window", "Last", "posY", m_currentState.posY);
+		Config.Set<int>("HeliosEngine/Window", "Last", "sizeX", m_currentState.sizeX);
+		Config.Set<int>("HeliosEngine/Window", "Last", "sizeY", m_currentState.sizeY);
 
-		m_Config.Set<bool>("State", "isMaximized", m_currentState.isMaximized);
-		m_Config.Set<bool>("State", "isMinimized", m_currentState.isMinimized);
-		m_Config.Set<bool>("State", "isFullscreen", m_currentState.isFullscreen);
+		Config.Set<bool>("HeliosEngine/Window", "State", "isMaximized", m_currentState.isMaximized);
+		Config.Set<bool>("HeliosEngine/Window", "State", "isMinimized", m_currentState.isMinimized);
+		Config.Set<bool>("HeliosEngine/Window", "State", "isFullscreen", m_currentState.isFullscreen);
 		// Don't save focus state
-		// m_Config.Set<bool>("State", "isFocused", m_currentState.isFocused);
+		// Config.Set<bool>("HeliosEngine/Window", "State", "isFocused", m_currentState.isFocused);
 
 		// Save fullscreen monitor-mode
 		if (!m_monitorState.monitorName.empty()) {
-			m_Config.Set<std::string>("Monitor", "MonitorName", m_monitorState.monitorName);
-			m_Config.Set<int>( "Monitor", "posX",         m_monitorState.posX);
-			m_Config.Set<int>( "Monitor", "posY",         m_monitorState.posY);
-			m_Config.Set<int>( "Monitor", "sizeX",        m_monitorState.sizeX);
-			m_Config.Set<int>( "Monitor", "sizeY",        m_monitorState.sizeY);
-			m_Config.Set<int>( "Monitor", "redBits",      m_monitorState.redBits);
-			m_Config.Set<int>( "Monitor", "greenBits",    m_monitorState.greenBits);
-			m_Config.Set<int>( "Monitor", "blueBits",     m_monitorState.blueBits);
-			m_Config.Set<int>( "Monitor", "refreshRate",  m_monitorState.refreshRate);
-			m_Config.Set<bool>("Monitor", "isNonDefault", m_monitorState.isNonDefault);
+			Config.Set<std::string>("HeliosEngine/Window", "Monitor", "MonitorName", m_monitorState.monitorName);
+			Config.Set<int>( "HeliosEngine/Window", "Monitor", "posX",         m_monitorState.posX);
+			Config.Set<int>( "HeliosEngine/Window", "Monitor", "posY",         m_monitorState.posY);
+			Config.Set<int>( "HeliosEngine/Window", "Monitor", "sizeX",        m_monitorState.sizeX);
+			Config.Set<int>( "HeliosEngine/Window", "Monitor", "sizeY",        m_monitorState.sizeY);
+			Config.Set<int>( "HeliosEngine/Window", "Monitor", "redBits",      m_monitorState.redBits);
+			Config.Set<int>( "HeliosEngine/Window", "Monitor", "greenBits",    m_monitorState.greenBits);
+			Config.Set<int>( "HeliosEngine/Window", "Monitor", "blueBits",     m_monitorState.blueBits);
+			Config.Set<int>( "HeliosEngine/Window", "Monitor", "refreshRate",  m_monitorState.refreshRate);
+			Config.Set<bool>("HeliosEngine/Window", "Monitor", "isNonDefault", m_monitorState.isNonDefault);
 		}
 		else {
 			// Clear monitor section if no monitor-mode is set
 			// (to avoid stale data)
-			m_Config.ClearSection("Monitor");
+//			Config.ClearSection("HeliosEngine/Window", "Monitor");
+			Config.Set<std::string>("HeliosEngine/Window", "Monitor", "MonitorName", "");
 		}
 
 		// Save windowed pos and size
-		m_Config.Set<int>("Windowed", "posX",  m_windowedState.posX);
-		m_Config.Set<int>("Windowed", "posY",  m_windowedState.posY);
-		m_Config.Set<int>("Windowed", "sizeX", m_windowedState.sizeX);
-		m_Config.Set<int>("Windowed", "sizeY", m_windowedState.sizeY);
+		Config.Set<int>("HeliosEngine/Window", "Windowed", "posX",  m_windowedState.posX);
+		Config.Set<int>("HeliosEngine/Window", "Windowed", "posY",  m_windowedState.posY);
+		Config.Set<int>("HeliosEngine/Window", "Windowed", "sizeX", m_windowedState.sizeX);
+		Config.Set<int>("HeliosEngine/Window", "Windowed", "sizeY", m_windowedState.sizeY);
 
-		m_Config.Save(filepath);
+		Config.SaveDomain("HeliosEngine/Window", "@config:/window_" + m_WindowName + ".ini");
 	}
 
 
