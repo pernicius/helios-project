@@ -10,6 +10,7 @@
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
 // Version history:
+// - 2026.01: Changed ConfigFile to ConfigUser for per-user config files
 // - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once
@@ -54,8 +55,8 @@ namespace Helios::Engine {
 		// Filename of the logfile
 		std::string LogFile = "log.log";
 		
-		// Filename of the configfile
-		std::string ConfigFile = "config.cfg";
+		// Subpath part to the writeable configfile
+		std::string ConfigUser = "user_undefined";
 	};
 
 

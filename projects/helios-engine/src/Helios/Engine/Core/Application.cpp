@@ -118,9 +118,18 @@ namespace Helios::Engine {
 		// Read config
 //		Config::Read(m_Spec.configfile, m_Spec.WorkingDirectory);
 
-		// Init VFS
+		// Init VFS (aliases for ConfigManager)
 		VirtFS.Mount("config", m_Spec.WorkingDirectory + "/config", 0, "HeliosEngine", false);
-		VirtFS.CreateAlias("@config:", "config");
+		VirtFS.CreateAlias("@config_default:",  "config/default");
+#if defined TARGET_PLATFORM_WINDOWS
+		VirtFS.CreateAlias("@config_platform:", "config/windows");
+#elif defined TARGET_PLATFORM_LINUX
+		VirtFS.CreateAlias("@config_platform:", "config/linux");
+#elif defined TARGET_PLATFORM_MACOS
+		VirtFS.CreateAlias("@config_platform:", "config/macos");
+#endif
+		VirtFS.CreateAlias("@config_project:",  "config/" + m_Spec.Name);
+		VirtFS.CreateAlias("@config_user:",     "config/" + m_Spec.ConfigUser);
 
 		// Init ConfigManager
 //		ConfigManager::GetInstance().LoadDomain("HeliosEngine/Window", "window_app.ini");

@@ -223,6 +223,28 @@ namespace Helios::Engine::VFS {
 			openMode |= std::ios::out | std::ios::app;
 		}
 
+		// If writing, ensure the directory exists
+		if (static_cast<int>(mode) & (static_cast<int>(FileMode::Write) | static_cast<int>(FileMode::Append))) {
+			fs::path filePath(path);
+			fs::path parentPath = filePath.parent_path();
+
+			if (!parentPath.empty() && !fs::exists(parentPath)) {
+				try {
+					std::error_code ec;
+					if (!fs::create_directories(parentPath, ec) && ec) {
+						LOG_CORE_ERROR("VFS: Failed to create directory '{}': {}", parentPath.string(), ec.message());
+						m_Valid = false;
+						return;
+					}
+				}
+				catch (const fs::filesystem_error& e) {
+					LOG_CORE_ERROR("VFS: Failed to create directory '{}': {}", parentPath.string(), e.what());
+					m_Valid = false;
+					return;
+				}
+			}
+		}
+
 		m_Stream.open(path, openMode);
 		m_Valid = m_Stream.is_open();
 
@@ -230,6 +252,9 @@ namespace Helios::Engine::VFS {
 			m_Stream.seekg(0, std::ios::end);
 			m_Size = static_cast<size_t>(m_Stream.tellg());
 			m_Stream.seekg(0, std::ios::beg);
+		}
+		else if (m_Valid) {
+			m_Size = 0; // For write/append, size starts at 0 or is determined by writes
 		}
 
 		if (!m_Valid) {

@@ -18,6 +18,7 @@
 // - Automatic resource management and error handling
 // 
 // Version history:
+// - 2026.01: Fixed file not exists on write stream open
 // - 2026.01: Added directory creation support
 // - 2026.01: Initial version / start of version history
 //==============================================================================

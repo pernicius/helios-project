@@ -25,12 +25,13 @@ namespace Helios::Engine::Renderer::Vulkan {
 //------------------------------------------------------------------------------
 // Configuration value shortcuts
 
-#define CFG_SwapChainSampleCount   ConfigManager::GetInstance().Get<int>( "HeliosEngine/Window", "Config", "SwapChainSampleCount",   1)
-#define CFG_ResizeWithDisplayScale ConfigManager::GetInstance().Get<bool>("HeliosEngine/Window", "Config", "ResizeWithDisplayScale", false)
-#define CFG_StartBorderless        ConfigManager::GetInstance().Get<bool>("HeliosEngine/Window", "Config", "StartBorderless",        false)
-#define CFG_AllowResizing          ConfigManager::GetInstance().Get<bool>("HeliosEngine/Window", "Config", "AllowResizing",          true)
-#define CFG_RefreshRate            ConfigManager::GetInstance().Get<int>( "HeliosEngine/Window", "Config", "RefreshRate",            60)
-#define CFG_DisableDPIAwareness    ConfigManager::GetInstance().Get<bool>("HeliosEngine/Window", "Config", "DisableDPIAwareness",    false) /* Windows only */
+#define CFG_DOM "window_" + m_WindowName
+#define CFG_SwapChainSampleCount   ConfigManager::GetInstance().Get<int>( CFG_DOM, "Config", "SwapChainSampleCount",   1)
+#define CFG_ResizeWithDisplayScale ConfigManager::GetInstance().Get<bool>(CFG_DOM, "Config", "ResizeWithDisplayScale", false)
+#define CFG_StartBorderless        ConfigManager::GetInstance().Get<bool>(CFG_DOM, "Config", "StartBorderless",        false)
+#define CFG_AllowResizing          ConfigManager::GetInstance().Get<bool>(CFG_DOM, "Config", "AllowResizing",          true)
+#define CFG_RefreshRate            ConfigManager::GetInstance().Get<int>( CFG_DOM, "Config", "RefreshRate",            60)
+#define CFG_DisableDPIAwareness    ConfigManager::GetInstance().Get<bool>(CFG_DOM, "Config", "DisableDPIAwareness",    false) /* Windows only */
 
 //------------------------------------------------------------------------------
 // Configuration value shortcuts (Vulkan specific)

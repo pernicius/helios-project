@@ -9,7 +9,7 @@
 #include "pch.h"
 #include "Helios/Engine/Core/Config.h"
 
-#include "Helios/Engine/Util/IniParser.h"
+#include "Helios/Engine/VFS/VFS.h"
 
 #include <sstream>
 #include <limits>
@@ -75,9 +75,9 @@ namespace Helios::Engine {
 		}
 		else if constexpr (std::is_same_v<T, bool>) {
 			std::string lower = str;
-			std::transform(lower.begin(), lower.end(), lower.begin(), 
+			std::transform(lower.begin(), lower.end(), lower.begin(),
 				[](unsigned char c) { return static_cast<char>(std::tolower(c)); });
-			
+
 			if (lower == "true" || lower == "1" || lower == "yes" || lower == "on" || lower == "y") {
 				out = true;
 				return true;
@@ -180,7 +180,7 @@ namespace Helios::Engine {
 			return false;
 
 		m_sections.clear();
-		
+
 		// Load data
 		for (const auto& sectionName : parser.Sections()) {
 			for (const auto& key : parser.Keys(sectionName)) {
@@ -188,21 +188,21 @@ namespace Helios::Engine {
 				m_sections[sectionName].Set<std::string>(key, value);
 			}
 		}
-		
+
 		// Load domain comment
 		m_domainComment = parser.GetFileComment();
-		
+
 		// Load section and key comments
 		for (const auto& sectionName : parser.Sections()) {
 			m_sections[sectionName].SetSectionComment(parser.GetSectionComment(sectionName));
-			
+
 			for (const auto& key : parser.Keys(sectionName)) {
 				std::string comment = parser.GetKeyComment(sectionName, key);
 				if (!comment.empty())
 					m_sections[sectionName].SetKeyComment(key, comment);
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -210,25 +210,25 @@ namespace Helios::Engine {
 	bool ConfigDomain::Save(const std::string& filePath) const
 	{
 		std::shared_lock lock(m_mutex);
-		
+
 		std::string savePath = filePath.empty() ? m_filePath : filePath;
 
 		Helios::Util::IniParser parser;
-		
+
 		// Save domain comment
 		parser.SetFileComment(m_domainComment);
-	
+
 		// Copy data and comments from sections to parser
 		for (const auto& [sectionName, section] : m_sections) {
 			// Save section comment
 			parser.SetSectionComment(sectionName, section.GetSectionComment());
-		
+
 			// Save data
 			std::shared_lock secLock(section.m_mutex);
 			for (const auto& [key, value] : section.m_data) {
 				parser.Set<std::string>(sectionName, key, value);
 			}
-		
+
 			// Save key comments
 			for (const auto& [key, comment] : section.m_keyComments) {
 				parser.SetKeyComment(sectionName, key, comment);
@@ -236,6 +236,39 @@ namespace Helios::Engine {
 		}
 
 		return parser.Save(savePath);
+	}
+
+
+	void ConfigDomain::MergeInto(Util::IniParser& parser) const
+	{
+		std::shared_lock lock(m_mutex);
+
+		// Set domain comment if the parser's one is empty
+		if (parser.GetFileComment().empty()) {
+			parser.SetFileComment(m_domainComment);
+		}
+
+		// Copy data and comments from sections to parser
+		for (const auto& [sectionName, section] : m_sections) {
+			// Set section comment if the parser's one is empty
+			if (parser.GetSectionComment(sectionName).empty()) {
+				parser.SetSectionComment(sectionName, section.GetSectionComment());
+			}
+
+			// Save data
+			std::shared_lock secLock(section.m_mutex);
+			for (const auto& [key, value] : section.m_data) {
+				parser.Set<std::string>(sectionName, key, value);
+			}
+
+			// Save key comments
+			for (const auto& [key, comment] : section.m_keyComments) {
+				// Set key comment if the parser's one is empty
+				if (parser.GetKeyComment(sectionName, key).empty()) {
+					parser.SetKeyComment(sectionName, key, comment);
+				}
+			}
+		}
 	}
 
 
@@ -325,6 +358,34 @@ namespace Helios::Engine {
 	}
 
 
+	void ConfigDomain::SetSectionComment(const std::string& section, const std::string& comment)
+	{
+		ConfigSection& sec = GetSection(section);
+		sec.SetSectionComment(comment);
+	}
+
+
+	void ConfigDomain::SetKeyComment(const std::string& section, const std::string& key, const std::string& comment)
+	{
+		ConfigSection& sec = GetSection(section);
+		sec.SetKeyComment(key, comment);
+	}
+
+
+	void ConfigDomain::ClearSectionComment(const std::string& section)
+	{
+		ConfigSection& sec = GetSection(section);
+		sec.ClearSectionComment();
+	}
+
+
+	void ConfigDomain::ClearKeyComment(const std::string& section, const std::string& key)
+	{
+		ConfigSection& sec = GetSection(section);
+		sec.ClearKeyComment(key);
+	}
+
+
 	//------------------------------------------------------------------------------
 	// ConfigManager Implementation
 	//------------------------------------------------------------------------------
@@ -343,83 +404,419 @@ namespace Helios::Engine {
 	}
 
 
-	bool ConfigManager::LoadDomain(const std::string& domain, const std::string& filePath)
+	const char* ConfigManager::GetVFSAlias(ConfigPriority priority)
 	{
-		std::unique_lock lock(m_mutex);
-		auto [it, inserted] = m_domains.try_emplace(domain, filePath);
-		lock.unlock(); // Unlock before calling Load (which has its own lock)
-		return it->second.Load(filePath);
+		switch (priority) {
+		case ConfigPriority::Default:  return "@config_default:";
+		case ConfigPriority::Platform: return "@config_platform:";
+		case ConfigPriority::Project:  return "@config_project:";
+		case ConfigPriority::User:     return "@config_user:";
+		case ConfigPriority::Runtime:  return ""; // Runtime is in-memory only
+		default: return "";
+		}
 	}
 
 
-	bool ConfigManager::SaveDomain(const std::string& domain, const std::string& filePath) const
+	bool ConfigManager::LoadDomain(const std::string& domain)
+	{
+		std::unique_lock lock(m_mutex);
+
+		auto& layers = m_domainLayers[domain];
+		layers.clear();
+
+		// Reserve space to avoid reallocations during emplace_back
+		layers.reserve(5); // Default, Platform, Project, User, Runtime
+
+		// Define priority order and read-only status
+		struct LayerInfo {
+			ConfigPriority priority;
+			bool readOnly;
+		};
+
+		const LayerInfo layersToLoad[] = {
+			{ ConfigPriority::Default,  true },
+			{ ConfigPriority::Platform, true },
+			{ ConfigPriority::Project,  true },
+			{ ConfigPriority::User,     false },
+		};
+
+		bool anyLoaded = false;
+
+		for (const auto& info : layersToLoad) {
+			const char* alias = GetVFSAlias(info.priority);
+			if (!alias || alias[0] == '\0')
+				continue;
+
+			// Construct VFS path: @config_default/engine.ini
+			std::string vfsPath = std::string(alias) + "/" + domain + ".ini";
+
+			// Check if file exists in VFS
+			if (!VirtFS.Exists(vfsPath)) {
+				LOG_CORE_TRACE("Config layer not found: {}", vfsPath);
+				continue;
+			}
+
+			// Create layer
+			layers.push_back(std::unique_ptr<ConfigLayer>(new ConfigLayer(vfsPath, info.priority, info.readOnly)));
+			ConfigLayer& layer = *layers.back();
+
+			// Try to load
+			if (layer.domain.Load(vfsPath)) {
+				layer.loaded = true;
+				anyLoaded = true;
+				LOG_CORE_INFO("Loaded config layer: {} (priority: {})", vfsPath, static_cast<int>(info.priority));
+			}
+			else {
+				LOG_CORE_WARN("Failed to load config layer: {}", vfsPath);
+			}
+		}
+
+		// Always create Runtime layer (in-memory only)
+		layers.push_back(std::unique_ptr<ConfigLayer>(new ConfigLayer("", ConfigPriority::Runtime, false)));
+		layers.back()->loaded = true; // Runtime is always "loaded"
+
+		// No sorting needed - layers are already inserted in priority order (Default=0, Platform=1, Project=2, User=3, Runtime=4)
+
+		return anyLoaded;
+	}
+
+
+	bool ConfigManager::SaveDomain(const std::string& domain) const
 	{
 		std::shared_lock lock(m_mutex);
-		auto it = m_domains.find(domain);
-		if (it == m_domains.end())
+
+		auto it = m_domainLayers.find(domain);
+		if (it == m_domainLayers.end()) {
+			LOG_CORE_WARN("Cannot save domain '{}': Domain not loaded.", domain);
 			return false;
-		
-		// Don't hold lock during Save (it has its own lock)
-		const ConfigDomain& dom = it->second;
+		}
+
+		// Find the highest-priority writable layer (User or Runtime) that contains data.
+		// We need to merge data from Runtime down into User for persistence.
+		const ConfigLayer* runtimeLayer = GetLayer(domain, ConfigPriority::Runtime);
+		const ConfigLayer* userLayer = GetLayer(domain, ConfigPriority::User);
+
+		// If neither layer exists, there's nothing to save.
+		if (!runtimeLayer && !userLayer) {
+			LOG_CORE_WARN("Cannot save domain '{}': No writable layers (User, Runtime) found.", domain);
+			return false;
+		}
+
+		// Construct the save path for the User layer. This is where we always save.
+		const char* alias = GetVFSAlias(ConfigPriority::User);
+		if (!alias || alias[0] == '\0') {
+			LOG_CORE_ERROR("Cannot save domain '{}': VFS alias for User priority is not defined.", domain);
+			return false;
+		}
+		std::string savePath = std::string(alias) + "/" + domain + ".ini";
+
+		// Create a temporary parser to merge data for saving.
+		Helios::Util::IniParser mergedParser;
+
+		// 1. Load the existing user config file into the parser, if it exists.
+		// This preserves any values and comments not touched during runtime.
+		if (userLayer && userLayer->loaded) {
+			mergedParser.Load(userLayer->domain.GetFilePath());
+		}
+
+		// 2. Merge data from the in-memory User layer (if it was loaded).
+		if (userLayer) {
+			userLayer->domain.MergeInto(mergedParser);
+		}
+
+		// 3. Merge data from the Runtime layer, overwriting any existing values.
+		if (runtimeLayer) {
+			runtimeLayer->domain.MergeInto(mergedParser);
+		}
+
 		lock.unlock();
-		return dom.Save(filePath);
+		bool result = mergedParser.Save(savePath);
+
+		if (result) {
+			LOG_CORE_INFO("Saved user config for domain '{}' to: {}", domain, savePath);
+		}
+		else {
+			LOG_CORE_ERROR("Failed to save user config for domain '{}' to: {}", domain, savePath);
+		}
+
+		return result;
 	}
 
 
-	ConfigDomain& ConfigManager::GetDomain(const std::string& domain)
+	ConfigLayer* ConfigManager::GetLayer(const std::string& domain, ConfigPriority priority)
 	{
-		std::unique_lock lock(m_mutex);
-		auto [it, inserted] = m_domains.try_emplace(domain, "");
-		return it->second;
-	}
-
-
-	const ConfigDomain* ConfigManager::GetDomain(const std::string& domain) const
-	{
-		std::shared_lock lock(m_mutex);
-		auto it = m_domains.find(domain);
-		if (it == m_domains.end())
+		auto it = m_domainLayers.find(domain);
+		if (it == m_domainLayers.end())
 			return nullptr;
-		return &it->second;
+
+		auto layerIt = std::find_if(it->second.begin(), it->second.end(),
+			[priority](const std::unique_ptr<ConfigLayer>& layer) {
+				return layer->priority == priority && layer->loaded;
+			});
+
+		return layerIt != it->second.end() ? layerIt->get() : nullptr;
 	}
 
 
-	ConfigSection& ConfigManager::GetSection(const std::string& domain, const std::string& section)
+	const ConfigLayer* ConfigManager::GetLayer(const std::string& domain, ConfigPriority priority) const
 	{
-		return GetDomain(domain).GetSection(section);
-	}
-
-
-	const ConfigSection* ConfigManager::GetSection(const std::string& domain, const std::string& section) const
-	{
-		const ConfigDomain* dom = GetDomain(domain);
-		if (!dom)
+		auto it = m_domainLayers.find(domain);
+		if (it == m_domainLayers.end())
 			return nullptr;
-		return dom->GetSection(section);
+
+		auto layerIt = std::find_if(it->second.begin(), it->second.end(),
+			[priority](const std::unique_ptr<ConfigLayer>& layer) {
+				return layer->priority == priority && layer->loaded;
+			});
+
+		return layerIt != it->second.end() ? layerIt->get() : nullptr;
 	}
 
 
-	bool ConfigManager::HasDomain(const std::string& domain) const
+	ConfigLayer* ConfigManager::GetWritableLayer(const std::string& domain)
 	{
-		std::shared_lock lock(m_mutex);
-		return m_domains.find(domain) != m_domains.end();
+		auto it = m_domainLayers.find(domain);
+		if (it == m_domainLayers.end())
+			return nullptr;
+
+		// Try User first, then Runtime
+		for (auto priority : { ConfigPriority::User, ConfigPriority::Runtime }) {
+			auto layerIt = std::find_if(it->second.begin(), it->second.end(),
+				[priority](const std::unique_ptr<ConfigLayer>& layer) {
+					return layer->priority == priority && !layer->readOnly && layer->loaded;
+				});
+
+			if (layerIt != it->second.end())
+				return layerIt->get();
+		}
+
+		return nullptr;
 	}
 
 
 	template<typename T>
 	T ConfigManager::Get(const std::string& domain, const std::string& section, const std::string& key, const T& defaultValue) const
 	{
-		const ConfigDomain* dom = GetDomain(domain);
-		if (!dom)
+		std::shared_lock lock(m_mutex);
+
+		auto it = m_domainLayers.find(domain);
+		if (it == m_domainLayers.end())
 			return defaultValue;
-		return dom->Get<T>(section, key, defaultValue);
+
+		// Search from highest priority (Runtime) to lowest (Default)
+		for (auto layerIt = it->second.rbegin(); layerIt != it->second.rend(); ++layerIt) {
+			if (!(*layerIt)->loaded)
+				continue;
+
+			const ConfigSection* sec = static_cast<const ConfigDomain&>((*layerIt)->domain).GetSection(section);
+			if (sec && sec->HasKey(key)) {
+				return sec->Get<T>(key, defaultValue);
+			}
+		}
+
+		return defaultValue;
 	}
 
 
 	template<typename T>
 	void ConfigManager::Set(const std::string& domain, const std::string& section, const std::string& key, const T& value)
 	{
-		GetDomain(domain).Set<T>(section, key, value);
+		std::unique_lock lock(m_mutex);
+
+		ConfigLayer* layer = GetWritableLayer(domain);
+		if (!layer) {
+			// Auto-create Runtime layer if no writable layer exists
+			auto& layers = m_domainLayers[domain];
+			layers.push_back(std::unique_ptr<ConfigLayer>(new ConfigLayer("", ConfigPriority::Runtime, false)));
+			layers.back()->loaded = true;
+
+			// No sorting needed - Runtime has highest priority and is added last
+
+			layer = GetWritableLayer(domain);
+		}
+
+		lock.unlock();
+		layer->domain.Set<T>(section, key, value);
+	}
+
+
+	ConfigPriority ConfigManager::GetValueSource(const std::string& domain, const std::string& section, const std::string& key) const
+	{
+		std::shared_lock lock(m_mutex);
+
+		auto it = m_domainLayers.find(domain);
+		if (it == m_domainLayers.end())
+			return ConfigPriority::Default;
+
+		// Search from highest priority to lowest
+		for (auto layerIt = it->second.rbegin(); layerIt != it->second.rend(); ++layerIt) {
+			if (!(*layerIt)->loaded)
+				continue;
+
+			const ConfigSection* sec = static_cast<const ConfigDomain&>((*layerIt)->domain).GetSection(section);
+			if (sec && sec->HasKey(key)) {
+				return (*layerIt)->priority;
+			}
+		}
+
+		return ConfigPriority::Default;
+	}
+
+
+	bool ConfigManager::HasDomain(const std::string& domain) const
+	{
+		std::shared_lock lock(m_mutex);
+		return m_domainLayers.find(domain) != m_domainLayers.end();
+	}
+
+
+	bool ConfigManager::HasLayer(const std::string& domain, ConfigPriority priority) const
+	{
+		std::shared_lock lock(m_mutex);
+		return GetLayer(domain, priority) != nullptr;
+	}
+
+
+	std::string ConfigManager::GetComment(const std::string& domain, const std::string& section, const std::string& key) const
+	{
+		if (section.empty())
+			return GetDomainComment(domain);
+		if (key.empty())
+			return GetSectionComment(domain, section);
+		return GetKeyComment(domain, section, key);
+	}
+
+
+	std::string ConfigManager::GetDomainComment(const std::string& domain) const
+	{
+		std::shared_lock lock(m_mutex);
+
+		auto it = m_domainLayers.find(domain);
+		if (it == m_domainLayers.end())
+			return "";
+
+		// Return comment from highest priority layer that has one
+		for (auto layerIt = it->second.rbegin(); layerIt != it->second.rend(); ++layerIt) {
+			if (!(*layerIt)->loaded)
+				continue;
+			std::string comment = (*layerIt)->domain.GetDomainComment();
+			if (!comment.empty())
+				return comment;
+		}
+
+		return "";
+	}
+
+
+	std::string ConfigManager::GetSectionComment(const std::string& domain, const std::string& section) const
+	{
+		std::shared_lock lock(m_mutex);
+
+		auto it = m_domainLayers.find(domain);
+		if (it == m_domainLayers.end())
+			return "";
+
+		for (auto layerIt = it->second.rbegin(); layerIt != it->second.rend(); ++layerIt) {
+			if (!(*layerIt)->loaded)
+				continue;
+			const ConfigSection* sec = static_cast<const ConfigDomain&>((*layerIt)->domain).GetSection(section);
+			if (sec) {
+				std::string comment = sec->GetSectionComment();
+				if (!comment.empty())
+					return comment;
+			}
+		}
+
+		return "";
+	}
+
+
+	std::string ConfigManager::GetKeyComment(const std::string& domain, const std::string& section, const std::string& key) const
+	{
+		std::shared_lock lock(m_mutex);
+
+		auto it = m_domainLayers.find(domain);
+		if (it == m_domainLayers.end())
+			return "";
+
+		for (auto layerIt = it->second.rbegin(); layerIt != it->second.rend(); ++layerIt) {
+			if (!(*layerIt)->loaded)
+				continue;
+			const ConfigSection* sec = static_cast<const ConfigDomain&>((*layerIt)->domain).GetSection(section);
+			if (sec && sec->HasKey(key)) {
+				std::string comment = sec->GetKeyComment(key);
+				if (!comment.empty())
+					return comment;
+			}
+		}
+
+		return "";
+	}
+
+
+	void ConfigManager::SetDomainComment(const std::string& domain, const std::string& comment)
+	{
+		std::unique_lock lock(m_mutex);
+		ConfigLayer* layer = GetWritableLayer(domain);
+		if (layer) {
+			lock.unlock();
+			layer->domain.SetDomainComment(comment);
+		}
+	}
+
+
+	void ConfigManager::SetSectionComment(const std::string& domain, const std::string& section, const std::string& comment)
+	{
+		std::unique_lock lock(m_mutex);
+		ConfigLayer* layer = GetWritableLayer(domain);
+		if (layer) {
+			lock.unlock();
+			layer->domain.SetSectionComment(section, comment);
+		}
+	}
+
+
+	void ConfigManager::SetKeyComment(const std::string& domain, const std::string& section, const std::string& key, const std::string& comment)
+	{
+		std::unique_lock lock(m_mutex);
+		ConfigLayer* layer = GetWritableLayer(domain);
+		if (layer) {
+			lock.unlock();
+			layer->domain.SetKeyComment(section, key, comment);
+		}
+	}
+
+
+	void ConfigManager::ClearDomainComment(const std::string& domain)
+	{
+		std::unique_lock lock(m_mutex);
+		ConfigLayer* layer = GetWritableLayer(domain);
+		if (layer) {
+			lock.unlock();
+			layer->domain.ClearDomainComment();
+		}
+	}
+
+
+	void ConfigManager::ClearSectionComment(const std::string& domain, const std::string& section)
+	{
+		std::unique_lock lock(m_mutex);
+		ConfigLayer* layer = GetWritableLayer(domain);
+		if (layer) {
+			lock.unlock();
+			layer->domain.ClearSectionComment(section);
+		}
+	}
+
+
+	void ConfigManager::ClearKeyComment(const std::string& domain, const std::string& section, const std::string& key)
+	{
+		std::unique_lock lock(m_mutex);
+		ConfigLayer* layer = GetWritableLayer(domain);
+		if (layer) {
+			lock.unlock();
+			layer->domain.ClearKeyComment(section, key);
+		}
 	}
 
 
@@ -437,40 +834,4 @@ namespace Helios::Engine {
 	template void ConfigManager::Set<double>(const std::string&, const std::string&, const std::string&, const double&);
 
 
-	std::string ConfigManager::GetComment(const std::string& domain, const std::string& section, const std::string& key) const
-	{
-		const ConfigDomain* dom = GetDomain(domain);
-		if (!dom)
-			return "";
-		return dom->GetComment(section, key);
-	}
-
-
-	std::string ConfigManager::GetDomainComment(const std::string& domain) const
-	{
-		const ConfigDomain* dom = GetDomain(domain);
-		if (!dom)
-			return "";
-		return dom->GetDomainComment();
-	}
-
-
-	std::string ConfigManager::GetSectionComment(const std::string& domain, const std::string& section) const
-	{
-		const ConfigDomain* dom = GetDomain(domain);
-		if (!dom)
-			return "";
-		return dom->GetSectionComment(section);
-	}
-
-
-	std::string ConfigManager::GetKeyComment(const std::string& domain, const std::string& section, const std::string& key) const
-	{
-		const ConfigDomain* dom = GetDomain(domain);
-		if (!dom)
-			return "";
-		return dom->GetKeyComment(section, key);
-	}
-
-
-} // namespace Helios::Engine::Core
+} // namespace Helios::Engine

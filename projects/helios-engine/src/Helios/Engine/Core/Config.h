@@ -12,6 +12,8 @@
 // 
 // Main Features:
 // - Hierarchical config system (Manager->Domain->Section->Key)
+// - Priority-based config layers (Default, Platform, Project, User, Runtime)
+// - Automatic layer loading via VFS aliases (@config_default, @config_platform, etc.)
 // - Thread-safe concurrent reads with shared_mutex
 // - Type-safe templated Get/Set with defaults
 // - Multi-level comment preservation
@@ -19,16 +21,38 @@
 // - Singleton pattern with auto-creation
 // 
 // Version history:
+// - 2026.01: Added hierarchical priority-based configuration layers
 // - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once
 
+#include "Helios/Engine/Util/IniParser.h"
+
 //#include <string>
 //#include <unordered_map>
 //#include <shared_mutex>
+//#include <vector>
+//#include <algorithm>
 
 namespace Helios::Engine {
 
+
+	//------------------------------------------------------------------------------
+	// Configuration Priority Levels
+	//------------------------------------------------------------------------------
+
+	enum class ConfigPriority : uint8_t {
+		Default  = 0,  // Shipped with application    (@config_default),  read-only
+		Platform = 1,  // Platform-specific overrides (@config_platform), read-only
+		Project  = 2,  // Project/workspace settings  (@config_project),  read-only
+		User     = 3,  // User account settings       (@config_user),     read/write
+		Runtime  = 4   // Runtime overrides           (in-memory only),   read/write
+	};
+
+
+	//------------------------------------------------------------------------------
+	// ConfigSection
+	//------------------------------------------------------------------------------
 
 	class ConfigDomain; // Forward declaration
 	class ConfigSection
@@ -83,7 +107,9 @@ namespace Helios::Engine {
 
 
 	//------------------------------------------------------------------------------
-	
+	// ConfigDomain
+	//------------------------------------------------------------------------------
+
 	
 	class ConfigDomain
 	{
@@ -101,6 +127,8 @@ namespace Helios::Engine {
 	public:
 		bool Load(const std::string& filePath);
 		bool Save(const std::string& filePath = "") const;
+		void MergeInto(Util::IniParser& parser) const;
+		std::string GetFilePath() const { std::shared_lock lock(m_mutex); return m_filePath; }
 
 		ConfigSection& GetSection(const std::string& name);
 		const ConfigSection* GetSection(const std::string& name) const;
@@ -121,17 +149,13 @@ namespace Helios::Engine {
 
 		void SetDomainComment(const std::string& comment)
 			{ std::unique_lock lock(m_mutex); m_domainComment = comment; }
-		void SetSectionComment(const std::string& section, const std::string& comment)
-			{ GetSection(section).SetSectionComment(comment); }
-		void SetKeyComment(const std::string& section, const std::string& key, const std::string& comment)
-			{ GetSection(section).SetKeyComment(key, comment); }
+		void SetSectionComment(const std::string& section, const std::string& comment);
+		void SetKeyComment(const std::string& section, const std::string& key, const std::string& comment);
 
 		void ClearDomainComment()
 			{ std::unique_lock lock(m_mutex); m_domainComment.clear(); }
-		void ClearSectionComment(const std::string& section)
-			{ GetSection(section).ClearSectionComment(); }
-		void ClearKeyComment(const std::string& section, const std::string& key)
-			{ GetSection(section).ClearKeyComment(key); }
+		void ClearSectionComment(const std::string& section);
+		void ClearKeyComment(const std::string& section, const std::string& key);
 
 	private:
 		mutable std::shared_mutex m_mutex;
@@ -141,6 +165,32 @@ namespace Helios::Engine {
 	};
 
 
+	//------------------------------------------------------------------------------
+	// ConfigLayer - Represents a single priority layer in the hierarchy
+	//------------------------------------------------------------------------------
+
+
+	struct ConfigLayer {
+		ConfigDomain domain;
+		ConfigPriority priority;
+		bool readOnly;
+		bool loaded;
+
+		ConfigLayer(const std::string& path, ConfigPriority prio, bool ro)
+			: domain(path), priority(prio), readOnly(ro), loaded(false) {}
+
+		// Explicitly default move operations (ConfigDomain supports move)
+		ConfigLayer(ConfigLayer&&) = default;
+		ConfigLayer& operator=(ConfigLayer&&) = default;
+
+		// Delete copy operations (ConfigDomain doesn't support copy)
+		ConfigLayer(const ConfigLayer&) = delete;
+		ConfigLayer& operator=(const ConfigLayer&) = delete;
+	};
+
+
+	//------------------------------------------------------------------------------
+	// ConfigManager - Singleton managing hierarchical configuration layers
 	//------------------------------------------------------------------------------
 
 
@@ -156,45 +206,61 @@ namespace Helios::Engine {
 	public:
 		static ConfigManager& GetInstance();
 
-		bool LoadDomain(const std::string& domain, const std::string& filePath);
-		bool SaveDomain(const std::string& domain, const std::string& filePath = "") const;
+		// Hierarchical domain loading (auto-loads all priority layers via VFS aliases)
+		// Expects VFS aliases: @config_default, @config_platform, @config_project, @config_user
+		// Example: LoadDomain("engine") looks for:
+		//   @config_default/engine.ini, @config_platform/engine.ini, etc.
+		bool LoadDomain(const std::string& domain);
 
-		ConfigDomain& GetDomain(const std::string& domain);
-		const ConfigDomain* GetDomain(const std::string& domain) const;
-		ConfigSection& GetSection(const std::string& domain, const std::string& section);
-		const ConfigSection* GetSection(const std::string& domain, const std::string& section) const;
-		bool HasDomain(const std::string& domain) const;
+		// Save only the User layer (read-only layers are never modified)
+		bool SaveDomain(const std::string& domain) const;
 
-		// Templated getter/setter methods
+		// Get value with hierarchical fallback (searches User->Project->Platform->Default)
 		template<typename T>
 		T Get(const std::string& domain, const std::string& section, const std::string& key, const T& defaultValue = T{}) const;
+
+		// Set value (writes only to User layer or Runtime if User is not loaded)
 		template<typename T>
 		void Set(const std::string& domain, const std::string& section, const std::string& key, const T& value);
 
-		// Comment management
+		// Query which priority layer provides a value
+		ConfigPriority GetValueSource(const std::string& domain, const std::string& section, const std::string& key) const;
+
+		// Check if domain exists in any layer
+		bool HasDomain(const std::string& domain) const;
+
+		// Check if a specific layer is loaded for a domain
+		bool HasLayer(const std::string& domain, ConfigPriority priority) const;
+
+		// Comment management (operates on highest priority layer that has the key)
 		std::string GetComment(const std::string& domain, const std::string& section = "", const std::string& key = "") const;
 		std::string GetDomainComment(const std::string& domain) const;
 		std::string GetSectionComment(const std::string& domain, const std::string& section) const;
 		std::string GetKeyComment(const std::string& domain, const std::string& section, const std::string& key) const;
-		
-		void SetDomainComment(const std::string& domain, const std::string& comment)
-			{ GetDomain(domain).SetDomainComment(comment); }
-		void SetSectionComment(const std::string& domain, const std::string& section, const std::string& comment)
-			{ GetDomain(domain).SetSectionComment(section, comment); }
-		void SetKeyComment(const std::string& domain, const std::string& section, const std::string& key, const std::string& comment)
-			{ GetDomain(domain).SetKeyComment(section, key, comment); }
 
-		void ClearDomainComment(const std::string& domain)
-			{ GetDomain(domain).ClearDomainComment(); }
-		void ClearSectionComment(const std::string& domain, const std::string& section)
-			{ GetDomain(domain).ClearSectionComment(section); }
-		void ClearKeyComment(const std::string& domain, const std::string& section, const std::string& key)
-			{ GetDomain(domain).ClearKeyComment(section, key); }
+		void SetDomainComment(const std::string& domain, const std::string& comment);
+		void SetSectionComment(const std::string& domain, const std::string& section, const std::string& comment);
+		void SetKeyComment(const std::string& domain, const std::string& section, const std::string& key, const std::string& comment);
+
+		void ClearDomainComment(const std::string& domain);
+		void ClearSectionComment(const std::string& domain, const std::string& section);
+		void ClearKeyComment(const std::string& domain, const std::string& section, const std::string& key);
+
+	private:
+		// Internal: Get layer by priority for a domain
+		ConfigLayer* GetLayer(const std::string& domain, ConfigPriority priority);
+		const ConfigLayer* GetLayer(const std::string& domain, ConfigPriority priority) const;
+
+		// Internal: Get writable layer (User or Runtime)
+		ConfigLayer* GetWritableLayer(const std::string& domain);
+
+		// VFS alias mapping
+		static const char* GetVFSAlias(ConfigPriority priority);
 
 	private:
 		mutable std::shared_mutex m_mutex;
-		std::unordered_map<std::string, ConfigDomain> m_domains;
+		std::unordered_map<std::string, std::vector<std::unique_ptr<ConfigLayer>>> m_domainLayers;
 	};
 
 
-} // namespace Helios::Engine::Core
+} // namespace Helios::Engine

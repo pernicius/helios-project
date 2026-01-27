@@ -35,7 +35,7 @@ HE::Application* HE::CreateApplication(int argc, char** argv)
 	appSpec.Version = App::APP_VERSION;
 	appSpec.Hints |= HE::AppSpec::HintFlags::USE_EXEPATH;
 	appSpec.LogFile = "Sandbox.log";
-	appSpec.ConfigFile = "Sandbox.cfg";
+	appSpec.ConfigUser = "user_123456789";
 
 	return new App(appSpec);
 }

@@ -21,6 +21,7 @@
 // - Entry point integration (AppMain) and factory pattern
 // 
 // Version history:
+// - 2026.01: Added hirarchical config support
 // - 2026.01: Added use of ConfigManager
 // - 2026.01: Initial version / start of version history
 //==============================================================================
