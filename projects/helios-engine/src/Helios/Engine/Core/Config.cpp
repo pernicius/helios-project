@@ -452,7 +452,7 @@ namespace Helios::Engine {
 
 			// Check if file exists in VFS
 			if (!VirtFS.Exists(vfsPath)) {
-				LOG_CORE_TRACE("Config layer not found: {}", vfsPath);
+				LOG_CORE_TRACE("CfgMgr: Config layer not found: {}", vfsPath);
 				continue;
 			}
 
@@ -464,10 +464,10 @@ namespace Helios::Engine {
 			if (layer.domain.Load(vfsPath)) {
 				layer.loaded = true;
 				anyLoaded = true;
-				LOG_CORE_INFO("Loaded config layer: {} (priority: {})", vfsPath, static_cast<int>(info.priority));
+				LOG_CORE_DEBUG("CfgMgr: Loaded config layer: {}", vfsPath);
 			}
 			else {
-				LOG_CORE_WARN("Failed to load config layer: {}", vfsPath);
+				LOG_CORE_WARN("CfgMgr: Failed to load config layer: {}", vfsPath);
 			}
 		}
 
@@ -487,7 +487,7 @@ namespace Helios::Engine {
 
 		auto it = m_domainLayers.find(domain);
 		if (it == m_domainLayers.end()) {
-			LOG_CORE_WARN("Cannot save domain '{}': Domain not loaded.", domain);
+			LOG_CORE_WARN("CfgMgr: Cannot save domain '{}': Domain not loaded.", domain);
 			return false;
 		}
 
@@ -498,14 +498,14 @@ namespace Helios::Engine {
 
 		// If neither layer exists, there's nothing to save.
 		if (!runtimeLayer && !userLayer) {
-			LOG_CORE_WARN("Cannot save domain '{}': No writable layers (User, Runtime) found.", domain);
+			LOG_CORE_WARN("CfgMgr: Cannot save domain '{}': No writable layers (User, Runtime) found.", domain);
 			return false;
 		}
 
 		// Construct the save path for the User layer. This is where we always save.
 		const char* alias = GetVFSAlias(ConfigPriority::User);
 		if (!alias || alias[0] == '\0') {
-			LOG_CORE_ERROR("Cannot save domain '{}': VFS alias for User priority is not defined.", domain);
+			LOG_CORE_ERROR("CfgMgr: Cannot save domain '{}': VFS alias for User priority is not defined.", domain);
 			return false;
 		}
 		std::string savePath = std::string(alias) + "/" + domain + ".ini";
@@ -533,10 +533,10 @@ namespace Helios::Engine {
 		bool result = mergedParser.Save(savePath);
 
 		if (result) {
-			LOG_CORE_INFO("Saved user config for domain '{}' to: {}", domain, savePath);
+			LOG_CORE_DEBUG("CfgMgr: Saved user config for domain '{}' to: {}", domain, savePath);
 		}
 		else {
-			LOG_CORE_ERROR("Failed to save user config for domain '{}' to: {}", domain, savePath);
+			LOG_CORE_ERROR("CfgMgr: Failed to save user config for domain '{}' to: {}", domain, savePath);
 		}
 
 		return result;

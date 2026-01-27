@@ -33,10 +33,6 @@ Rework CONTRIBUTING.md
 
 Rework README.md
 
-central configuration solution
- - hirarchy of config files (default (read-only), platform (read-only), user/account (read/write), ...)
-
-
 better comments:
  - descriptive file headers
    - usage
