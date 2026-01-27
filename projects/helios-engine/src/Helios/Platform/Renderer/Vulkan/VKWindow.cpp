@@ -38,8 +38,6 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 #define CFG_SwapChainFormat        vk::Format::eB8G8R8A8Unorm
 
-#define CFG_Title                  "test"
-
 //------------------------------------------------------------------------------
 
 
@@ -99,7 +97,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		ConfigureWindowHints();
 
 		// Create window (hidden initially)
-		m_Window = glfwCreateWindow(m_windowedState.sizeX, m_windowedState.sizeY, CFG_Title, nullptr, nullptr);
+		m_Window = glfwCreateWindow(m_windowedState.sizeX, m_windowedState.sizeY, name.c_str(), nullptr, nullptr);
 		LOG_GLFW_ASSERT(m_Window, "Could not create the window!");
 
 		// Apply position/size

@@ -189,7 +189,7 @@ namespace Helios::Engine {
 	void Application::InitRenderer()
 	{
 		// Main window
-		m_Window = Renderer::Window::Create("app");
+		m_Window = Renderer::Window::Create(m_Spec.Name);
 		m_Window->Show();
 
 //		m_DeviceManager = Renderer::DeviceManager::Create();

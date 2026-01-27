@@ -11,6 +11,7 @@
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
 // Version history:
+// - 2026.01: Fixed window name/title
 // - 2026.01: Changed to the new config system
 // - 2026.01: Reworked to use ConfigManager insead of IniParser directly
 // - 2026.01: Initial version / start of version history
