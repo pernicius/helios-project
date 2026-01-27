@@ -10,10 +10,14 @@ Window handling:
  - custom decorations (later)
 
 Next steps in vulkan:
+ - [ ] VKInstance
+   - requires VKWindow
+ - [ ] VKSurfaceKHR
+   - requires VKInstance, VKWindow
  - [ ] DeviceManager
- - [ ] instance
- - [ ] physical device
- - [ ] logical device
+   - requires VKInstance, VKSurfaceKHR
+   - [ ] select physical device
+   - [ ] create logical device
  - [ ] swapchain
  - [ ] pipeline
  - [ ] basic rendering

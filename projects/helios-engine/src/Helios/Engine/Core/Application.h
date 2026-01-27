@@ -35,6 +35,7 @@
 #include "Helios/Engine/Core/EventTypeWindow.h"
 
 #include "Helios/Engine/Renderer/Window.h"
+#include "Helios/Engine/Renderer/Renderer.h"
 //#include "Helios/Engine/Renderer/DeviceManager.h"
 
 namespace Helios::Engine {
@@ -83,6 +84,7 @@ namespace Helios::Engine {
 		std::vector<Scope<Event>> m_EventQueue;
 
 		Ref<Renderer::Window> m_Window;
+		Scope<Renderer::Renderer> m_Renderer;
 //		Ref<Renderer::DeviceManager> m_DeviceManager;
 
 	private:

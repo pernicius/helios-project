@@ -13,7 +13,9 @@
 #include "Helios/Engine/Core/Timestep.h"
 #include "Helios/Engine/Core/Config.h"
 #include "Helios/Engine/VFS/VFS.h"
+
 #include "Helios/Engine/Renderer/RendererAPI.h"
+#include "Helios/Engine/Renderer/Renderer.h"
 
 #include <Helios/Platform/PlatformDetection.h>
 #if defined TARGET_PLATFORM_WINDOWS
@@ -176,7 +178,11 @@ namespace Helios::Engine {
 //		Config::Save();
 
 		// Shutdown Renderer
-//		m_DeviceManager.reset();
+		if (m_Renderer) {
+			m_Renderer->Shutdown();
+			m_Renderer.reset();
+		}
+		//		m_DeviceManager.reset();
 		m_Window.reset();
 		
 		// Shutdown application components
@@ -191,6 +197,15 @@ namespace Helios::Engine {
 		// Main window
 		m_Window = Renderer::Window::Create(m_Spec.Name);
 		m_Window->Show();
+
+		m_Renderer = Renderer::Renderer::Create();
+		if (m_Renderer) {
+			m_Renderer->Init(m_Spec, *m_Window);
+		}
+		else {
+			LOG_CORE_FATAL("Failed to create Renderer!");
+			m_Running = false;
+		}
 
 //		m_DeviceManager = Renderer::DeviceManager::Create();
 	}

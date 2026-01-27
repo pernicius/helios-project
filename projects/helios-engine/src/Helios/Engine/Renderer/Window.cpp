@@ -20,7 +20,7 @@
 #	include "Helios/Platform/Renderer/Vulkan/VKWindow.h"
 #endif
 #ifdef HE_RENDERER_DIRECTX
-#	include "Helios/Platform/Renderer/DirectX/DX12Window.h"
+#	include "Helios/Platform/Renderer/DirectX/DXWindow.h"
 #endif
 #ifdef HE_RENDERER_METAL
 #	include "Helios/Platform/Renderer/Metal/MTWindow.h"

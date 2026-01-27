@@ -16,7 +16,9 @@
 #pragma once
 
 // Library includes
-#include <vulkan/vulkan.hpp>
+#ifdef HE_RENDERER_VULKAN
+#	include <vulkan/vulkan.hpp>
+#endif
 #include <GLFW/glfw3.h>
 #undef APIENTRY // undefine GLFW's APIENTRY to avoid conflicts
 
