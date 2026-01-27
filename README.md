@@ -56,11 +56,11 @@ While the project is designed to be cross-platform, the primary development focu
 Development follows an "engine-first" approach, where core systems and the rendering infrastructure are implemented first.
 
 - **Platform Support:**
-  - [x] Windows (Primary Target)
+  - [x] Windows
   - [ ] Linux
   - [ ] macOS
 - **Graphics APIs:**
-  - [ ] Vulkan (Primary Target)
+  - [ ] Vulkan *(see also [TODO.md](https://github.com/pernicius/helios-project/blob/master/projects/helios-engine/src/Helios/Platform/Renderer/Vulkan/TODO.md))*
   - [ ] DirectX 12
   - [ ] Metal
 - **Rendering Features:**

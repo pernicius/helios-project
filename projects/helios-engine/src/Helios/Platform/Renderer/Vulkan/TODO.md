@@ -1,7 +1,7 @@
 > [!NOTE]
 > This is just a reminder for myself where i'm at and what are the next steps i want to do.
 
-Next steps in vulkan:
+Next steps in Vulkan:
  - [ ] **Renderer Core**
    - [x] `VKInstance`: Manages the connection to the Vulkan API.
      - [x] Gathers required extensions from GLFW.
