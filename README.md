@@ -68,6 +68,18 @@ Development follows an "engine-first" approach, where core systems and the rende
   - [ ] Real-Time Shadows
   - [ ] HDR and Tonemapping
   - [ ] Post-Processing Effects
+- **Audio System:**
+  - [ ] Abstracted `AudioEngine` interface.
+  - [ ] `AudioSource` component for (3D positional) audio.
+  - [ ] `AudioAmbient` component for (3D positional but not directional) ambient audio.
+  - [ ] `AudioMusic` component for playing (dynamic) music.
+  - [ ] `AudioListener` for scene-relative hearing.
+  - [ ] Support for loading patent-free audio formats:
+    - [ ] **WAV** (Uncompressed PCM)
+    - [ ] **Ogg Vorbis** (Compressed, for music and effects)
+    - [ ] **FLAC** (Lossless, for high-quality audio)
+  - [ ] Backend Implementations:
+    - [ ] *unknown yet*
 - **Engine Systems:**
   - [x] Logging System
   - [x] Abstracted Windowing and Input
