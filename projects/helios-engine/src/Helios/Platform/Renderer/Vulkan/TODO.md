@@ -2,12 +2,12 @@
 > This is just a reminder for myself where i'm at and what are the next steps i want to do.
 
 Next steps in Vulkan:
- - [ ] **Renderer Core**
+ - [x] **Renderer Core**
    - [x] `VKInstance`: Manages the connection to the Vulkan API.
      - [x] Gathers required extensions from GLFW.
      - [x] Sets up validation layers for debugging.
    - [x] `VKDebugMessenger`: Captures validation layer messages.
-   - [ ] `VKSurface`: Creates the window surface (`VkSurfaceKHR`) to render to.
+   - [x] `VKSurface`: Creates the window surface (`VkSurfaceKHR`) to render to.
      - Requires `VKInstance` and the `GLFWwindow`.
  - [ ] **Device Abstraction**
    - [ ] `DeviceManager`: Manages the physical and logical devices.

@@ -10,19 +10,7 @@ Window handling:
  - custom decorations (later)
 
 Next steps in vulkan:
- - [ ] VKInstance
-   - requires VKWindow
- - [ ] VKSurfaceKHR
-   - requires VKInstance, VKWindow
- - [ ] DeviceManager
-   - requires VKInstance, VKSurfaceKHR
-   - [ ] select physical device
-   - [ ] create logical device
- - [ ] swapchain
- - [ ] pipeline
- - [ ] basic rendering
- - [ ] multithreaded rendering
- - [ ] ....
+ - see [TODO.md](src/Helios/Platform/Renderer/Vulkan/TODO.md)
 
 
 App icon: (Copilot questions)

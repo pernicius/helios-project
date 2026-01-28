@@ -79,11 +79,11 @@ Development follows an "engine-first" approach, where core systems and the rende
     - [ ] **Ogg Vorbis** (Compressed, for music and effects)
     - [ ] **FLAC** (Lossless, for high-quality audio)
   - [ ] Backend Implementations:
-    - [ ] *unknown yet*
+    - [ ] **miniaudio** or **OpenAL Soft**
 - **Engine Systems:**
-  - [x] Logging System
-  - [x] Abstracted Windowing and Input
+  - [x] Logging System ([spdlog](https://github.com/gabime/spdlog))
+  - [x] Abstracted Windowing and Input ([GLFW](https://www.glfw.org/))
   - [x] Hierarchical Configuration System
   - [x] Virtual File System (VFS)
   - [ ] Asset Management
-  - [ ] Entity Component System (ECS)
+  - [ ] Entity Component System

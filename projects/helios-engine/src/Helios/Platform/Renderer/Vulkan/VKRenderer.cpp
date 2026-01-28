@@ -20,8 +20,8 @@ namespace Helios::Engine::Renderer::Vulkan {
 		// 1. Create the Vulkan Instance
 		m_vkInstance = CreateScope<VKInstance>(appSpec);
 
-		// 2. Create the Window Surface (next step)
-		// m_vkSurface = CreateScope<VKSurface>(m_vkInstance, window);
+		// 2. Create the Window Surface
+		m_vkSurface = CreateScope<VKSurface>(*m_vkInstance, window);
 
 		// 3. Create the Device Manager (selects physical device, creates logical device)
 		// m_vkDeviceManager = CreateScope<VKDeviceManager>(m_vkInstance, m_vkSurface);
@@ -39,19 +39,19 @@ namespace Helios::Engine::Renderer::Vulkan {
 		// The Scope<T> smart pointers will handle calling the destructors automatically
 		// when they are reset.
 
-		// 7. Destroy Framebuffers, Command Buffers, etc.
+		// 6. Destroy Framebuffers, Command Buffers, etc.
 
-		// 6. Destroy Pipeline and RenderPass
+		// 5. Destroy Pipeline and RenderPass
 
-		// 5. Destroy Swapchain
+		// 4. Destroy Swapchain
 
-		// 4. Destroy Device Manager
+		// 3. Destroy Device Manager
 		// m_vkDeviceManager.reset();
 
-		// 3. Destroy Surface
-		// m_vkSurface.reset();
+		// 2. Destroy Surface
+		m_vkSurface.reset();
 
-		// 2. Destroy Instance (which also handles the debug messenger)
+		// 1. Destroy Instance (which also handles the debug messenger)
 		m_vkInstance.reset();
 	}
 

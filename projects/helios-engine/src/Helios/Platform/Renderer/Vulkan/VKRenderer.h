@@ -17,6 +17,7 @@
 // - Serves as the central hub for all Vulkan-specific rendering logic.
 // 
 // Version history:
+// - 2026.01: Added Surface management
 // - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once
@@ -24,7 +25,7 @@
 #include "Helios/Engine/Renderer/Renderer.h"
 
 #include "Helios/Platform/Renderer/Vulkan/VKInstance.h"
-// #include "Helios/Platform/Renderer/Vulkan/VKSurface.h"
+#include "Helios/Platform/Renderer/Vulkan/VKSurface.h"
 // #include "Helios/Platform/Renderer/Vulkan/VKDeviceManager.h"
 // ... other Vulkan headers
 
@@ -42,7 +43,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 	private:
 		Scope<VKInstance> m_vkInstance;
-		// Scope<VKSurface> m_vkSurface;
+		Scope<VKSurface> m_vkSurface;
 		// Scope<VKDeviceManager> m_vkDeviceManager;
 		// ... other Vulkan objects
 	};
