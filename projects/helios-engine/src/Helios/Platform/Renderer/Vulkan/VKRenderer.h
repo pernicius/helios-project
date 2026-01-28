@@ -17,6 +17,7 @@
 // - Serves as the central hub for all Vulkan-specific rendering logic.
 // 
 // Version history:
+// - 2026.01: Added Event handling for window resize
 // - 2026.01: Added Swapchain management
 // - 2026.01: Added Device management
 // - 2026.01: Added Surface management
@@ -44,7 +45,13 @@ namespace Helios::Engine::Renderer::Vulkan {
 		virtual void Init(const AppSpec& appSpec, Window& window) override;
 		virtual void Shutdown() override;
 
+		virtual void OnEvent(Event& e) override;
+
 	private:
+		bool OnFramebufferResize(const FramebufferResizeEvent& e);
+
+	private:
+		Window* m_Window = nullptr;
 		Scope<VKInstance> m_vkInstance;
 		Scope<VKSurface> m_vkSurface;
 		Scope<VKDeviceManager> m_vkDeviceManager;

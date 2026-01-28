@@ -382,6 +382,9 @@ namespace Helios::Engine {
 		dispatcher.Dispatch<WindowCloseEvent>(HE_BIND_EVENT_FN(Application::OnWindowClose));
 //		dispatcher.Dispatch<WindowResizeEvent>(HE_BIND_EVENT_FN(Application::OnWindowResize));
 
+		if (m_Renderer)
+			m_Renderer->OnEvent(e);
+
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it) 
 		{
 			if (e.Handled)

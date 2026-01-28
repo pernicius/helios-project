@@ -21,6 +21,7 @@
 // - Entry point integration (AppMain) and factory pattern
 // 
 // Version history:
+// - 2026.01: Added renderer event forwarding
 // - 2026.01: Fixed window name/title
 // - 2026.01: Added hirarchical config support
 // - 2026.01: Added use of ConfigManager

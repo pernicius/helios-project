@@ -56,6 +56,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		while (width == 0 || height == 0) {
 			glfwGetFramebufferSize(nativeWindow, &width, &height);
 			glfwWaitEvents();
+			// TODO: make it nonblocking and handle minimization in the main loop (prevent rendering if minimized)
 		}
 
 		// Wait for the device to be idle before recreating resources

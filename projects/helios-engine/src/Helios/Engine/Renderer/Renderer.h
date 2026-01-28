@@ -39,6 +39,8 @@ namespace Helios::Engine::Renderer {
 		virtual void Init(const AppSpec& appSpec, Window& window) = 0;
 		virtual void Shutdown() = 0;
 
+		virtual void OnEvent(Event& e) = 0;
+
 		// Other methods for rendering will go here later
 		// virtual void BeginFrame() = 0;
 		// virtual void EndFrame() = 0;
