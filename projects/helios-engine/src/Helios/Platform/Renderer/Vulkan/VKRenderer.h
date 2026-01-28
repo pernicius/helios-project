@@ -17,6 +17,7 @@
 // - Serves as the central hub for all Vulkan-specific rendering logic.
 // 
 // Version history:
+// - 2026.01: Added Swapchain management
 // - 2026.01: Added Device management
 // - 2026.01: Added Surface management
 // - 2026.01: Initial version / start of version history
@@ -28,6 +29,7 @@
 #include "Helios/Platform/Renderer/Vulkan/VKInstance.h"
 #include "Helios/Platform/Renderer/Vulkan/VKSurface.h"
 #include "Helios/Platform/Renderer/Vulkan/VKDeviceManager.h"
+#include "Helios/Platform/Renderer/Vulkan/VKSwapchain.h"
 // ... other Vulkan headers
 
 namespace Helios::Engine::Renderer::Vulkan {
@@ -46,6 +48,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		Scope<VKInstance> m_vkInstance;
 		Scope<VKSurface> m_vkSurface;
 		Scope<VKDeviceManager> m_vkDeviceManager;
+		Scope<VKSwapchain> m_vkSwapchain;
 		// ... other Vulkan objects
 	};
 

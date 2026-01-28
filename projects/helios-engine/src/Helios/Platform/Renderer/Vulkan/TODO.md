@@ -15,10 +15,10 @@ Next steps in Vulkan:
      - Requires `VKInstance` and `VKSurface`.
      - [x] Selects a suitable `VkPhysicalDevice`.
      - [x] Creates the `VkLogicalDevice` and retrieves `VkQueue` handles.
- - [ ] **Presentation**
-   - [ ] `VKSwapchain`: Manages the list of images to be presented to the screen.
+ - [x] **Presentation**
+   - [x] `VKSwapchain`: Manages the list of images to be presented to the screen.
      - Requires `DeviceManager` and `VKSurface`.
-     - [ ] Creates `VkImageViews` for each swapchain image.
+     - [x] Creates `VkImageViews` for each swapchain image.
  - [ ] **Graphics Pipeline**
    - [ ] `VKRenderPass`: Defines the structure of a rendering operation (attachments, subpasses).
    - [ ] `VKPipeline`: The main graphics pipeline object.
@@ -29,7 +29,7 @@ Next steps in Vulkan:
    - [ ] `VKFramebuffer`: Links a `VKRenderPass` with the specific `VkImageViews` to be rendered into.
      - [ ] Create one framebuffer for each swapchain image view.
  - [ ] **Command Buffers & Synchronization**
-   - [ ] `VKCommandPool`: Allocates command buffers.
+   - [ ] `VKCommandPool`: Allocates command buffers integrate into VKDeviceManager.
    - [ ] `VKCommandBuffer`: Records rendering commands.
    - [ ] Create synchronization primitives (`VkSemaphore`, `VkFence`) for each frame in flight.
  - [ ] **Basic Rendering**
