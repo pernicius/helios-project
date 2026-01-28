@@ -38,6 +38,18 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 	VKInstance::VKInstance(const AppSpec& appSpec)
 	{
+		// Populate required extensions from GLFW
+		uint32_t glfwExtensionCount = 0;
+		const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+		for (uint32_t i = 0; i < glfwExtensionCount; ++i) {
+			m_instanceExtensionsInfo.required.insert(glfwExtensions[i]);
+		}
+
+		// Add optional debug utils extension if validation is enabled
+		if (m_enableValidationLayers) {
+			m_instanceExtensionsInfo.optional.insert(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+		}
+
 		CreateInstance(appSpec);
 		SetupDebugMessenger();
 	}
@@ -45,7 +57,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 	VKInstance::~VKInstance()
 	{
-		if (m_enableValidationLayers) {
+		if (m_debugMessenger) {
 			DestroyDebugUtilsMessengerEXT(m_instance, m_debugMessenger, nullptr);
 			LOG_RENDER_DEBUG("VKInstance: Debug messenger destroyed.");
 		}
@@ -63,6 +75,8 @@ namespace Helios::Engine::Renderer::Vulkan {
 			LOG_RENDER_WARN("VKInstance: Validation layers requested, but not available!");
 		}
 
+		CheckInstanceExtensionSupport();
+
 		// --- Application Info ---
 		vk::ApplicationInfo appInfo(
 			appSpec.Name.c_str(),
@@ -76,10 +90,9 @@ namespace Helios::Engine::Renderer::Vulkan {
 		vk::InstanceCreateInfo createInfo;
 		createInfo.pApplicationInfo = &appInfo;
 
-		// Get extensions required by GLFW and our debug messenger
-		auto extensions = GetRequiredExtensions();
-		createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-		createInfo.ppEnabledExtensionNames = extensions.data();
+		// Use the enabled extensions from our struct
+		createInfo.enabledExtensionCount = static_cast<uint32_t>(m_instanceExtensionsInfo.enabled.size());
+		createInfo.ppEnabledExtensionNames = m_instanceExtensionsInfo.enabled.data();
 
 		// Enable validation layers and set up debug messenger for create/destroy
 		vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo;
@@ -91,6 +104,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 			debugCreateInfo.flags = vk::DebugUtilsMessengerCreateFlagsEXT();
 			debugCreateInfo.messageSeverity =
 				vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
+				vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo |
 				vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
 				vk::DebugUtilsMessageSeverityFlagBitsEXT::eError;
 			debugCreateInfo.messageType =
@@ -113,12 +127,21 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 	void VKInstance::SetupDebugMessenger()
 	{
-		if (!m_enableValidationLayers) return;
+		// Only create the messenger if the extension was successfully enabled
+		bool debugUtilsEnabled = false;
+		for(const char* ext : m_instanceExtensionsInfo.enabled) {
+			if (strcmp(ext, VK_EXT_DEBUG_UTILS_EXTENSION_NAME) == 0) {
+				debugUtilsEnabled = true;
+				break;
+			}
+		}
+		if (!debugUtilsEnabled) return;
 
 		vk::DebugUtilsMessengerCreateInfoEXT createInfo;
 		createInfo.flags = vk::DebugUtilsMessengerCreateFlagsEXT();
 		createInfo.messageSeverity =
 			vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose |
+			vk::DebugUtilsMessageSeverityFlagBitsEXT::eInfo |
 			vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
 			vk::DebugUtilsMessageSeverityFlagBitsEXT::eError;
 		createInfo.messageType =
@@ -137,19 +160,37 @@ namespace Helios::Engine::Renderer::Vulkan {
 	}
 
 
-	std::vector<const char*> VKInstance::GetRequiredExtensions() const
+	void VKInstance::CheckInstanceExtensionSupport()
 	{
-		uint32_t glfwExtensionCount = 0;
-		const char** glfwExtensions;
-		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-
-		std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
-
-		if (m_enableValidationLayers) {
-			extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+		std::vector<vk::ExtensionProperties> availableExtensions = vk::enumerateInstanceExtensionProperties();
+		std::unordered_set<std::string> available;
+		for (const auto& ext : availableExtensions) {
+			available.insert(ext.extensionName);
 		}
 
-		return extensions;
+		// Check for all required extensions
+		for (const auto& requiredExt : m_instanceExtensionsInfo.required) {
+			if (available.find(requiredExt) == available.end()) {
+				LOG_RENDER_EXCEPT("VKInstance: Required instance extension '{}' not supported.", requiredExt);
+			}
+			LOG_RENDER_TRACE("VKInstance: Required instance extension '{}' is supported.", requiredExt);
+		}
+
+		// If all required extensions are found, build our list of enabled extensions
+		m_instanceExtensionsInfo.enabled.clear();
+		for (const auto& ext : m_instanceExtensionsInfo.required) {
+			m_instanceExtensionsInfo.enabled.push_back(ext.c_str());
+		}
+		// Add optional extensions if available
+		for (const auto& ext : m_instanceExtensionsInfo.optional) {
+			if (available.find(ext) != available.end()) {
+				m_instanceExtensionsInfo.enabled.push_back(ext.c_str());
+				LOG_RENDER_TRACE("VKInstance: Optional instance extension '{}' is supported and enabled.", ext);
+			}
+		}
+
+		// Store supported extensions for reference
+		m_instanceExtensionsInfo.supported = std::move(available);
 	}
 
 
@@ -168,9 +209,10 @@ namespace Helios::Engine::Renderer::Vulkan {
 			}
 
 			if (!layerFound) {
-				LOG_RENDER_WARN("VKInstance: Validation layer not found: {}", layerName);
+				LOG_RENDER_WARN("VKInstance: Validation layer NOT found: {}", layerName);
 				return false;
 			}
+			LOG_RENDER_TRACE("VKInstance: Validation layer found: {}", layerName);
 		}
 
 		LOG_RENDER_TRACE("VKInstance: All requested validation layers are available.");

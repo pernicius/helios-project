@@ -17,6 +17,8 @@
 // - Provides a temporary debug messenger for instance creation/destruction.
 // 
 // Version history:
+// - 2026.01: Refactored extension handling
+//            Added accessors for VKDeviceManager class
 // - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once
@@ -24,6 +26,15 @@
 #include "Helios/Engine/Core/Application.h"
 
 namespace Helios::Engine::Renderer::Vulkan {
+
+
+	// Struct to hold instance extensions
+	struct InstanceExtensionInfo {
+		std::unordered_set<std::string> required;
+		std::unordered_set<std::string> optional;
+		std::unordered_set<std::string> supported;
+		std::vector<const char*> enabled;
+	};
 
 
 	class VKInstance
@@ -42,12 +53,16 @@ namespace Helios::Engine::Renderer::Vulkan {
 		const vk::Instance& Get() const { return m_instance; }
 		operator const vk::Instance& () const { return m_instance; }
 
+		// Accessors for VKDeviceManager class
+		bool AreValidationLayersEnabled() const { return m_enableValidationLayers; }
+		const std::vector<const char*>& GetValidationLayers() const { return m_validationLayers; }
+
 	private:
 		void CreateInstance(const AppSpec& appSpec);
 		void SetupDebugMessenger();
 
 		// Helper functions for instance creation
-		std::vector<const char*> GetRequiredExtensions() const;
+		void CheckInstanceExtensionSupport();
 		bool CheckValidationLayerSupport() const;
 
 		// Debug callback
@@ -61,11 +76,14 @@ namespace Helios::Engine::Renderer::Vulkan {
 		vk::Instance m_instance = nullptr;
 		vk::DebugUtilsMessengerEXT m_debugMessenger = nullptr;
 
+		// Centralized list of instance extensions
+		InstanceExtensionInfo m_instanceExtensionsInfo;
+
 		const std::vector<const char*> m_validationLayers = {
 			"VK_LAYER_KHRONOS_validation"
 		};
 
-#		ifdef HE_DEBUG
+#		ifdef BUILD_DEBUG
 			const bool m_enableValidationLayers = true;
 #		else
 			const bool m_enableValidationLayers = false;

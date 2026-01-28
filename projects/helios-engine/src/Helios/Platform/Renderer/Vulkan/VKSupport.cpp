@@ -9,10 +9,6 @@
 #include "pch.h"
 #include "Helios/Platform/Renderer/Vulkan/VKSupport.h"
 
-#include <vulkan/vulkan.hpp>
-
-#include <mutex>
-
 namespace Helios::Engine::Renderer::Vulkan
 {
 

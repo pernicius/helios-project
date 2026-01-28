@@ -6,14 +6,15 @@ Next steps in Vulkan:
    - [x] `VKInstance`: Manages the connection to the Vulkan API.
      - [x] Gathers required extensions from GLFW.
      - [x] Sets up validation layers for debugging.
+     - [ ] Better filtering of the validation layers callback messages.
    - [x] `VKDebugMessenger`: Captures validation layer messages.
    - [x] `VKSurface`: Creates the window surface (`VkSurfaceKHR`) to render to.
      - Requires `VKInstance` and the `GLFWwindow`.
- - [ ] **Device Abstraction**
-   - [ ] `DeviceManager`: Manages the physical and logical devices.
+ - [x] **Device Abstraction**
+   - [x] `DeviceManager`: Manages the physical and logical devices.
      - Requires `VKInstance` and `VKSurface`.
-     - [ ] Selects a suitable `VkPhysicalDevice`.
-     - [ ] Creates the `VkLogicalDevice` and retrieves `VkQueue` handles.
+     - [x] Selects a suitable `VkPhysicalDevice`.
+     - [x] Creates the `VkLogicalDevice` and retrieves `VkQueue` handles.
  - [ ] **Presentation**
    - [ ] `VKSwapchain`: Manages the list of images to be presented to the screen.
      - Requires `DeviceManager` and `VKSurface`.

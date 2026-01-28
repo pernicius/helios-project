@@ -24,7 +24,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		m_vkSurface = CreateScope<VKSurface>(*m_vkInstance, window);
 
 		// 3. Create the Device Manager (selects physical device, creates logical device)
-		// m_vkDeviceManager = CreateScope<VKDeviceManager>(m_vkInstance, m_vkSurface);
+		m_vkDeviceManager = CreateScope<VKDeviceManager>(*m_vkInstance, *m_vkSurface);
 
 		// 4. Create the Swapchain
 		// ...and so on for the rest of the rendering pipeline.
@@ -46,7 +46,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		// 4. Destroy Swapchain
 
 		// 3. Destroy Device Manager
-		// m_vkDeviceManager.reset();
+		m_vkDeviceManager.reset();
 
 		// 2. Destroy Surface
 		m_vkSurface.reset();
