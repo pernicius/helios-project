@@ -49,14 +49,18 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 	void VKSwapchain::RecreateSwapchain(Window& window)
 	{
-		// Handle minimization by waiting for the window to have a non-zero size
+		// Handle minimization
 		int width = 0, height = 0;
 		GLFWwindow* nativeWindow = static_cast<GLFWwindow*>(window.GetNativeWindow());
 		glfwGetFramebufferSize(nativeWindow, &width, &height);
-		while (width == 0 || height == 0) {
-			glfwGetFramebufferSize(nativeWindow, &width, &height);
-			glfwWaitEvents();
-			// TODO: make it nonblocking and handle minimization in the main loop (prevent rendering if minimized)
+		if (width == 0 || height == 0) {
+			// Wait for the device to be idle
+			m_deviceManager.GetLogicalDevice().waitIdle();
+
+			// Clean up old resources before creating new ones
+			CleanupSwapchain();
+
+			return;
 		}
 
 		// Wait for the device to be idle before recreating resources

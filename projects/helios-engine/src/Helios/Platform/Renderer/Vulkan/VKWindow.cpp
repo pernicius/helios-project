@@ -97,13 +97,13 @@ namespace Helios::Engine::Renderer::Vulkan {
 		ConfigureWindowHints();
 
 		// Create window (hidden initially)
-		m_Window = glfwCreateWindow(m_windowedState.sizeX, m_windowedState.sizeY, name.c_str(), nullptr, nullptr);
+		m_Window = glfwCreateWindow(m_windowedState.sizeX ? m_windowedState.sizeX : 800, m_windowedState.sizeY ? m_windowedState.sizeY : 600, name.c_str(), nullptr, nullptr);
 		LOG_GLFW_ASSERT(m_Window, "Could not create the window!");
 
 		// Apply position/size
 		if (m_windowedState.posX != -1 and m_windowedState.posY != -1)
 			glfwSetWindowPos(m_Window, m_windowedState.posX, m_windowedState.posY);
-		glfwSetWindowSize(m_Window, m_windowedState.sizeX, m_windowedState.sizeY);
+		glfwSetWindowSize(m_Window, m_windowedState.sizeX ? m_windowedState.sizeX : 800, m_windowedState.sizeY ? m_windowedState.sizeY : 600);
 
 		// Show window
 		Show();

@@ -68,6 +68,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 	bool VKRenderer::OnFramebufferResize(const FramebufferResizeEvent& e)
 	{
+		LOG_RENDER_DEBUG("VKRenderer: Framebuffer resize event received: {}, {}", e.width, e.height);
 		if (m_vkSwapchain) {
 			m_vkSwapchain->RecreateSwapchain(*m_Window);
 		}

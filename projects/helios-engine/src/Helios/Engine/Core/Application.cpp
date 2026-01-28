@@ -269,7 +269,7 @@ namespace Helios::Engine {
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate(timestep);
 
-			// Rendering
+			// Rendering (only if not minimized!)
 			if (!m_Minimized)
 			{
 				for (Layer* layer : m_LayerStack)
@@ -380,7 +380,7 @@ namespace Helios::Engine {
 
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(HE_BIND_EVENT_FN(Application::OnWindowClose));
-//		dispatcher.Dispatch<WindowResizeEvent>(HE_BIND_EVENT_FN(Application::OnWindowResize));
+		dispatcher.Dispatch<FramebufferResizeEvent>(HE_BIND_EVENT_FN(Application::OnFramebufferResize));
 
 		if (m_Renderer)
 			m_Renderer->OnEvent(e);
@@ -402,34 +402,18 @@ namespace Helios::Engine {
 	}
 
 
-//	bool Application::OnWindowResize(const WindowResizeEvent& e)
-//	{
-//		if (e.GetWidth() == 0 || e.GetHeight() == 0)
-//		{
-//			m_Minimized = true;
-//			return false;
-//		}
-//
-//		m_Minimized = false;
-////		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
-//
-//		return false;
-//	}
+	bool Application::OnFramebufferResize(const FramebufferResizeEvent& e)
+	{
+		LOG_CORE_DEBUG("Application: Framebuffer resize event received.");
+		if (e.width == 0 || e.height == 0)
+		{
+			m_Minimized = true;
+			return false;
+		}
 
-
-//	bool Application::OnFramebufferResize(const FramebufferResizeEvent& e)
-//	{
-//		if (e.GetWidth() == 0 || e.GetHeight() == 0)
-//		{
-//			m_Minimized = true;
-//			return false;
-//		}
-//
-//		m_Minimized = false;
-////		Renderer::OnFramebufferResize(e.GetWidth(), e.GetHeight());
-//
-//		return false;
-//	}
+		m_Minimized = false;
+		return false;
+	}
 
 
 } // namespace Helios::Engine
