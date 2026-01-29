@@ -81,16 +81,14 @@ namespace Helios::Engine::Renderer::Vulkan {
 			imageCount = support.capabilities.maxImageCount;
 		}
 
-		vk::SwapchainCreateInfoKHR createInfo(
-			{},
-			m_surface.Get(),
-			imageCount,
-			surfaceFormat.format,
-			surfaceFormat.colorSpace,
-			extent,
-			1, // imageArrayLayers
-			vk::ImageUsageFlagBits::eColorAttachment
-		);
+		vk::SwapchainCreateInfoKHR createInfo = vk::SwapchainCreateInfoKHR()
+			.setSurface(m_surface.Get())
+			.setMinImageCount(imageCount)
+			.setImageFormat(surfaceFormat.format)
+			.setImageColorSpace(surfaceFormat.colorSpace)
+			.setImageExtent(extent)
+			.setImageArrayLayers(1)
+			.setImageUsage(vk::ImageUsageFlagBits::eColorAttachment);
 
 		QueueFamilyIndices indices = m_deviceManager.GetQueueFamilyIndices();
 		uint32_t queueFamilyIndices[] = { indices.graphics.value(), indices.present.value() };
@@ -123,15 +121,20 @@ namespace Helios::Engine::Renderer::Vulkan {
 	void VKSwapchain::CreateImageViews()
 	{
 		m_imageViews.resize(m_images.size());
+
+		vk::ImageSubresourceRange subresourceRange = vk::ImageSubresourceRange()
+			.setAspectMask(vk::ImageAspectFlagBits::eColor)
+			.setBaseMipLevel(0)
+			.setLevelCount(1)
+			.setBaseArrayLayer(0)
+			.setLayerCount(1);
+
 		for (size_t i = 0; i < m_images.size(); i++) {
-			vk::ImageViewCreateInfo createInfo(
-				{},
-				m_images[i],
-				vk::ImageViewType::e2D,
-				m_imageFormat,
-				{}, // component mapping
-				{ vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1 } // subresourceRange
-			);
+			vk::ImageViewCreateInfo createInfo = vk::ImageViewCreateInfo()
+				.setImage(m_images[i])
+				.setViewType(vk::ImageViewType::e2D)
+				.setFormat(m_imageFormat)
+				.setSubresourceRange(subresourceRange);
 			m_imageViews[i] = m_deviceManager.GetLogicalDevice().createImageView(createInfo);
 		}
 		LOG_RENDER_DEBUG("VKSwapchain: ImageViews created.");

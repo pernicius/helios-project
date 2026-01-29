@@ -464,11 +464,12 @@ namespace Helios::Engine::Renderer {
 			window->RaiseEvent(CreateScope<WindowCloseEvent>());
 		});
 
-		glfwSetWindowRefreshCallback(m_Window, [](GLFWwindow* handle) {
-			auto* window = static_cast<Window*>(glfwGetWindowUserPointer(handle));
-			if (!window) return;
-			window->RaiseEvent(CreateScope<WindowRefreshEvent>());
-		});
+// TODO: Do we need this?
+//		glfwSetWindowRefreshCallback(m_Window, [](GLFWwindow* handle) {
+//			auto* window = static_cast<Window*>(glfwGetWindowUserPointer(handle));
+//			if (!window) return;
+//			window->RaiseEvent(CreateScope<WindowRefreshEvent>());
+//		});
 
 		glfwSetWindowIconifyCallback(m_Window, [](GLFWwindow* handle, int iconified) {
 			auto* window = static_cast<Window*>(glfwGetWindowUserPointer(handle));

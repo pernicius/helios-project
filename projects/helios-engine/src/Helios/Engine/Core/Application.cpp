@@ -373,17 +373,21 @@ namespace Helios::Engine {
 
 	void Application::OnEvent(Event& e)
 	{
+		// Log filtering
 		if (e.GetCategoryFlags() & EventCategory::Window) {
 			if (e.GetEventType() != EventType::WindowMoved)
 				LOG_CORE_TRACE("Application: OnEvent: {}", e.ToString());
 		}
 
+		// Dispatch event to application
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(HE_BIND_EVENT_FN(Application::OnWindowClose));
 
+		// Forward event to renderer
 		if (m_Renderer)
 			m_Renderer->OnEvent(e);
 
+		// Dispatch events to layers in reverse order
 		for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it) 
 		{
 			if (e.Handled)

@@ -78,13 +78,12 @@ namespace Helios::Engine::Renderer::Vulkan {
 		CheckInstanceExtensionSupport();
 
 		// --- Application Info ---
-		vk::ApplicationInfo appInfo(
-			appSpec.Name.c_str(),
-			appSpec.Version,
-			"Helios Engine",
-			HE_VERSION,
-			VK_API_VERSION_1_3
-		);
+		vk::ApplicationInfo appInfo = vk::ApplicationInfo()
+			.setPApplicationName(appSpec.Name.c_str())
+			.setApplicationVersion(appSpec.Version)
+			.setPEngineName("Helios Engine")
+			.setEngineVersion(HE_VERSION)
+			.setApiVersion(VK_API_VERSION_1_3);
 
 		// --- Instance Create Info ---
 		vk::InstanceCreateInfo createInfo;
