@@ -18,8 +18,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 	VKSwapchain::VKSwapchain(const VKDeviceManager& deviceManager, const VKSurface& surface, Window& window)
 		: m_deviceManager(deviceManager), m_surface(surface)
 	{
-		CreateSwapchain(window);
-		CreateImageViews();
+		RecreateSwapchain(window);
 	}
 
 	
@@ -32,36 +31,28 @@ namespace Helios::Engine::Renderer::Vulkan {
 	void VKSwapchain::CleanupSwapchain()
 	{
 		const vk::Device& logicalDevice = m_deviceManager.GetLogicalDevice();
-		for (auto imageView : m_imageViews) {
-			logicalDevice.destroyImageView(imageView);
+
+		if (m_imageViews.size() > 0 && m_imageViews[0]) {
+			for (auto imageView : m_imageViews)
+				logicalDevice.destroyImageView(imageView);
+			m_imageViews.clear();
+			LOG_RENDER_DEBUG("VKSwapchain: ImageViews destroyed.");
 		}
-		m_imageViews.clear();
-		LOG_RENDER_DEBUG("VKSwapchain: ImageViews destroyed.");
 
 
 		if (m_swapchain) {
 			logicalDevice.destroySwapchainKHR(m_swapchain);
 			m_swapchain = nullptr;
+			LOG_RENDER_DEBUG("VKSwapchain: Swapchain destroyed.");
 		}
-		LOG_RENDER_DEBUG("VKSwapchain: Swapchain destroyed.");
 	}
 
 
 	void VKSwapchain::RecreateSwapchain(Window& window)
 	{
-		// Handle minimization
-		int width = 0, height = 0;
-		GLFWwindow* nativeWindow = static_cast<GLFWwindow*>(window.GetNativeWindow());
-		glfwGetFramebufferSize(nativeWindow, &width, &height);
-		if (width == 0 || height == 0) {
-			// Wait for the device to be idle
-			m_deviceManager.GetLogicalDevice().waitIdle();
-
-			// Clean up old resources before creating new ones
-			CleanupSwapchain();
-
+		// Handle minimization (only recreate when not minimized)
+		if (window.glfwIsMinimized())
 			return;
-		}
 
 		// Wait for the device to be idle before recreating resources
 		m_deviceManager.GetLogicalDevice().waitIdle();

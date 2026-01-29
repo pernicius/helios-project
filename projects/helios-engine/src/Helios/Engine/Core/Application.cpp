@@ -270,7 +270,7 @@ namespace Helios::Engine {
 				layer->OnUpdate(timestep);
 
 			// Rendering (only if not minimized!)
-			if (!m_Minimized)
+			if (!m_Window->glfwIsMinimized())
 			{
 				for (Layer* layer : m_LayerStack)
 					layer->OnRender();

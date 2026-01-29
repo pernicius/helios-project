@@ -397,8 +397,9 @@ namespace Helios::Engine::Renderer {
 		m_currentState.isMinimized  = glfwIsMinimized();
 		m_currentState.isMaximized  = glfwIsMaximized();
 
-		m_currentState.sizeX = e.width;
-		m_currentState.sizeY = e.height;
+		glfwGetWindowSize(m_Window, &m_currentState.sizeX, &m_currentState.sizeY);
+//		m_currentState.sizeX = e.width;
+//		m_currentState.sizeY = e.height;
 
 		int posX = 0, posY = 0;
 		glfwGetWindowPos(m_Window, &posX, &posY);

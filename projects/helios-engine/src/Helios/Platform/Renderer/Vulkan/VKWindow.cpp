@@ -97,25 +97,23 @@ namespace Helios::Engine::Renderer::Vulkan {
 		ConfigureWindowHints();
 
 		// Create window (hidden initially)
-		m_Window = glfwCreateWindow(m_windowedState.sizeX ? m_windowedState.sizeX : 800, m_windowedState.sizeY ? m_windowedState.sizeY : 600, name.c_str(), nullptr, nullptr);
+		m_Window = glfwCreateWindow(m_windowedState.sizeX, m_windowedState.sizeY, name.c_str(), nullptr, nullptr);
 		LOG_GLFW_ASSERT(m_Window, "Could not create the window!");
 
 		// Apply position/size
 		if (m_windowedState.posX != -1 and m_windowedState.posY != -1)
 			glfwSetWindowPos(m_Window, m_windowedState.posX, m_windowedState.posY);
-		glfwSetWindowSize(m_Window, m_windowedState.sizeX ? m_windowedState.sizeX : 800, m_windowedState.sizeY ? m_windowedState.sizeY : 600);
+		glfwSetWindowSize(m_Window, m_windowedState.sizeX, m_windowedState.sizeY);
 
 		// Show window
 		Show();
 		glfwFocusWindow(m_Window);
 
-		// Apply maximize/minimize
+		// Apply maximize/minimize/fullscreen
 		if (m_currentState.isMaximized)
 			glfwMaximizeWindow(m_Window);
-		else if (m_currentState.isMinimized)
+		if (m_currentState.isMinimized)
 			glfwIconifyWindow(m_Window);
-
-		// Apply fullscreen
 		if (m_currentState.isFullscreen)
 			ToggleFullscreen();
 		m_monitorState.monitor = GetCurrentMonitor();
@@ -123,6 +121,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		// Initialize callbacks
 		InitCallbacks();
 
+#if 0
 		// Force some events to update the application accordingly
 		{
 			// Force window move event
@@ -138,7 +137,9 @@ namespace Helios::Engine::Renderer::Vulkan {
 			glfwGetFramebufferSize(m_Window, &fbx, &fby);
 			RaiseEvent(CreateScope<FramebufferResizeEvent>(fbx, fby));
 		}
+#endif
 
+#if 0
 		// some logging
 		{
 			LOG_RENDER_TRACE("Video modes of selected monitor ({}):", GetCurrentMonitorName());
@@ -151,6 +152,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 					modes[i].refreshRate);
 			}
 		}
+#endif
 	}
 
 
