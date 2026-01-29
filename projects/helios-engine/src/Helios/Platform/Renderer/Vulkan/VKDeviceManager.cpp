@@ -12,6 +12,8 @@
 #include "Helios/Platform/Renderer/Vulkan/VKInstance.h"
 #include "Helios/Platform/Renderer/Vulkan/VKSurface.h"
 
+#include "Helios/Engine/Core/Config.h"
+
 namespace Helios::Engine::Renderer::Vulkan {
 
 
@@ -41,29 +43,44 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 		LOG_RENDER_INFO("VKDevMgr: Found {} device(s).", devices.size());
 
-		// Use a map to store candidates and their scores
-		std::multimap<int, vk::PhysicalDevice> candidates;
+		// First, try to find the preferred device from config
+		m_physicalDevice = FindPreferredDevice(devices, surface);
 
-		for (const auto& device : devices) {
-			int score = RateDeviceSuitability(device, surface);
-			candidates.insert(std::make_pair(score, device));
-			vk::PhysicalDeviceProperties properties = device.getProperties();
-			LOG_RENDER_DEBUG("VKDevMgr: Found physical device: {} (Score: {})", properties.deviceName.data(), score);
-		}
-
-		// Check if the best candidate is suitable
-		if (candidates.rbegin()->first > 0) {
-			m_physicalDevice = candidates.rbegin()->second;
+		if (m_physicalDevice) {
 			vk::PhysicalDeviceProperties properties = m_physicalDevice.getProperties();
-			LOG_RENDER_INFO("VKDevMgr: Selected physical device: {} (Score: {})", properties.deviceName.data(), candidates.rbegin()->first);
+			LOG_RENDER_INFO("VKDevMgr: Selected preferred physical device: {}", properties.deviceName.data());
 		}
 		else {
-			LOG_RENDER_EXCEPT("VKDevMgr: Failed to find a suitable GPU!");
+			LOG_RENDER_INFO("VKDevMgr: No preferred device found or suitable. Selecting best alternative.");
+			// Use a map to store candidates and their scores
+			std::multimap<int, vk::PhysicalDevice> candidates;
+
+			for (const auto& device : devices) {
+				int score = RateDeviceSuitability(device, surface);
+				candidates.insert(std::make_pair(score, device));
+				vk::PhysicalDeviceProperties properties = device.getProperties();
+				LOG_RENDER_DEBUG("VKDevMgr: Found physical device: {} (Score: {})", properties.deviceName.data(), score);
+			}
+
+			// Check if the best candidate is suitable
+			if (candidates.rbegin()->first > 0) {
+				m_physicalDevice = candidates.rbegin()->second;
+				vk::PhysicalDeviceProperties properties = m_physicalDevice.getProperties();
+				LOG_RENDER_INFO("VKDevMgr: Selected physical device: {} (Score: {})", properties.deviceName.data(), candidates.rbegin()->first);
+			}
+			else {
+				LOG_RENDER_EXCEPT("VKDevMgr: Failed to find a suitable GPU!");
+			}
 		}
 
 		if (!m_physicalDevice) {
 			LOG_RENDER_EXCEPT("VKDevMgr: Failed to find a suitable GPU!");
 		}
+
+		// Save the selected device's info for next time
+		vk::PhysicalDeviceProperties properties = m_physicalDevice.getProperties();
+		ConfigManager::GetInstance().Set<std::string>("renderer_vulkan", "PhysicalDevice", "PreferredVendorID", std::to_string(properties.vendorID));
+		ConfigManager::GetInstance().Set<std::string>("renderer_vulkan", "PhysicalDevice", "PreferredDeviceID", std::to_string(properties.deviceID));
 	}
 
 
@@ -120,6 +137,35 @@ namespace Helios::Engine::Renderer::Vulkan {
 			m_queueIndices.present.value(),
 			m_queueIndices.compute.has_value() ? std::to_string(m_queueIndices.compute.value()) : "N/A",
 			m_queueIndices.transfer.has_value() ? std::to_string(m_queueIndices.transfer.value()) : "N/A");
+	}
+
+
+	vk::PhysicalDevice VKDeviceManager::FindPreferredDevice(const std::vector<vk::PhysicalDevice>& devices, const VKSurface& surface)
+	{
+		std::string preferredVendorID_str = ConfigManager::GetInstance().Get<std::string>("renderer_vulkan", "PhysicalDevice", "PreferredVendorID");
+		std::string preferredDeviceID_str = ConfigManager::GetInstance().Get<std::string>("renderer_vulkan", "PhysicalDevice", "PreferredDeviceID");
+
+		if (preferredVendorID_str.empty() || preferredDeviceID_str.empty()) {
+			return nullptr; // No preferred device configured
+		}
+
+		uint32_t preferredVendorID = std::stoul(preferredVendorID_str);
+		uint32_t preferredDeviceID = std::stoul(preferredDeviceID_str);
+
+		for (const auto& device : devices) {
+			vk::PhysicalDeviceProperties properties = device.getProperties();
+			if (properties.vendorID == preferredVendorID && properties.deviceID == preferredDeviceID) {
+				if (IsDeviceSuitable(device, surface)) {
+					LOG_RENDER_DEBUG("VKDevMgr: Found matching preferred device: {}", properties.deviceName.data());
+					return device;
+				}
+				else {
+					LOG_RENDER_WARN("VKDevMgr: Found preferred device '{}', but it is no longer suitable.", properties.deviceName.data());
+				}
+			}
+		}
+
+		return nullptr;
 	}
 
 

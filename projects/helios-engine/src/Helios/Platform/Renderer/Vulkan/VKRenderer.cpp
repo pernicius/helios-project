@@ -9,6 +9,8 @@
 #include "pch.h"
 #include "Helios/Platform/Renderer/Vulkan/VKRenderer.h"
 
+#include "Helios/Engine/Core/Config.h"
+
 namespace Helios::Engine::Renderer::Vulkan {
 
 
@@ -17,6 +19,9 @@ namespace Helios::Engine::Renderer::Vulkan {
 		LOG_RENDER_INFO("Initializing Vulkan Renderer...");
 
 		m_Window = &window;
+
+		// Load the configuration for the Vulkan renderer
+		ConfigManager::GetInstance().LoadDomain("renderer_vulkan");
 
 		// The initialization order is critical and follows the Vulkan object dependency chain.
 		// 1. Create the Vulkan Instance
@@ -56,6 +61,9 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 		// 1. Destroy Instance (which also handles the debug messenger)
 		m_vkInstance.reset();
+
+		// Save the configuration for the Vulkan renderer
+		ConfigManager::GetInstance().SaveDomain("renderer_vulkan");
 	}
 
 

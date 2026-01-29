@@ -94,7 +94,6 @@ namespace Helios::Engine {
 
 	private:
 		bool OnWindowClose(const WindowCloseEvent& e);
-		bool OnFramebufferResize(const FramebufferResizeEvent& e);
 	};
 
 

@@ -16,6 +16,7 @@
 // - Manages device-related resources in an RAII-compliant manner.
 // 
 // Version history:
+// - 2025.01: Added physical device selection persistence
 // - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once
@@ -93,6 +94,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		void CreateLogicalDevice(const VKSurface& surface);
 
 		// --- Helper Functions for Device Selection ---
+		vk::PhysicalDevice FindPreferredDevice(const std::vector<vk::PhysicalDevice>& devices, const VKSurface& surface);
 		bool IsDeviceSuitable(vk::PhysicalDevice device, const VKSurface& surface);
 		int RateDeviceSuitability(vk::PhysicalDevice device, const VKSurface& surface);
 		QueueFamilyIndices FindQueueFamilies(vk::PhysicalDevice device, const VKSurface& surface);

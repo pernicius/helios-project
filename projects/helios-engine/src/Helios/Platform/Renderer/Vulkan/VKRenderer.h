@@ -17,6 +17,7 @@
 // - Serves as the central hub for all Vulkan-specific rendering logic.
 // 
 // Version history:
+// - 2025.01: Added Configuration support via ConfigManager
 // - 2026.01: Added Event handling for window resize
 // - 2026.01: Added Swapchain management
 // - 2026.01: Added Device management

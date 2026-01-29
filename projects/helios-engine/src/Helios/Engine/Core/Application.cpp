@@ -380,7 +380,6 @@ namespace Helios::Engine {
 
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(HE_BIND_EVENT_FN(Application::OnWindowClose));
-		dispatcher.Dispatch<FramebufferResizeEvent>(HE_BIND_EVENT_FN(Application::OnFramebufferResize));
 
 		if (m_Renderer)
 			m_Renderer->OnEvent(e);
@@ -398,20 +397,6 @@ namespace Helios::Engine {
 	{
 		LOG_CORE_DEBUG("Application: Window close event received.");
 		m_Running = false;
-		return false;
-	}
-
-
-	bool Application::OnFramebufferResize(const FramebufferResizeEvent& e)
-	{
-		LOG_CORE_DEBUG("Application: Framebuffer resize event received.");
-		if (e.width == 0 || e.height == 0)
-		{
-			m_Minimized = true;
-			return false;
-		}
-
-		m_Minimized = false;
 		return false;
 	}
 
