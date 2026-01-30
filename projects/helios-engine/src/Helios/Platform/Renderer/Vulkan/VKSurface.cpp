@@ -24,7 +24,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 			&surface_c);
 
 		if (result != VK_SUCCESS) {
-			LOG_RENDER_FATAL("VKSurface: Failed to create window surface!");
+			LOG_RENDER_EXCEPT("VKSurface: Failed to create window surface!");
 		}
 
 		m_surface = vk::SurfaceKHR(surface_c);

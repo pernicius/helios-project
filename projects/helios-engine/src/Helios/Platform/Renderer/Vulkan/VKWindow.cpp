@@ -89,8 +89,9 @@ namespace Helios::Engine::Renderer::Vulkan {
 				}
 	#		endif
 
-			int success = glfwInit();
-			LOG_GLFW_ASSERT(success, "Could not initialize GLFW!");
+			if (!glfwInit()) {
+				LOG_GLFW_EXCEPT("Could not initialize GLFW!");
+			}
 		}
 
 		// Configure window hints
@@ -98,7 +99,9 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 		// Create window (hidden initially)
 		m_Window = glfwCreateWindow(m_windowedState.sizeX, m_windowedState.sizeY, name.c_str(), nullptr, nullptr);
-		LOG_GLFW_ASSERT(m_Window, "Could not create the window!");
+		if (!m_Window) {
+			LOG_GLFW_EXCEPT("Could not create the window!");
+		}
 
 		// Apply position/size
 		if (m_windowedState.posX != -1 and m_windowedState.posY != -1)

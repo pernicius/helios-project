@@ -305,7 +305,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		// Check for all required extensions
 		for (const auto& requiredExt : m_deviceExtensionsInfo.required) {
 			if (available.find(requiredExt) == available.end()) {
-				LOG_RENDER_WARN("VKDevMgr: Required device extension '{}' not supported.", requiredExt);
+				LOG_RENDER_EXCEPT("VKDevMgr: Required device extension '{}' not supported.", requiredExt);
 				return false;
 			}
 		}
