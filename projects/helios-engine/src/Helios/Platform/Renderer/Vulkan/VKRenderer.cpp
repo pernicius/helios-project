@@ -11,6 +11,14 @@
 
 #include "Helios/Engine/Core/Config.h"
 
+#ifdef BUILD_DEBUG
+#	define DEBUG_FILTER_ID(id) VKInstance::DisableDebugMessageID(id)
+#	define DEBUG_FILTER_RESET() VKInstance::ResetDisabledDebugMessageIDs()
+#else
+#	define DEBUG_FILTER_ID(id)
+#	define DEBUG_FILTER_RESET()
+#endif
+
 namespace Helios::Engine::Renderer::Vulkan {
 
 
@@ -26,21 +34,21 @@ namespace Helios::Engine::Renderer::Vulkan {
 		// The initialization order is critical and follows the Vulkan object dependency chain.
 
 		// 1. Create the Vulkan Instance
-VKInstance::DisableDebugMessageID(0); // Massive clutter
-VKInstance::DisableDebugMessageID(601872502); // Khronos Validation Layer Active...
+		DEBUG_FILTER_ID(0); // Massive clutter
+		DEBUG_FILTER_ID(601872502); // Khronos Validation Layer Active...
 		m_vkInstance = VKInstanceBuilder()
 			.SetAppSpec(appSpec)
 			.WithGlfwExtensions()
 			.Build();
-VKInstance::ResetDisabledDebugMessageIDs();
+		DEBUG_FILTER_RESET();
 
 		// 2. Create the Window Surface
 		m_vkSurface = CreateScope<VKSurface>(*m_vkInstance, *m_Window);
 
 		// 3. Create the Device Manager (selects physical device, creates logical device)
-VKInstance::DisableDebugMessageID(0); // Massive clutter
+		DEBUG_FILTER_ID(0); // Massive clutter
 		m_vkDeviceManager = CreateScope<VKDeviceManager>(*m_vkInstance, *m_vkSurface);
-VKInstance::ResetDisabledDebugMessageIDs();
+		DEBUG_FILTER_RESET();
 
 		// 4. Create the Swapchain
 		m_vkSwapchain = CreateScope<VKSwapchain>(*m_vkDeviceManager, *m_vkSurface, *m_Window);
@@ -75,9 +83,9 @@ VKInstance::ResetDisabledDebugMessageIDs();
 		m_vkSurface.reset();
 
 		// 1. Destroy Instance (which also handles the debug messenger)
-VKInstance::DisableDebugMessageID(0); // Massive clutter
+		DEBUG_FILTER_ID(0); // Massive clutter
 		m_vkInstance.reset();
-VKInstance::ResetDisabledDebugMessageIDs();
+		DEBUG_FILTER_RESET();
 
 		// Save the configuration for the Vulkan renderer
 		ConfigManager::GetInstance().SaveDomain("renderer_vulkan");
