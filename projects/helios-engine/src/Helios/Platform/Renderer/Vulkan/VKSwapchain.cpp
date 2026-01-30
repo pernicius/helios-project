@@ -187,9 +187,17 @@ namespace Helios::Engine::Renderer::Vulkan {
 	vk::PresentModeKHR VKSwapchain::ChoosePresentMode(const std::vector<vk::PresentModeKHR>& availablePresentModes)
 	{
 		for (const auto& availablePresentMode : availablePresentModes) {
+#if 0
+			// VSync On
 			if (availablePresentMode == vk::PresentModeKHR::eMailbox) {
 				return availablePresentMode;
 			}
+#else
+			// VSync Off
+			if (availablePresentMode == vk::PresentModeKHR::eImmediate) {
+				return availablePresentMode;
+			}
+#endif
 		}
 		return vk::PresentModeKHR::eFifo;
 	}

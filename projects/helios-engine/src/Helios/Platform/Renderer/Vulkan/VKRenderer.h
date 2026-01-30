@@ -17,6 +17,7 @@
 // - Serves as the central hub for Vulkan-specific rendering logic.
 // 
 // Changelog:
+// - 2026.01: Added basic rendering loop with command buffers and synchronization
 // - 2026.01: Added framebuffer creation in swapchain
 // - 2026.01: Added graphics pipeline management
 // - 2026.01: Refactored to use the builder pattern for RenderPass creation
@@ -54,8 +55,14 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 		virtual void OnEvent(Event& e) override;
 
+		virtual void DrawFrame() override;
+
 	private:
 		bool OnFramebufferResize(const FramebufferResizeEvent& e);
+
+		void CreateCommandPool();
+		void CreateCommandBuffers();
+		void CreateSyncObjects();
 
 		// Tempoary
 		void CreateSimpleRenderPass();
@@ -69,6 +76,15 @@ namespace Helios::Engine::Renderer::Vulkan {
 		Scope<VKSwapchain> m_vkSwapchain;
 		Scope<VKRenderPass> m_vkRenderPass;
 		Scope<VKPipeline> m_vkPipeline;
+
+		vk::CommandPool m_commandPool;
+		std::vector<vk::CommandBuffer> m_commandBuffers;
+
+		int m_FramesInFlight = 0;
+		std::vector<vk::Semaphore> m_imageAvailableSemaphores;
+		std::vector<vk::Semaphore> m_renderFinishedSemaphores;
+		std::vector<vk::Fence> m_inFlightFences;
+		uint32_t m_currentFrame = 0;
 	};
 
 

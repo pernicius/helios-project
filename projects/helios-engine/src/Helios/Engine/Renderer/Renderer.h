@@ -40,6 +40,8 @@ namespace Helios::Engine::Renderer {
 		virtual void Shutdown() = 0;
 
 		virtual void OnEvent(Event& e) = 0;
+		
+		virtual void DrawFrame() = 0;
 
 		// Other methods for rendering will go here later
 		// virtual void BeginFrame() = 0;

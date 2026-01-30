@@ -227,7 +227,7 @@ namespace Helios::Engine {
 			Timestep timestep = RunLoopTimer.Elapsed();
 			RunLoopTimer.Reset();
 
-#if 0
+#if 1
 			{ // tempoary for debuging
 				static int fps = 0;
 				static float fps_ts = 0;
@@ -275,7 +275,7 @@ namespace Helios::Engine {
 				for (Layer* layer : m_LayerStack)
 					layer->OnRender();
 
-//				Renderer::Get()->Render();
+				m_Renderer->DrawFrame();
 
 //				// ImGui rendering
 //				{

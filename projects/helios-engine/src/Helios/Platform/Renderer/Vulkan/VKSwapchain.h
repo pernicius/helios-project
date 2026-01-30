@@ -58,6 +58,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		const vk::SwapchainKHR& GetSwapchain() const { return m_swapchain; }
 		const std::vector<vk::Image>& GetImages() const { return m_images; }
 		const std::vector<vk::ImageView>& GetImageViews() const { return m_imageViews; }
+		uint32_t GetImageCount() const { return static_cast<uint32_t>(m_images.size()); }
 		const vk::Format& GetImageFormat() const { return m_imageFormat; }
 		const vk::Extent2D& GetExtent() const { return m_extent; }
 		const std::vector<Scope<VKFramebuffer>>& GetFramebuffers() const { return m_framebuffers; }

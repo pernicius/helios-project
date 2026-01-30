@@ -31,17 +31,17 @@ Next steps in Vulkan:
  - [x] **Frame Buffers**
    - [x] `VKFramebuffer`: Links a `VKRenderPass` with the specific `VkImageViews` to be rendered into.
      - [x] Create one framebuffer for each swapchain image view.
- - [ ] **Command Buffers & Synchronization**
-   - [ ] `VKCommandPool`: Allocates command buffers integrate into VKDeviceManager.
-   - [ ] `VKCommandBuffer`: Records rendering commands.
-   - [ ] Create synchronization primitives (`VkSemaphore`, `VkFence`) for each frame in flight.
- - [ ] **Basic Rendering**
-   - [ ] Implement the main render loop.
-     - [ ] Acquire an image from the swapchain.
-     - [ ] Record commands into a command buffer (bind pipeline, set viewport, draw).
-     - [ ] Submit the command buffer to a graphics queue.
-     - [ ] Present the rendered image to the screen.
-   - [ ] Draw the first triangle!
+ - [x] **Command Buffers & Synchronization**
+   - [x] `VKCommandPool`: Allocates command buffers integrate into VKDeviceManager.
+   - [x] `VKCommandBuffer`: Records rendering commands.
+   - [x] Create synchronization primitives (`VkSemaphore`, `VkFence`) for each frame in flight.
+ - [x] **Basic Rendering**
+   - [x] Implement the main render loop.
+     - [x] Acquire an image from the swapchain.
+     - [x] Record commands into a command buffer (bind pipeline, set viewport, draw).
+     - [x] Submit the command buffer to a graphics queue.
+     - [x] Present the rendered image to the screen.
+   - [x] Draw the first triangle!
  - [ ] **Advanced Topics (Future)**
    - [ ] Vertex Buffers and Index Buffers.
    - [ ] Uniform Buffers and Descriptor Sets.
