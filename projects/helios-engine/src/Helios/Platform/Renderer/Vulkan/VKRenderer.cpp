@@ -54,7 +54,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		DEBUG_FILTER_RESET();
 
 		m_vkSwapchain = CreateScope<VKSwapchain>(*m_vkDeviceManager, *m_vkSurface, *m_Window);
-		m_FramesInFlight = m_vkSwapchain->GetImageCount();
+		m_framesCount = m_vkSwapchain->GetImageCount();
 
 		CreateSimpleRenderPass();
 		m_vkSwapchain->CreateFramebuffers(m_vkRenderPass->Get());
@@ -76,7 +76,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		// Destruction must happen in the reverse order of creation to respect dependencies.
 		// The Scope<T> smart pointers will handle calling the destructors automatically
 		// when they are reset.
-		for (size_t i = 0; i < m_FramesInFlight; i++) {
+		for (size_t i = 0; i < m_framesCount; i++) {
 			m_vkDeviceManager->GetLogicalDevice().destroySemaphore(m_renderFinishedSemaphores[i]);
 			m_vkDeviceManager->GetLogicalDevice().destroySemaphore(m_imageAvailableSemaphores[i]);
 			m_vkDeviceManager->GetLogicalDevice().destroyFence(m_inFlightFences[i]);
@@ -105,70 +105,81 @@ namespace Helios::Engine::Renderer::Vulkan {
 	}
 
 
-	void VKRenderer::DrawFrame()
+	bool VKRenderer::BeginFrame()
 	{
 		vk::Device logicalDevice = m_vkDeviceManager->GetLogicalDevice();
 
 		// Wait for the frame to be finished
 		vk::Result waitResult = logicalDevice.waitForFences(1, &m_inFlightFences[m_currentFrame], VK_TRUE, UINT64_MAX);
 		if (waitResult != vk::Result::eSuccess) {
-			LOG_RENDER_ERROR("VKRenderer: Failed to wait for fence!");
+			// This is a critical error. The cause could be a device loss, a driver crash, or a timeout
+			// (which is unlikely with UINT64_MAX but indicates a GPU hang).
+			// In any case, the rendering state is now undefined and we cannot safely continue.
+			LOG_RENDER_EXCEPT("Failed to wait for fence! Result: {}", vk::to_string(waitResult));
+		}
+
+		// Acquire an image from the swap chain
+		try {
+			vk::ResultValue result = logicalDevice.acquireNextImageKHR(m_vkSwapchain->GetSwapchain(), UINT64_MAX, m_imageAvailableSemaphores[m_currentFrame], nullptr);
+			m_currentImageIndex = result.value;
+		}
+		catch (const vk::OutOfDateKHRError&) {
+			m_vkSwapchain->Recreate(*m_Window, m_vkRenderPass->Get());
+			m_stateBeginFrameSuccess = false;
+			return m_stateBeginFrameSuccess;
 		}
 
 		// Reset the fence only when we are about to submit new work
 		vk::Result resetResult = logicalDevice.resetFences(1, &m_inFlightFences[m_currentFrame]);
 		if (resetResult != vk::Result::eSuccess) {
-			LOG_RENDER_ERROR("VKRenderer: Failed to reset fence!");
+			LOG_RENDER_EXCEPT("Failed to reset fence! Result: {}", vk::to_string(resetResult));
 		}
-
-		// Acquire an image from the swap chain
-		uint32_t imageIndex;
-		try {
-			vk::ResultValue result = logicalDevice.acquireNextImageKHR(m_vkSwapchain->GetSwapchain(), UINT64_MAX, m_imageAvailableSemaphores[m_currentFrame], nullptr);
-			imageIndex = result.value;
-		}
-		catch (const vk::OutOfDateKHRError&) {
-			m_vkSwapchain->Recreate(*m_Window, m_vkRenderPass->Get());
-			return;
-		}
-
 
 		// Record the command buffer
 		vk::CommandBuffer commandBuffer = m_commandBuffers[m_currentFrame];
 		commandBuffer.reset();
 
 		commandBuffer.begin(vk::CommandBufferBeginInfo{});
-		{
-			vk::ClearValue clearColor(std::array<float, 4>{0.0f, 0.0f, 0.0f, 1.0f});
-			vk::RenderPassBeginInfo renderPassInfo = vk::RenderPassBeginInfo()
-				.setRenderPass(m_vkRenderPass->Get())
-				.setFramebuffer(m_vkSwapchain->GetFramebuffers()[imageIndex]->Get())
-				.setRenderArea({ {0, 0}, m_vkSwapchain->GetExtent() })
-				.setClearValueCount(1)
-				.setPClearValues(&clearColor);
 
-			commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
-			{
-				commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, m_vkPipeline->GetPipeline());
+		vk::ClearValue clearColor(std::array<float, 4>{0.0f, 0.0f, 0.0f, 1.0f});
+		vk::RenderPassBeginInfo renderPassInfo = vk::RenderPassBeginInfo()
+			.setRenderPass(m_vkRenderPass->Get())
+			.setFramebuffer(m_vkSwapchain->GetFramebuffers()[m_currentImageIndex]->Get())
+			.setRenderArea({ {0, 0}, m_vkSwapchain->GetExtent() })
+			.setClearValueCount(1)
+			.setPClearValues(&clearColor);
 
-				vk::Viewport viewport = vk::Viewport()
-					.setX(0.0f)
-					.setY(0.0f)
-					.setWidth(static_cast<float>(m_vkSwapchain->GetExtent().width))
-					.setHeight(static_cast<float>(m_vkSwapchain->GetExtent().height))
-					.setMinDepth(0.0f)
-					.setMaxDepth(1.0f);
-				commandBuffer.setViewport(0, { viewport });
+		commandBuffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 
-				vk::Rect2D scissor = vk::Rect2D()
-					.setOffset({ 0, 0 })
-					.setExtent(m_vkSwapchain->GetExtent());
-				commandBuffer.setScissor(0, { scissor });
+		commandBuffer.bindPipeline(vk::PipelineBindPoint::eGraphics, m_vkPipeline->GetPipeline());
 
-				commandBuffer.draw(3, 1, 0, 0);
-			}
-			commandBuffer.endRenderPass();
+		vk::Viewport viewport = vk::Viewport()
+			.setX(0.0f)
+			.setY(0.0f)
+			.setWidth(static_cast<float>(m_vkSwapchain->GetExtent().width))
+			.setHeight(static_cast<float>(m_vkSwapchain->GetExtent().height))
+			.setMinDepth(0.0f)
+			.setMaxDepth(1.0f);
+		commandBuffer.setViewport(0, { viewport });
+
+		vk::Rect2D scissor = vk::Rect2D()
+			.setOffset({ 0, 0 })
+			.setExtent(m_vkSwapchain->GetExtent());
+		commandBuffer.setScissor(0, { scissor });
+
+		m_stateBeginFrameSuccess = true;
+		return m_stateBeginFrameSuccess;
+	}
+
+
+	void VKRenderer::EndFrame()
+	{
+		if (!m_stateBeginFrameSuccess) {
+			return;
 		}
+
+		vk::CommandBuffer commandBuffer = m_commandBuffers[m_currentFrame];
+		commandBuffer.endRenderPass();
 		commandBuffer.end();
 
 		// Submit the command buffer
@@ -194,7 +205,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 			.setPWaitSemaphores(signalSemaphores)
 			.setSwapchainCount(1)
 			.setPSwapchains(swapChains)
-			.setPImageIndices(&imageIndex);
+			.setPImageIndices(&m_currentImageIndex);
 
 		vk::Result presentResult = vk::Result::eSuccess;
 		try {
@@ -208,7 +219,19 @@ namespace Helios::Engine::Renderer::Vulkan {
 			m_vkSwapchain->Recreate(*m_Window, m_vkRenderPass->Get());
 		}
 
-		m_currentFrame = (m_currentFrame + 1) % m_FramesInFlight;
+		m_currentFrame = (m_currentFrame + 1) % m_framesCount;
+	}
+
+
+	void VKRenderer::DrawFrame()
+	{
+		if (!m_stateBeginFrameSuccess) {
+			return;
+		}
+
+		vk::CommandBuffer commandBuffer = m_commandBuffers[m_currentFrame];
+
+		commandBuffer.draw(3, 1, 0, 0);
 	}
 
 
@@ -238,7 +261,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 	void VKRenderer::CreateCommandBuffers()
 	{
-		m_commandBuffers.resize(m_FramesInFlight);
+		m_commandBuffers.resize(m_framesCount);
 
 		vk::CommandBufferAllocateInfo allocInfo = vk::CommandBufferAllocateInfo()
 			.setCommandPool(m_commandPool)
@@ -252,15 +275,15 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 	void VKRenderer::CreateSyncObjects()
 	{
-		m_imageAvailableSemaphores.resize(m_FramesInFlight);
-		m_renderFinishedSemaphores.resize(m_FramesInFlight);
-		m_inFlightFences.resize(m_FramesInFlight);
+		m_imageAvailableSemaphores.resize(m_framesCount);
+		m_renderFinishedSemaphores.resize(m_framesCount);
+		m_inFlightFences.resize(m_framesCount);
 
 		vk::SemaphoreCreateInfo semaphoreInfo = {};
 		vk::FenceCreateInfo fenceInfo = vk::FenceCreateInfo()
 			.setFlags(vk::FenceCreateFlagBits::eSignaled); // Create fences in signaled state
 
-		for (size_t i = 0; i < m_FramesInFlight; i++) {
+		for (size_t i = 0; i < m_framesCount; i++) {
 			m_imageAvailableSemaphores[i] = m_vkDeviceManager->GetLogicalDevice().createSemaphore(semaphoreInfo);
 			m_renderFinishedSemaphores[i] = m_vkDeviceManager->GetLogicalDevice().createSemaphore(semaphoreInfo);
 			m_inFlightFences[i] = m_vkDeviceManager->GetLogicalDevice().createFence(fenceInfo);

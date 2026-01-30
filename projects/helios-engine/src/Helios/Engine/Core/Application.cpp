@@ -275,7 +275,9 @@ namespace Helios::Engine {
 				for (Layer* layer : m_LayerStack)
 					layer->OnRender();
 
+				m_Renderer->BeginFrame();
 				m_Renderer->DrawFrame();
+				m_Renderer->EndFrame();
 
 //				// ImGui rendering
 //				{

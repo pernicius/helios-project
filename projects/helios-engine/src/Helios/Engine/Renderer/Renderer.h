@@ -20,6 +20,7 @@
 //   like `BeginFrame`, `Draw`, and `EndFrame`.
 // 
 // Changelog:
+// - 2026.01: Refactored rendering loop into BeginFrame/EndFrame
 // - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once
@@ -41,11 +42,11 @@ namespace Helios::Engine::Renderer {
 
 		virtual void OnEvent(Event& e) = 0;
 		
+		virtual bool BeginFrame() = 0;
+		virtual void EndFrame() = 0;
 		virtual void DrawFrame() = 0;
 
 		// Other methods for rendering will go here later
-		// virtual void BeginFrame() = 0;
-		// virtual void EndFrame() = 0;
 		// virtual void Draw() = 0;
 	};
 

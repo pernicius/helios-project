@@ -17,6 +17,7 @@
 // - Serves as the central hub for Vulkan-specific rendering logic.
 // 
 // Changelog:
+// - 2026.01: Refactored rendering loop into BeginFrame/DrawFrame/EndFrame
 // - 2026.01: Added basic rendering loop with command buffers and synchronization
 // - 2026.01: Added framebuffer creation in swapchain
 // - 2026.01: Added graphics pipeline management
@@ -55,6 +56,8 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 		virtual void OnEvent(Event& e) override;
 
+		virtual bool BeginFrame() override;
+		virtual void EndFrame() override;
 		virtual void DrawFrame() override;
 
 	private:
@@ -80,11 +83,14 @@ namespace Helios::Engine::Renderer::Vulkan {
 		vk::CommandPool m_commandPool;
 		std::vector<vk::CommandBuffer> m_commandBuffers;
 
-		int m_FramesInFlight = 0;
+		int m_framesCount = 0;
 		std::vector<vk::Semaphore> m_imageAvailableSemaphores;
 		std::vector<vk::Semaphore> m_renderFinishedSemaphores;
 		std::vector<vk::Fence> m_inFlightFences;
 		uint32_t m_currentFrame = 0;
+		uint32_t m_currentImageIndex = 0;
+
+		bool m_stateBeginFrameSuccess = false;
 	};
 
 
