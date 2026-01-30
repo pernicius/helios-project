@@ -10,6 +10,7 @@
 #include "Helios/Platform/Renderer/Vulkan/VKRenderer.h"
 
 #include "Helios/Engine/Core/Config.h"
+#include "Helios/Engine/VFS/VFS.h"
 
 #ifdef BUILD_DEBUG
 #	define DEBUG_FILTER_ID(id) VKInstance::DisableDebugMessageID(id)
@@ -31,9 +32,13 @@ namespace Helios::Engine::Renderer::Vulkan {
 		// Load the configuration for the Vulkan renderer
 		ConfigManager::GetInstance().LoadDomain("renderer_vulkan");
 
+// Tempoary!!!
+		VirtFS.Mount("assets", appSpec.WorkingDirectory + "/../helios-engine/assets", 0, "HeliosEngine");
+		VirtFS.CreateAlias("@assets:", "assets");
+// Tempoary!!!
+
 		// The initialization order is critical and follows the Vulkan object dependency chain.
 
-		// 1. Create the Vulkan Instance
 		DEBUG_FILTER_ID(0); // Massive clutter
 		DEBUG_FILTER_ID(601872502); // Khronos Validation Layer Active...
 		m_vkInstance = VKInstanceBuilder()
@@ -42,19 +47,17 @@ namespace Helios::Engine::Renderer::Vulkan {
 			.Build();
 		DEBUG_FILTER_RESET();
 
-		// 2. Create the Window Surface
 		m_vkSurface = CreateScope<VKSurface>(*m_vkInstance, *m_Window);
 
-		// 3. Create the Device Manager (selects physical device, creates logical device)
 		DEBUG_FILTER_ID(0); // Massive clutter
 		m_vkDeviceManager = CreateScope<VKDeviceManager>(*m_vkInstance, *m_vkSurface);
 		DEBUG_FILTER_RESET();
 
-		// 4. Create the Swapchain
 		m_vkSwapchain = CreateScope<VKSwapchain>(*m_vkDeviceManager, *m_vkSurface, *m_Window);
 
-		// 5. Create the Render Pass
 		CreateSimpleRenderPass();
+
+		CreateSimpleGraphicsPipeline();
 	}
 
 
@@ -66,23 +69,12 @@ namespace Helios::Engine::Renderer::Vulkan {
 		// The Scope<T> smart pointers will handle calling the destructors automatically
 		// when they are reset.
 
-		// 7. Destroy Framebuffers, Command Buffers, etc.
-
-		// 6. Destroy Pipeline
-
-		// 5. Destroy RenderPass
+		m_vkPipeline.reset();
 		m_vkRenderPass.reset();
-
-		// 4. Destroy Swapchain
 		m_vkSwapchain.reset();
-
-		// 3. Destroy Device Manager
 		m_vkDeviceManager.reset();
-
-		// 2. Destroy Surface
 		m_vkSurface.reset();
 
-		// 1. Destroy Instance (which also handles the debug messenger)
 		DEBUG_FILTER_ID(0); // Massive clutter
 		m_vkInstance.reset();
 		DEBUG_FILTER_RESET();
@@ -147,5 +139,32 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 		m_vkRenderPass = builder.Build();
 	}
+
+
+	void VKRenderer::CreateSimpleGraphicsPipeline()
+	{
+		// Viewport and scissor will be dynamic
+		vk::Viewport viewport = {};
+		vk::Rect2D scissor = {};
+
+		// Color blend attachment state
+		vk::PipelineColorBlendAttachmentState colorBlendAttachment = vk::PipelineColorBlendAttachmentState()
+			.setColorWriteMask(vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA)
+			.setBlendEnable(VK_FALSE);
+
+		VKPipelineBuilder builder(*m_vkDeviceManager, *m_vkRenderPass);
+		builder.SetShaders("@assets:/shaders/vulkan/simple.vert.spv", "@assets:/shaders/vulkan/simple.frag.spv")
+			.SetVertexInput({}, {}) // No vertex input for now
+			.SetInputAssembly(vk::PrimitiveTopology::eTriangleList)
+			.SetViewport(viewport)
+			.SetScissor(scissor)
+			.SetRasterizer(vk::PolygonMode::eFill, vk::CullModeFlagBits::eBack, vk::FrontFace::eClockwise)
+			.SetMultisampling()
+			.SetColorBlending(colorBlendAttachment)
+			.SetDepthStencil(VK_FALSE, VK_FALSE, vk::CompareOp::eLess)
+			.SetDynamicState({ vk::DynamicState::eViewport, vk::DynamicState::eScissor });
+		m_vkPipeline = builder.Build();
+	}
+
 
 } // namespace Helios::Engine::Renderer::Vulkan

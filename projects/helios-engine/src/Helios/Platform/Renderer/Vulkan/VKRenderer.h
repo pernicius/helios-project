@@ -17,6 +17,7 @@
 // - Serves as the central hub for Vulkan-specific rendering logic.
 // 
 // Changelog:
+// - 2026.01: Added graphics pipeline management
 // - 2026.01: Refactored to use the builder pattern for RenderPass creation
 // - 2026.01: Added RenderPass management
 // - 2025.01: Added Configuration support via ConfigManager
@@ -35,6 +36,7 @@
 #include "Helios/Platform/Renderer/Vulkan/VKDeviceManager.h"
 #include "Helios/Platform/Renderer/Vulkan/VKSwapchain.h"
 #include "Helios/Platform/Renderer/Vulkan/VKRenderPass.h"
+#include "Helios/Platform/Renderer/Vulkan/VKPipeline.h"
 
 namespace Helios::Engine::Renderer::Vulkan {
 
@@ -55,6 +57,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 		// Tempoary
 		void CreateSimpleRenderPass();
+		void CreateSimpleGraphicsPipeline();
 
 	private:
 		Window* m_Window = nullptr;
@@ -63,6 +66,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		Scope<VKDeviceManager> m_vkDeviceManager;
 		Scope<VKSwapchain> m_vkSwapchain;
 		Scope<VKRenderPass> m_vkRenderPass;
+		Scope<VKPipeline> m_vkPipeline;
 	};
 
 
