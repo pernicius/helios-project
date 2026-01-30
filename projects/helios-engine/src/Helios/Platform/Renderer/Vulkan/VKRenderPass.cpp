@@ -15,55 +15,100 @@ namespace Helios::Engine::Renderer::Vulkan {
 	//------------------------------------------------------------------------------
 	// VKRenderPass Implementation
 	//------------------------------------------------------------------------------
-	VKRenderPass::VKRenderPass(const VKDeviceManager& deviceManager, const VKSwapchain& swapchain)
-		: m_DeviceManager(deviceManager)
+
+	VKRenderPass::VKRenderPass(const VKDeviceManager& deviceManager, const VKRenderPassBuilder& builder)
+		: m_deviceManager(deviceManager),
+		m_attachments(builder.m_attachments),
+		m_subpasses(builder.m_subpasses),
+		m_dependencies(builder.m_dependencies),
+		m_subpassAttachmentRefs(builder.m_subpassAttachmentRefs)
 	{
-		vk::AttachmentDescription colorAttachment = vk::AttachmentDescription()
-			.setFormat(swapchain.GetImageFormat())
-			.setSamples(vk::SampleCountFlagBits::e1)
-			.setLoadOp(vk::AttachmentLoadOp::eClear)
-			.setStoreOp(vk::AttachmentStoreOp::eStore)
-			.setStencilLoadOp(vk::AttachmentLoadOp::eDontCare)
-			.setStencilStoreOp(vk::AttachmentStoreOp::eDontCare)
-			.setInitialLayout(vk::ImageLayout::eUndefined)
-			.setFinalLayout(vk::ImageLayout::ePresentSrcKHR);
-
-		vk::AttachmentReference colorAttachmentRef = vk::AttachmentReference()
-			.setAttachment(0)
-			.setLayout(vk::ImageLayout::eColorAttachmentOptimal);
-
-		vk::SubpassDescription subpass = vk::SubpassDescription()
-			.setPipelineBindPoint(vk::PipelineBindPoint::eGraphics)
-			.setColorAttachmentCount(1)
-			.setPColorAttachments(&colorAttachmentRef);
-
-		vk::SubpassDependency dependency = vk::SubpassDependency()
-			.setSrcSubpass(VK_SUBPASS_EXTERNAL)
-			.setDstSubpass(0)
-			.setSrcStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput)
-			.setDstStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput)
-			.setSrcAccessMask({})
-			.setDstAccessMask(vk::AccessFlagBits::eColorAttachmentWrite);
+		// The builder stores attachment references, but the subpass descriptions
+		// need valid pointers. We must repoint them to the stored vectors.
+		for (size_t i = 0; i < m_subpasses.size(); ++i) {
+			if (!m_subpassAttachmentRefs[i].empty()) {
+				m_subpasses[i].pColorAttachments = m_subpassAttachmentRefs[i].data();
+			}
+			if (m_subpasses[i].pDepthStencilAttachment) {
+				// This assumes one depth attachment per subpass for simplicity.
+				// The builder stores depth refs separately.
+				m_subpasses[i].pDepthStencilAttachment = &builder.m_depthAttachmentRefs[i];
+			}
+		}
 
 		vk::RenderPassCreateInfo renderPassInfo = vk::RenderPassCreateInfo()
-			.setAttachmentCount(1)
-			.setPAttachments(&colorAttachment)
-			.setSubpassCount(1)
-			.setPSubpasses(&subpass)
-			.setDependencyCount(1)
-			.setPDependencies(&dependency);
+			.setAttachmentCount(static_cast<uint32_t>(m_attachments.size()))
+			.setPAttachments(m_attachments.data())
+			.setSubpassCount(static_cast<uint32_t>(m_subpasses.size()))
+			.setPSubpasses(m_subpasses.data())
+			.setDependencyCount(static_cast<uint32_t>(m_dependencies.size()))
+			.setPDependencies(m_dependencies.data());
 
-		m_RenderPass = m_DeviceManager.GetLogicalDevice().createRenderPass(renderPassInfo);
+		m_renderPass = m_deviceManager.GetLogicalDevice().createRenderPass(renderPassInfo);
 		LOG_RENDER_DEBUG("VKRenderPass: RenderPass created.");
 	}
 
+
 	VKRenderPass::~VKRenderPass()
 	{
-		if (m_RenderPass) {
-			m_DeviceManager.GetLogicalDevice().destroyRenderPass(m_RenderPass);
-			m_RenderPass = nullptr;
+		if (m_renderPass) {
+			m_deviceManager.GetLogicalDevice().destroyRenderPass(m_renderPass);
+			m_renderPass = nullptr;
 			LOG_RENDER_DEBUG("VKRenderPass: RenderPass destroyed.");
 		}
+	}
+
+
+	//------------------------------------------------------------------------------
+	// VKRenderPassBuilder Implementation
+	//------------------------------------------------------------------------------
+	
+	VKRenderPassBuilder::VKRenderPassBuilder(const VKDeviceManager& deviceManager)
+		: m_deviceManager(deviceManager)
+	{
+	}
+
+
+	VKRenderPassBuilder& VKRenderPassBuilder::AddAttachment(const vk::AttachmentDescription& attachment)
+	{
+		m_attachments.push_back(attachment);
+		return *this;
+	}
+
+
+	VKRenderPassBuilder& VKRenderPassBuilder::AddSubpass(const std::vector<vk::AttachmentReference>& colorAttachments, const vk::AttachmentReference* depthAttachment)
+	{
+		// Store a copy of the attachment references for this subpass
+		m_subpassAttachmentRefs.push_back(colorAttachments);
+
+		vk::SubpassDescription subpass = vk::SubpassDescription()
+			.setPipelineBindPoint(vk::PipelineBindPoint::eGraphics)
+			.setColorAttachmentCount(static_cast<uint32_t>(colorAttachments.size()))
+			.setPColorAttachments(nullptr); // Will be set in VKRenderPass constructor
+
+		if (depthAttachment) {
+			m_depthAttachmentRefs.push_back(*depthAttachment);
+			subpass.pDepthStencilAttachment = nullptr; // Will be set in VKRenderPass constructor
+		} else {
+			// Add a placeholder to keep indices in sync
+			m_depthAttachmentRefs.emplace_back();
+		}
+
+		m_subpasses.push_back(subpass);
+		return *this;
+	}
+
+
+	VKRenderPassBuilder& VKRenderPassBuilder::AddDependency(const vk::SubpassDependency& dependency)
+	{
+		m_dependencies.push_back(dependency);
+		return *this;
+	}
+
+
+	Scope<VKRenderPass> VKRenderPassBuilder::Build()
+	{
+		return CreateScope<VKRenderPass>(m_deviceManager, *this);
 	}
 
 

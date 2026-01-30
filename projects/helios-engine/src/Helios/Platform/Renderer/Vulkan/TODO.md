@@ -22,7 +22,7 @@ Next steps in Vulkan:
      - [x] Creates `VkImageViews` for each swapchain image.
  - [ ] **Graphics Pipeline**
    - [x] `VKRenderPass`: Defines the structure of a rendering operation (attachments, subpasses).
-     - [ ] Use builder style creation pattern
+     - [x] Use builder style creation pattern
    - [ ] `VKPipeline`: The main graphics pipeline object.
      - [ ] Loads SPIR-V shader code.
      - [ ] Configures vertex input, viewport, rasterizer, etc.

@@ -1,22 +1,23 @@
 //==============================================================================
 // Vulkan Instance Wrapper
 //
-// Provides a RAII (Resource Acquisition Is Initialization) wrapper for a
-// vk::Instance, handling its creation and destruction. It is responsible for
-// gathering required extensions (e.g., from GLFW), enabling validation layers
-// for debugging, and setting up the debug messenger for validation output.
+// Provides a RAII wrapper for a vk::Instance and a builder for its
+// configuration. The VKInstance class manages the lifecycle of the Vulkan
+// instance, while the VKInstanceBuilder provides a fluent interface for
+// setting it up.
 //
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
 // Main Features:
+// - VKInstanceBuilder for fluent and flexible instance configuration.
 // - RAII-style management of the vk::Instance.
 // - Automatic enabling of validation layers in debug builds.
 // - Gathers and enables required instance extensions from the windowing system.
 // - Sets up a debug messenger to log validation messages via spdlog.
 // - Provides a temporary debug messenger for instance creation/destruction.
 // 
-// Version history:
+// Changelog:
 // - 2026.01: Added static methods to disable specific debug message IDs
 // - 2026.01: Refactored to use a builder pattern
 // - 2026.01: Refactored extension handling

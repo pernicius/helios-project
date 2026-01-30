@@ -17,6 +17,7 @@
 // - Serves as the central hub for all Vulkan-specific rendering logic.
 // 
 // Version history:
+// - 2026.01: Refactored to use the builder pattern for RenderPass creation
 // - 2026.01: Added RenderPass management
 // - 2025.01: Added Configuration support via ConfigManager
 // - 2026.01: Added Event handling for window resize
@@ -51,6 +52,9 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 	private:
 		bool OnFramebufferResize(const FramebufferResizeEvent& e);
+
+		// Tempoary
+		void CreateSimpleRenderPass();
 
 	private:
 		Window* m_Window = nullptr;

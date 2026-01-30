@@ -54,7 +54,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		m_vkSwapchain = CreateScope<VKSwapchain>(*m_vkDeviceManager, *m_vkSurface, *m_Window);
 
 		// 5. Create the Render Pass
-		m_vkRenderPass = CreateScope<VKRenderPass>(*m_vkDeviceManager, *m_vkSwapchain);
+		CreateSimpleRenderPass();
 	}
 
 
@@ -108,5 +108,44 @@ namespace Helios::Engine::Renderer::Vulkan {
 		return false;
 	}
 
+
+	void VKRenderer::CreateSimpleRenderPass()
+	{
+		VKRenderPassBuilder builder(*m_vkDeviceManager);
+
+		// Color attachment for the swapchain image
+		vk::AttachmentDescription colorAttachment = vk::AttachmentDescription()
+			.setFormat(m_vkSwapchain->GetImageFormat())
+			.setSamples(vk::SampleCountFlagBits::e1)
+			.setLoadOp(vk::AttachmentLoadOp::eClear)
+			.setStoreOp(vk::AttachmentStoreOp::eStore)
+			.setStencilLoadOp(vk::AttachmentLoadOp::eDontCare)
+			.setStencilStoreOp(vk::AttachmentStoreOp::eDontCare)
+			.setInitialLayout(vk::ImageLayout::eUndefined)
+			.setFinalLayout(vk::ImageLayout::ePresentSrcKHR);
+
+		builder.AddAttachment(colorAttachment);
+
+		// Reference to the color attachment
+		vk::AttachmentReference colorAttachmentRef = vk::AttachmentReference()
+			.setAttachment(0) // Index of the attachment in the attachments array
+			.setLayout(vk::ImageLayout::eColorAttachmentOptimal);
+
+		// A single subpass using the color attachment
+		builder.AddSubpass({ colorAttachmentRef });
+
+		// Dependency to transition the image layout for presentation
+		vk::SubpassDependency dependency = vk::SubpassDependency()
+			.setSrcSubpass(VK_SUBPASS_EXTERNAL)
+			.setDstSubpass(0)
+			.setSrcStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput)
+			.setDstStageMask(vk::PipelineStageFlagBits::eColorAttachmentOutput)
+			.setSrcAccessMask({})
+			.setDstAccessMask(vk::AccessFlagBits::eColorAttachmentWrite);
+
+		builder.AddDependency(dependency);
+
+		m_vkRenderPass = builder.Build();
+	}
 
 } // namespace Helios::Engine::Renderer::Vulkan
