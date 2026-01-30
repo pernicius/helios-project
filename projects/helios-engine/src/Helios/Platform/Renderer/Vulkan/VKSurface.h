@@ -14,7 +14,7 @@
 // - Bridges the gap between the Vulkan instance and the native window.
 // - Non-copyable to ensure unique ownership.
 // 
-// Version history:
+// Changelog:
 // - 2026.01: Initial version / start of version history
 //==============================================================================
 

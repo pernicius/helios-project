@@ -22,7 +22,7 @@
 // - Section/key enumeration and existence checking
 // - Type-aware value formatting
 // 
-// Version history:
+// Changelog:
 // - 2026.01: Converted to use Virtual File System (VFS) for file access
 // - 2026.01: Initial version / start of version history
 //==============================================================================

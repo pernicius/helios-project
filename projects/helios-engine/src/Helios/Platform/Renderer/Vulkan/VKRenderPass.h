@@ -2,18 +2,21 @@
 // Vulkan Render Pass
 //
 // Encapsulates a Vulkan render pass, which describes the attachments,
-// subpasses, and dependencies required for rendering operations. This class
-// defines the structure of a rendering process, including how color and depth
-// buffers are handled.
+// subpasses, and dependencies required for rendering. This file provides a
+// `VKRenderPass` class for RAII-style management and a `VKRenderPassBuilder`
+		// for flexible construction.
 //
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
-// - Creates a vk::RenderPass with a single color attachment.
-// - Configures a subpass for graphics rendering.
-// - Sets up dependencies to ensure correct image layout transitions.
+// Main Features:
+// - `VKRenderPass`: RAII wrapper for a `vk::RenderPass`.
+// - `VKRenderPassBuilder`: A builder pattern for constructing complex render passes.
+// - Supports multiple attachments, subpasses, and dependencies.
+// - Configures the structure of a rendering process (e.g., color/depth handling).
 //
-// Version history:
+//
+// Changelog:
 // - 2026.01: Refactored to use a builder pattern
 // - 2026.01: Initial version
 //==============================================================================

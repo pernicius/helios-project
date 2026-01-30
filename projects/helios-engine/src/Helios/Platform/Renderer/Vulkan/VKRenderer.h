@@ -11,12 +11,12 @@
 // 
 // Main Features:
 // - Implements the abstract `Renderer` interface for Vulkan.
-// - Manages the entire lifecycle of core Vulkan components.
-// - Initializes the Vulkan API in the correct order (Instance -> Surface -> Device).
-// - Handles graceful shutdown and resource destruction.
-// - Serves as the central hub for all Vulkan-specific rendering logic.
+// - Manages the lifecycle of core Vulkan objects (Instance, Surface, Device, etc.).
+// - Coordinates the initialization and shutdown of the Vulkan API.
+// - Handles events, such as window resizing, to recreate the swapchain.
+// - Serves as the central hub for Vulkan-specific rendering logic.
 // 
-// Version history:
+// Changelog:
 // - 2026.01: Refactored to use the builder pattern for RenderPass creation
 // - 2026.01: Added RenderPass management
 // - 2025.01: Added Configuration support via ConfigManager

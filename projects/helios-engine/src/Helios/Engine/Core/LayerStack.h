@@ -17,7 +17,7 @@
 // - Overlays always processed last for UI/debug priority
 // - STL-compatible iterator interface
 // 
-// Version history:
+// Changelog:
 // - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once

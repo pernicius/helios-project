@@ -21,7 +21,7 @@
 // - Dual validation (cached + GLFW queries)
 // - Multi-window support
 // 
-// Version history:
+// Changelog:
 // - 2026.01: Changed to the new config system
 // - 2026.01: Reworked to use ConfigManager insead of IniParser directly
 // - 2026.01: Initial version / start of version history

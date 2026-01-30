@@ -20,7 +20,7 @@
 // - Platform-agnostic backend abstraction
 // - Named API access for debugging
 // 
-// Version history:
+// Changelog:
 // - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once

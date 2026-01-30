@@ -1,21 +1,22 @@
 //==============================================================================
 // Vulkan Device Manager
 //
-// Responsible for selecting a suitable physical device (GPU), creating a
-// logical device for interaction, and managing device-related resources like
-// queue families. This class is a critical part of the Vulkan initialization
-// process, bridging the gap between the Vulkan instance and the command queues.
+// Encapsulates the selection and management of Vulkan physical and logical
+// devices. It is responsible for identifying a suitable GPU, creating a
+// logical device for command submission, and managing queue families for
+// various operations (graphics, presentation, compute, and transfer).
 //
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
-// - Selects the most suitable vk::PhysicalDevice based on a scoring system.
+// Main Features:
+// - Selects an optimal vk::PhysicalDevice using a scoring-based system.
 // - Creates a vk::Device with required extensions and features.
 // - Identifies and provides access to graphics, present, compute, and
-//   transfer queues.
-// - Manages device-related resources in an RAII-compliant manner.
+//   transfer queue families and their corresponding vk::Queues.
+// - Manages device-related resources in a RAII-compliant manner.
 // 
-// Version history:
+// Changelog:
 // - 2025.01: Added physical device selection persistence
 // - 2026.01: Initial version / start of version history
 //==============================================================================

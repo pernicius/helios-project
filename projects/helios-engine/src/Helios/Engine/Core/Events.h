@@ -19,7 +19,7 @@
 // - Lambda callback binding
 // - Lambda binding helper (HE_BIND_EVENT_FN)
 // 
-// Version history:
+// Changelog:
 // - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once

@@ -20,7 +20,7 @@
 // - INI file persistence via VFS
 // - Singleton pattern with auto-creation
 // 
-// Version history:
+// Changelog:
 // - 2026.01: Added hierarchical priority-based configuration layers
 // - 2026.01: Initial version / start of version history
 //==============================================================================

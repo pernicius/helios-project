@@ -2,19 +2,23 @@
 // Vulkan Window Implementation
 //
 // Provides a Vulkan-specific window implementation derived from the base
-// Window class. Configures GLFW window hints for Vulkan compatibility
-// (including disabling OpenGL context creation). Manages Vulkan surface
-// creation and integration with the GLFW windowing system. Non-copyable to
-// ensure unique ownership of window resources.
+// Window class. Its primary responsibility is to configure GLFW window hints
+// for Vulkan compatibility (e.g., disabling the OpenGL context) before the
+// window is created and initialized.
 //
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
-// Version history:
+// Main Features:
+// - Implements the abstract `Window` interface for a Vulkan context.
+// - Configures GLFW to be Vulkan-ready by setting appropriate window hints.
+// - Ensures unique ownership of window resources by being non-copyable.
+//
+// Changelog:
 // - 2026.01: Fixed window name/title
 // - 2026.01: Changed to the new config system
-// - 2026.01: Reworked to use ConfigManager insead of IniParser directly
-// - 2026.01: Initial version / start of version history
+// - 2026.01: Reworked to use ConfigManager instead of IniParser directly
+// - 2026.01: Initial version
 //==============================================================================
 #pragma once
 

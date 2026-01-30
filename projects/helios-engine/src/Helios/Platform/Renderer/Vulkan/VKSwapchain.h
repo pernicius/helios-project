@@ -10,13 +10,15 @@
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 //
 // Main Features:
-// - Creates and manages a vk::SwapchainKHR object.
+// - Creates and manages a vk::SwapchainKHR object and its associated images.
 // - Queries for and selects optimal surface format, present mode, and extent.
 // - Creates vk::ImageViews for each swapchain image.
-// - Provides accessors for swapchain properties.
+// - Handles swapchain recreation (e.g., on window resize) and cleanup.
+// - Provides accessors for swapchain properties like format, extent, and image views.
 //
-// Version history:
-// - 2026.01: Initial version / start of version history
+// Changelog:
+// - 2026.01: Added recreation and cleanup logic
+// - 2026.01: Initial version
 //==============================================================================
 #pragma once
 

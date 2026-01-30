@@ -19,7 +19,7 @@
 // - Extensible Design: Structured to accommodate future rendering commands
 //   like `BeginFrame`, `Draw`, and `EndFrame`.
 // 
-// Version history:
+// Changelog:
 // - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once

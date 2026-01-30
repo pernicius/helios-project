@@ -20,7 +20,7 @@
 // - Configuration management via AppSpec
 // - Entry point integration (AppMain) and factory pattern
 // 
-// Version history:
+// Changelog:
 // - 2026.01: Added renderer event forwarding
 // - 2026.01: Fixed window name/title
 // - 2026.01: Added hirarchical config support

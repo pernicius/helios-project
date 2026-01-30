@@ -9,7 +9,7 @@
 // Copyright (c) 2026 Lennart "Pernicius" Molnar. All rights reserved.
 // Part of the Helios Project - https://github.com/pernicius/helios-project
 // 
-// Version history:
+// Changelog:
 // - 2026.01: Changed ConfigFile to ConfigUser for per-user config files
 // - 2026.01: Initial version / start of version history
 //==============================================================================

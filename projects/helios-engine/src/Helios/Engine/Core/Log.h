@@ -19,7 +19,7 @@
 // - Build-aware level defaults (TRACE/INFO)
 // - File and console output
 // 
-// Version history:
+// Changelog:
 // - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once

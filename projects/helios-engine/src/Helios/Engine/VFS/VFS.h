@@ -17,7 +17,7 @@
 // - Stream-based I/O
 // - Directory management 
 // 
-// Version history:
+// Changelog:
 // - 2026.01: Added file read/write stream abstraction
 // - 2026.01: Switched to 'Meyer's Singleton' pattern
 //            Added directory creation support
