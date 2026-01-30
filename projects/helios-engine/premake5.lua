@@ -105,12 +105,12 @@ project "Helios-Engine"
 	filter { "system:windows", "files:**.glsl" }
 		buildmessage "Compiling %{file.name} -> %{file.basename}.spv"
 		buildcommands {
-			"\"%{(os.getenv('VULKAN_SDK') .. '/Bin/glslangValidator.exe')}\" -V \"%{file.relpath}\" -o \"%{(cfg.buildtarget.directory .. '/assets/shader/vulkan/' .. file.basename)}.spv\"",
+			"\"%{(os.getenv('VULKAN_SDK') .. '/Bin/glslangValidator.exe')}\" -V \"%{file.relpath}\" -o \"%{(cfg.buildtarget.directory .. '/assets/shaders/vulkan/' .. file.basename)}.spv\"",
 			-- glslangValidator.exe leaves *.spv files in the working directory
 			"del *.spv",
 		}
 		buildoutputs {
-			"%{(cfg.buildtarget.directory .. '/assets/shader/vulkan/' .. file.basename)}.spv",
+			"%{(cfg.buildtarget.directory .. '/assets/shaders/vulkan/' .. file.basename)}.spv",
 		}
 --	filter { "system:linux or macos", "files:**.glsl" }
 --		buildmessage "Compiling %{file.name} -> %{file.basename}.spv"
