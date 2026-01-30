@@ -36,40 +36,11 @@ namespace Helios::Engine::Renderer::Vulkan {
 	}
 
 
-	VKInstance::VKInstance(const AppSpec& appSpec)
-	{
-		// Populate required extensions from GLFW
-		uint32_t glfwExtensionCount = 0;
-		const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-		for (uint32_t i = 0; i < glfwExtensionCount; ++i) {
-			m_instanceExtensionsInfo.required.insert(glfwExtensions[i]);
-		}
-
-		// Add optional debug utils extension if validation is enabled
-		if (m_enableValidationLayers) {
-			m_instanceExtensionsInfo.optional.insert(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
-		}
-
-		CreateInstance(appSpec);
-		SetupDebugMessenger();
-	}
-
-
-	VKInstance::~VKInstance()
-	{
-		if (m_debugMessenger) {
-			DestroyDebugUtilsMessengerEXT(m_instance, m_debugMessenger, nullptr);
-			LOG_RENDER_DEBUG("VKInstance: Debug messenger destroyed.");
-		}
-
-		if (m_instance) {
-			m_instance.destroy();
-			LOG_RENDER_DEBUG("VKInstance: Instance destroyed.");
-		}
-	}
-
-
-	void VKInstance::CreateInstance(const AppSpec& appSpec)
+	//------------------------------------------------------------------------------
+	// VKInstance Implementation
+	//------------------------------------------------------------------------------
+	VKInstance::VKInstance(const AppSpec& appSpec, bool enableValidationLayers, InstanceExtensionInfo& extensions)
+		: m_enableValidationLayers(enableValidationLayers), m_instanceExtensionsInfo(std::move(extensions))
 	{
 		if (m_enableValidationLayers && !CheckValidationLayerSupport()) {
 			LOG_RENDER_WARN("VKInstance: Validation layers requested, but not available!");
@@ -121,6 +92,22 @@ namespace Helios::Engine::Renderer::Vulkan {
 		// --- Create the Instance ---
 		m_instance = vk::createInstance(createInfo);
 		LOG_RENDER_DEBUG("VKInstance: Instance created.");
+
+		SetupDebugMessenger();
+	}
+
+
+	VKInstance::~VKInstance()
+	{
+		if (m_debugMessenger) {
+			DestroyDebugUtilsMessengerEXT(m_instance, m_debugMessenger, nullptr);
+			LOG_RENDER_DEBUG("VKInstance: Debug messenger destroyed.");
+		}
+
+		if (m_instance) {
+			m_instance.destroy();
+			LOG_RENDER_DEBUG("VKInstance: Instance destroyed.");
+		}
 	}
 
 
@@ -243,6 +230,47 @@ namespace Helios::Engine::Renderer::Vulkan {
 		}
 
 		return VK_FALSE;
+	}
+
+
+	//------------------------------------------------------------------------------
+	// VKInstanceBuilder Implementation
+	//------------------------------------------------------------------------------
+	VKInstanceBuilder& VKInstanceBuilder::SetAppSpec(const AppSpec& spec)
+	{
+		m_appSpec = spec;
+		return *this;
+	}
+
+	VKInstanceBuilder& VKInstanceBuilder::WithValidationLayers()
+	{
+		m_enableValidationLayers = true;
+		return *this;
+	}
+
+	VKInstanceBuilder& VKInstanceBuilder::WithGlfwExtensions()
+	{
+		uint32_t glfwExtensionCount = 0;
+		const char** glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+		for (uint32_t i = 0; i < glfwExtensionCount; ++i) {
+			m_extensions.required.insert(glfwExtensions[i]);
+		}
+		return *this;
+	}
+
+	VKInstanceBuilder& VKInstanceBuilder::WithDebugMessenger()
+	{
+		m_extensions.optional.insert(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+		return *this;
+	}
+
+	Scope<VKInstance> VKInstanceBuilder::Build()
+	{
+#		ifdef BUILD_DEBUG
+			WithDebugMessenger();
+			WithValidationLayers();
+#		endif
+		return CreateScope<VKInstance>(m_appSpec, m_enableValidationLayers, m_extensions);
 	}
 
 

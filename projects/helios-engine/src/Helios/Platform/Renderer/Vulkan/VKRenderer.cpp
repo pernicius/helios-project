@@ -24,8 +24,12 @@ namespace Helios::Engine::Renderer::Vulkan {
 		ConfigManager::GetInstance().LoadDomain("renderer_vulkan");
 
 		// The initialization order is critical and follows the Vulkan object dependency chain.
+
 		// 1. Create the Vulkan Instance
-		m_vkInstance = CreateScope<VKInstance>(appSpec);
+		m_vkInstance = VKInstanceBuilder()
+			.SetAppSpec(appSpec)
+			.WithGlfwExtensions()
+			.Build();
 
 		// 2. Create the Window Surface
 		m_vkSurface = CreateScope<VKSurface>(*m_vkInstance, *m_Window);
@@ -35,6 +39,9 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 		// 4. Create the Swapchain
 		m_vkSwapchain = CreateScope<VKSwapchain>(*m_vkDeviceManager, *m_vkSurface, *m_Window);
+
+		// 5. Create the Render Pass
+		m_vkRenderPass = CreateScope<VKRenderPass>(*m_vkDeviceManager, *m_vkSwapchain);
 	}
 
 
@@ -46,9 +53,12 @@ namespace Helios::Engine::Renderer::Vulkan {
 		// The Scope<T> smart pointers will handle calling the destructors automatically
 		// when they are reset.
 
-		// 6. Destroy Framebuffers, Command Buffers, etc.
+		// 7. Destroy Framebuffers, Command Buffers, etc.
 
-		// 5. Destroy Pipeline and RenderPass
+		// 6. Destroy Pipeline
+
+		// 5. Destroy RenderPass
+		m_vkRenderPass.reset();
 
 		// 4. Destroy Swapchain
 		m_vkSwapchain.reset();

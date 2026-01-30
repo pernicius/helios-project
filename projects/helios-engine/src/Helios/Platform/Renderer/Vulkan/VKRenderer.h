@@ -17,6 +17,7 @@
 // - Serves as the central hub for all Vulkan-specific rendering logic.
 // 
 // Version history:
+// - 2026.01: Added RenderPass management
 // - 2025.01: Added Configuration support via ConfigManager
 // - 2026.01: Added Event handling for window resize
 // - 2026.01: Added Swapchain management
@@ -32,7 +33,7 @@
 #include "Helios/Platform/Renderer/Vulkan/VKSurface.h"
 #include "Helios/Platform/Renderer/Vulkan/VKDeviceManager.h"
 #include "Helios/Platform/Renderer/Vulkan/VKSwapchain.h"
-// ... other Vulkan headers
+#include "Helios/Platform/Renderer/Vulkan/VKRenderPass.h"
 
 namespace Helios::Engine::Renderer::Vulkan {
 
@@ -57,7 +58,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		Scope<VKSurface> m_vkSurface;
 		Scope<VKDeviceManager> m_vkDeviceManager;
 		Scope<VKSwapchain> m_vkSwapchain;
-		// ... other Vulkan objects
+		Scope<VKRenderPass> m_vkRenderPass;
 	};
 
 

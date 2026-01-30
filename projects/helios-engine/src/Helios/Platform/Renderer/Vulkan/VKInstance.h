@@ -17,13 +17,12 @@
 // - Provides a temporary debug messenger for instance creation/destruction.
 // 
 // Version history:
+// - 2026.01: Refactored to use a builder pattern
 // - 2026.01: Refactored extension handling
 //            Added accessors for VKDeviceManager class
 // - 2026.01: Initial version / start of version history
 //==============================================================================
 #pragma once
-
-#include "Helios/Engine/Core/Application.h"
 
 namespace Helios::Engine::Renderer::Vulkan {
 
@@ -40,7 +39,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 	class VKInstance
 	{
 	public:
-		VKInstance(const AppSpec& appSpec);
+		VKInstance(const AppSpec& appSpec, bool enableValidationLayers, InstanceExtensionInfo& extensions);
 		~VKInstance();
 
 		// Prevent copying and moving
@@ -58,7 +57,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		const std::vector<const char*>& GetValidationLayers() const { return m_validationLayers; }
 
 	private:
-		void CreateInstance(const AppSpec& appSpec);
+
 		void SetupDebugMessenger();
 
 		// Helper functions for instance creation
@@ -83,11 +82,29 @@ namespace Helios::Engine::Renderer::Vulkan {
 			"VK_LAYER_KHRONOS_validation"
 		};
 
-#		ifdef BUILD_DEBUG
-			const bool m_enableValidationLayers = true;
-#		else
-			const bool m_enableValidationLayers = false;
-#		endif
+		bool m_enableValidationLayers = false;
+	};
+
+
+	//------------------------------------------------------------------------------
+	// VKInstanceBuilder
+	//------------------------------------------------------------------------------
+	class VKInstanceBuilder
+	{
+	public:
+		VKInstanceBuilder() = default;
+
+		VKInstanceBuilder& SetAppSpec(const AppSpec& spec);
+		VKInstanceBuilder& WithValidationLayers();
+		VKInstanceBuilder& WithGlfwExtensions();
+		VKInstanceBuilder& WithDebugMessenger();
+
+		Scope<VKInstance> Build();
+
+	private:
+		AppSpec m_appSpec;
+		InstanceExtensionInfo m_extensions;
+		bool m_enableValidationLayers = false;
 	};
 
 

@@ -7,6 +7,7 @@ Next steps in Vulkan:
      - [x] Gathers required extensions from GLFW.
      - [x] Sets up validation layers for debugging.
      - [ ] Better filtering of the validation layers callback messages.
+     - [x] Use builder style creation pattern
    - [x] `VKDebugMessenger`: Captures validation layer messages.
    - [x] `VKSurface`: Creates the window surface (`VkSurfaceKHR`) to render to.
      - Requires `VKInstance` and the `GLFWwindow`.
@@ -20,10 +21,12 @@ Next steps in Vulkan:
      - Requires `DeviceManager` and `VKSurface`.
      - [x] Creates `VkImageViews` for each swapchain image.
  - [ ] **Graphics Pipeline**
-   - [ ] `VKRenderPass`: Defines the structure of a rendering operation (attachments, subpasses).
+   - [x] `VKRenderPass`: Defines the structure of a rendering operation (attachments, subpasses).
+     - [ ] Use builder style creation pattern
    - [ ] `VKPipeline`: The main graphics pipeline object.
      - [ ] Loads SPIR-V shader code.
      - [ ] Configures vertex input, viewport, rasterizer, etc.
+     - [ ] Use builder style creation pattern
      - Requires `DeviceManager` and `VKRenderPass`.
  - [ ] **Frame Buffers**
    - [ ] `VKFramebuffer`: Links a `VKRenderPass` with the specific `VkImageViews` to be rendered into.
