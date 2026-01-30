@@ -6,7 +6,7 @@ Next steps in Vulkan:
    - [x] `VKInstance`: Manages the connection to the Vulkan API.
      - [x] Gathers required extensions from GLFW.
      - [x] Sets up validation layers for debugging.
-     - [ ] Better filtering of the validation layers callback messages.
+     - [x] Better filtering of the validation layers callback messages.
      - [x] Use builder style creation pattern
    - [x] `VKDebugMessenger`: Captures validation layer messages.
    - [x] `VKSurface`: Creates the window surface (`VkSurfaceKHR`) to render to.

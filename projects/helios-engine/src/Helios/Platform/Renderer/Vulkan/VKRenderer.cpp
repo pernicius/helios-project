@@ -26,16 +26,21 @@ namespace Helios::Engine::Renderer::Vulkan {
 		// The initialization order is critical and follows the Vulkan object dependency chain.
 
 		// 1. Create the Vulkan Instance
+VKInstance::DisableDebugMessageID(0); // Massive clutter
+VKInstance::DisableDebugMessageID(601872502); // Khronos Validation Layer Active...
 		m_vkInstance = VKInstanceBuilder()
 			.SetAppSpec(appSpec)
 			.WithGlfwExtensions()
 			.Build();
+VKInstance::ResetDisabledDebugMessageIDs();
 
 		// 2. Create the Window Surface
 		m_vkSurface = CreateScope<VKSurface>(*m_vkInstance, *m_Window);
 
 		// 3. Create the Device Manager (selects physical device, creates logical device)
+VKInstance::DisableDebugMessageID(0); // Massive clutter
 		m_vkDeviceManager = CreateScope<VKDeviceManager>(*m_vkInstance, *m_vkSurface);
+VKInstance::ResetDisabledDebugMessageIDs();
 
 		// 4. Create the Swapchain
 		m_vkSwapchain = CreateScope<VKSwapchain>(*m_vkDeviceManager, *m_vkSurface, *m_Window);
@@ -70,7 +75,9 @@ namespace Helios::Engine::Renderer::Vulkan {
 		m_vkSurface.reset();
 
 		// 1. Destroy Instance (which also handles the debug messenger)
+VKInstance::DisableDebugMessageID(0); // Massive clutter
 		m_vkInstance.reset();
+VKInstance::ResetDisabledDebugMessageIDs();
 
 		// Save the configuration for the Vulkan renderer
 		ConfigManager::GetInstance().SaveDomain("renderer_vulkan");

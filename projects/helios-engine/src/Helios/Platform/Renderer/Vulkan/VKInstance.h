@@ -17,6 +17,7 @@
 // - Provides a temporary debug messenger for instance creation/destruction.
 // 
 // Version history:
+// - 2026.01: Added static methods to disable specific debug message IDs
 // - 2026.01: Refactored to use a builder pattern
 // - 2026.01: Refactored extension handling
 //            Added accessors for VKDeviceManager class
@@ -56,6 +57,9 @@ namespace Helios::Engine::Renderer::Vulkan {
 		bool AreValidationLayersEnabled() const { return m_enableValidationLayers; }
 		const std::vector<const char*>& GetValidationLayers() const { return m_validationLayers; }
 
+		static void DisableDebugMessageID(int32_t messageId) { s_disabledMessageIds.insert(messageId); }
+		static void ResetDisabledDebugMessageIDs() { s_disabledMessageIds.clear(); }
+
 	private:
 
 		void SetupDebugMessenger();
@@ -83,6 +87,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		};
 
 		bool m_enableValidationLayers = false;
+		static std::unordered_set<int32_t> s_disabledMessageIds;
 	};
 
 

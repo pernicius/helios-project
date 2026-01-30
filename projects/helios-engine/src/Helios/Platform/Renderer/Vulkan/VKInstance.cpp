@@ -206,14 +206,21 @@ namespace Helios::Engine::Renderer::Vulkan {
 	}
 
 
+	std::unordered_set<int32_t> VKInstance::s_disabledMessageIds = {};
+	
 	VKAPI_ATTR VkBool32 VKAPI_CALL VKInstance::DebugCallback(
 		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
 		VkDebugUtilsMessageTypeFlagsEXT messageType,
 		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
 		void* pUserData)
 	{
+		// Check if this message ID is disabled
+		if (s_disabledMessageIds.count(pCallbackData->messageIdNumber)) {
+			return VK_FALSE; // Suppress this message
+		}
+
 		// Format the message
-		std::string message = "VKCallback:: " + std::string(pCallbackData->pMessage);
+		std::string message = "VKCallback(#" + std::to_string(pCallbackData->messageIdNumber) + "): " + std::string(pCallbackData->pMessage);
 
 		// Log with appropriate severity
 		if (messageSeverity >= VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT) {
