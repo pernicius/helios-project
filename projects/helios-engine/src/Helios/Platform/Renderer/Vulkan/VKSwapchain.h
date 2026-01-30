@@ -17,16 +17,15 @@
 // - Provides accessors for swapchain properties like format, extent, and image views.
 //
 // Changelog:
+// - 2026.01: Added framebuffer management
 // - 2026.01: Added recreation and cleanup logic
 // - 2026.01: Initial version
 //==============================================================================
 #pragma once
 
+#include "Helios/Platform/Renderer/Vulkan/VKFramebuffer.h"
+
 namespace Helios::Engine::Renderer::Vulkan {
-
-
-	class VKDeviceManager;
-	class VKSurface;
 
 
 	struct SwapchainSupportDetails {
@@ -34,6 +33,10 @@ namespace Helios::Engine::Renderer::Vulkan {
 		std::vector<vk::SurfaceFormatKHR> formats;
 		std::vector<vk::PresentModeKHR> presentModes;
 	};
+
+
+	class VKDeviceManager;
+	class VKSurface;
 
 
 	class VKSwapchain
@@ -48,7 +51,8 @@ namespace Helios::Engine::Renderer::Vulkan {
 		VKSwapchain(VKSwapchain&&) = delete;
 		VKSwapchain& operator=(VKSwapchain&&) = delete;
 
-		void RecreateSwapchain(Window& window);
+		void Recreate(Window& window, const vk::RenderPass& renderPass);
+		void CreateFramebuffers(const vk::RenderPass& renderPass);
 
 		// --- Accessors ---
 		const vk::SwapchainKHR& GetSwapchain() const { return m_swapchain; }
@@ -56,12 +60,14 @@ namespace Helios::Engine::Renderer::Vulkan {
 		const std::vector<vk::ImageView>& GetImageViews() const { return m_imageViews; }
 		const vk::Format& GetImageFormat() const { return m_imageFormat; }
 		const vk::Extent2D& GetExtent() const { return m_extent; }
+		const std::vector<Scope<VKFramebuffer>>& GetFramebuffers() const { return m_framebuffers; }
 
 	private:
 		// --- Initialization Steps ---
 		void CreateSwapchain(Window& window);
 		void CreateImageViews();
-		void CleanupSwapchain();
+		void Cleanup();
+		void CleanupFramebuffers();
 
 		// --- Helper Functions ---
 		SwapchainSupportDetails QuerySupport(vk::PhysicalDevice physicalDevice) const;
@@ -73,6 +79,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		vk::SwapchainKHR m_swapchain = nullptr;
 		std::vector<vk::Image> m_images;
 		std::vector<vk::ImageView> m_imageViews;
+		std::vector<Scope<VKFramebuffer>> m_framebuffers;
 		vk::Format m_imageFormat;
 		vk::Extent2D m_extent;
 

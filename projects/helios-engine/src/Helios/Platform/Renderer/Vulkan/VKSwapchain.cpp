@@ -18,18 +18,24 @@ namespace Helios::Engine::Renderer::Vulkan {
 	VKSwapchain::VKSwapchain(const VKDeviceManager& deviceManager, const VKSurface& surface, Window& window)
 		: m_deviceManager(deviceManager), m_surface(surface)
 	{
-		RecreateSwapchain(window);
+		CreateSwapchain(window);
+		CreateImageViews();
 	}
 
 	
 	VKSwapchain::~VKSwapchain()
 	{
-		CleanupSwapchain();
+		Cleanup();
 	}
 
 
-	void VKSwapchain::CleanupSwapchain()
+	void VKSwapchain::Cleanup()
 	{
+		if (!m_framebuffers.empty()) {
+			m_framebuffers.clear();
+			LOG_RENDER_DEBUG("VKSwapchain: Framebuffers destroyed.");
+		}
+
 		const vk::Device& logicalDevice = m_deviceManager.GetLogicalDevice();
 
 		if (m_imageViews.size() > 0 && m_imageViews[0]) {
@@ -48,7 +54,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 	}
 
 
-	void VKSwapchain::RecreateSwapchain(Window& window)
+	void VKSwapchain::Recreate(Window& window, const vk::RenderPass& renderPass)
 	{
 		// Handle minimization (only recreate when not minimized)
 		if (window.glfwIsMinimized())
@@ -58,11 +64,23 @@ namespace Helios::Engine::Renderer::Vulkan {
 		m_deviceManager.GetLogicalDevice().waitIdle();
 
 		// Clean up old resources before creating new ones
-		CleanupSwapchain();
+		Cleanup();
 
 		// Recreate the swapchain and its image views
 		CreateSwapchain(window);
 		CreateImageViews();
+		CreateFramebuffers(renderPass);
+	}
+
+
+	void VKSwapchain::CreateFramebuffers(const vk::RenderPass& renderPass)
+	{
+		m_framebuffers.resize(m_imageViews.size());
+
+		for (size_t i = 0; i < m_imageViews.size(); i++) {
+			std::vector<vk::ImageView> attachments = { m_imageViews[i] };
+			m_framebuffers[i] = CreateScope<VKFramebuffer>(m_deviceManager, renderPass, attachments, m_extent);
+		}
 	}
 
 

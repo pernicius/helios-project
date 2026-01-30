@@ -42,7 +42,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		VKRenderPass(VKRenderPass&&) = delete;
 		VKRenderPass& operator=(VKRenderPass&&) = delete;
 
-		vk::RenderPass GetRenderPass() const { return m_renderPass; }
+		vk::RenderPass Get() const { return m_renderPass; }
 
 	private:
 		friend class VKRenderPassBuilder;

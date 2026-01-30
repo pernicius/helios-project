@@ -36,7 +36,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 			.setPColorBlendState(&builder.m_colorBlending)
 			.setPDynamicState(&builder.m_dynamicState)
 			.setLayout(m_pipelineLayout)
-			.setRenderPass(builder.m_renderPass.GetRenderPass())
+			.setRenderPass(builder.m_renderPass.Get())
 			.setSubpass(0) // Index of the subpass where this pipeline will be used
 			.setBasePipelineHandle(nullptr)
 			.setBasePipelineIndex(-1);

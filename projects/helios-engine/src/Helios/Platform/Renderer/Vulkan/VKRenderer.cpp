@@ -56,6 +56,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		m_vkSwapchain = CreateScope<VKSwapchain>(*m_vkDeviceManager, *m_vkSurface, *m_Window);
 
 		CreateSimpleRenderPass();
+		m_vkSwapchain->CreateFramebuffers(m_vkRenderPass->Get());
 
 		CreateSimpleGraphicsPipeline();
 	}
@@ -95,7 +96,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 	{
 		LOG_RENDER_DEBUG("VKRenderer: Framebuffer resize event received: {}, {}", e.width, e.height);
 		if (m_vkSwapchain) {
-			m_vkSwapchain->RecreateSwapchain(*m_Window);
+			m_vkSwapchain->Recreate(*m_Window, m_vkRenderPass->Get());
 		}
 		return false;
 	}

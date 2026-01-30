@@ -17,6 +17,7 @@
 // - Serves as the central hub for Vulkan-specific rendering logic.
 // 
 // Changelog:
+// - 2026.01: Added framebuffer creation in swapchain
 // - 2026.01: Added graphics pipeline management
 // - 2026.01: Refactored to use the builder pattern for RenderPass creation
 // - 2026.01: Added RenderPass management
@@ -37,6 +38,7 @@
 #include "Helios/Platform/Renderer/Vulkan/VKSwapchain.h"
 #include "Helios/Platform/Renderer/Vulkan/VKRenderPass.h"
 #include "Helios/Platform/Renderer/Vulkan/VKPipeline.h"
+#include "Helios/Platform/Renderer/Vulkan/VKFramebuffer.h"
 
 namespace Helios::Engine::Renderer::Vulkan {
 

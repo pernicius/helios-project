@@ -23,14 +23,14 @@ Next steps in Vulkan:
  - [ ] **Graphics Pipeline**
    - [x] `VKRenderPass`: Defines the structure of a rendering operation (attachments, subpasses).
      - [x] Use builder style creation pattern
-   - [ ] `VKPipeline`: The main graphics pipeline object.
-     - [ ] Loads SPIR-V shader code.
-     - [ ] Configures vertex input, viewport, rasterizer, etc.
-     - [ ] Use builder style creation pattern
+   - [x] `VKPipeline`: The main graphics pipeline object.
+     - [x] Loads SPIR-V shader code.
+     - [x] Configures vertex input, viewport, rasterizer, etc.
+     - [x] Use builder style creation pattern
      - Requires `DeviceManager` and `VKRenderPass`.
- - [ ] **Frame Buffers**
-   - [ ] `VKFramebuffer`: Links a `VKRenderPass` with the specific `VkImageViews` to be rendered into.
-     - [ ] Create one framebuffer for each swapchain image view.
+ - [x] **Frame Buffers**
+   - [x] `VKFramebuffer`: Links a `VKRenderPass` with the specific `VkImageViews` to be rendered into.
+     - [x] Create one framebuffer for each swapchain image view.
  - [ ] **Command Buffers & Synchronization**
    - [ ] `VKCommandPool`: Allocates command buffers integrate into VKDeviceManager.
    - [ ] `VKCommandBuffer`: Records rendering commands.
