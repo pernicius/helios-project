@@ -4,3 +4,6 @@
 [submodule "vendor/libs/glfw"]
 	path = vendor/libs/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "vendor/header/glm"]
+	path = vendor/header/glm
+	url = https://github.com/g-truc/glm.git

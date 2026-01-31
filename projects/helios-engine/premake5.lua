@@ -14,6 +14,7 @@ function Lib_HeliosEngine()
 	Lib_RendererVulkan{}
 
 	-- vendor/header
+	Lib_GLM{}
 	Lib_Spdlog{}
 
 	-- vendor/lib

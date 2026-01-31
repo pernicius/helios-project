@@ -26,6 +26,8 @@
 #	include "Helios/Platform/System/MacOS/MacOSUtil.h"
 #endif
 
+#include <glm/glm.hpp>
+
 // Configuration
 #define IMMEDIATE_EVENT_PROCESSING 1
 
@@ -111,10 +113,10 @@ namespace Helios::Engine {
 //			ENTT_VERSION_MAJOR,
 //			ENTT_VERSION_MINOR,
 //			ENTT_VERSION_PATCH);
-//		LOG_CORE_DEBUG("Lib \"GLM\": {}.{}.{}",
-//			GLM_VERSION_MAJOR,
-//			GLM_VERSION_MINOR,
-//			GLM_VERSION_PATCH);
+		LOG_CORE_DEBUG("Lib \"GLM\": {}.{}.{}",
+			GLM_VERSION_MAJOR,
+			GLM_VERSION_MINOR,
+			GLM_VERSION_PATCH);
 		LOG_CORE_DEBUG("Working path: {}", m_Spec.WorkingDirectory);
 
 		// Read config
