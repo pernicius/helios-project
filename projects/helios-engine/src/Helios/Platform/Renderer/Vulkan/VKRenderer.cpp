@@ -20,6 +20,9 @@
 #	define DEBUG_FILTER_RESET()
 #endif
 
+//#define GLM_ENABLE_EXPERIMENTAL
+//#include <glm/gtx/string_cast.hpp>
+
 namespace Helios::Engine::Renderer::Vulkan {
 
 
@@ -105,8 +108,13 @@ namespace Helios::Engine::Renderer::Vulkan {
 	}
 
 
-	bool VKRenderer::BeginFrame()
+	bool VKRenderer::BeginFrame(Camera& camera)
 	{
+		m_sceneData.ViewProjectionMatrix = camera.GetViewProjectionMatrix();
+		//static auto startTime = std::chrono::high_resolution_clock::now();
+		//auto currentTime = std::chrono::high_resolution_clock::now();
+		//m_sceneData.time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
 		vk::Device logicalDevice = m_vkDeviceManager->GetLogicalDevice();
 
 		// Wait for the frame to be finished
@@ -166,6 +174,8 @@ namespace Helios::Engine::Renderer::Vulkan {
 			.setOffset({ 0, 0 })
 			.setExtent(m_vkSwapchain->GetExtent());
 		commandBuffer.setScissor(0, { scissor });
+
+		commandBuffer.pushConstants(m_vkPipeline->GetLayout(), vk::ShaderStageFlagBits::eVertex, 0, sizeof(SceneData), &m_sceneData);
 
 		m_stateBeginFrameSuccess = true;
 		return m_stateBeginFrameSuccess;
@@ -343,6 +353,12 @@ namespace Helios::Engine::Renderer::Vulkan {
 			.setColorWriteMask(vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA)
 			.setBlendEnable(VK_FALSE);
 
+		// Push constant for the view-projection matrix
+		vk::PushConstantRange pushConstantRange = vk::PushConstantRange()
+			.setStageFlags(vk::ShaderStageFlagBits::eVertex)
+			.setOffset(0)
+			.setSize(sizeof(SceneData));
+
 		VKPipelineBuilder builder(*m_vkDeviceManager, *m_vkRenderPass);
 		builder.SetShaders("@assets:/shaders/vulkan/simple.vert.spv", "@assets:/shaders/vulkan/simple.frag.spv")
 			.SetVertexInput({}, {}) // No vertex input for now
@@ -353,7 +369,8 @@ namespace Helios::Engine::Renderer::Vulkan {
 			.SetMultisampling()
 			.SetColorBlending(colorBlendAttachment)
 			.SetDepthStencil(VK_FALSE, VK_FALSE, vk::CompareOp::eLess)
-			.SetDynamicState({ vk::DynamicState::eViewport, vk::DynamicState::eScissor });
+			.SetDynamicState({ vk::DynamicState::eViewport, vk::DynamicState::eScissor })
+			.SetPushConstantRanges({ pushConstantRange });
 		m_vkPipeline = builder.Build();
 	}
 

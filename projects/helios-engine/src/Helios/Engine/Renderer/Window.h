@@ -78,6 +78,8 @@ namespace Helios::Engine::Renderer {
 		virtual void Show() { glfwShowWindow(m_Window); }
 		virtual void Hide() { glfwHideWindow(m_Window); }
 
+		float GetAspectRatio() const;
+
 		void ToggleFullscreen();
 		void Restore() { if (IsMinimized() or IsMaximized()) glfwRestoreWindow(m_Window); }
 

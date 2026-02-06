@@ -71,6 +71,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		VKPipelineBuilder& SetColorBlending(const vk::PipelineColorBlendAttachmentState& colorBlendAttachment, vk::Bool32 logicOpEnable = VK_FALSE, vk::LogicOp logicOp = vk::LogicOp::eCopy);
 		VKPipelineBuilder& SetDepthStencil(vk::Bool32 depthTestEnable, vk::Bool32 depthWriteEnable, vk::CompareOp depthCompareOp);
 		VKPipelineBuilder& SetDynamicState(const std::vector<vk::DynamicState>& dynamicStates);
+		VKPipelineBuilder& SetPushConstantRanges(const std::vector<vk::PushConstantRange>& pushConstantRanges);
 
 		Scope<VKPipeline> Build();
 
@@ -97,6 +98,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 		std::vector<vk::VertexInputAttributeDescription> m_attributeDescriptions;
 		std::vector<vk::PipelineColorBlendAttachmentState> m_colorBlendAttachments;
 		std::vector<vk::DynamicState> m_dynamicStates;
+		std::vector<vk::PushConstantRange> m_pushConstantRanges;
 	};
 
 

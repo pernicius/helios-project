@@ -17,6 +17,7 @@
 // - Serves as the central hub for Vulkan-specific rendering logic.
 // 
 // Changelog:
+// - 2026.01: Added Camera support to BeginFrame
 // - 2026.01: Refactored rendering loop into BeginFrame/DrawFrame/EndFrame
 // - 2026.01: Added basic rendering loop with command buffers and synchronization
 // - 2026.01: Added framebuffer creation in swapchain
@@ -56,7 +57,7 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 		virtual void OnEvent(Event& e) override;
 
-		virtual bool BeginFrame() override;
+		virtual bool BeginFrame(Camera& camera) override;
 		virtual void EndFrame() override;
 		virtual void DrawFrame() override;
 
@@ -72,6 +73,12 @@ namespace Helios::Engine::Renderer::Vulkan {
 		void CreateSimpleGraphicsPipeline();
 
 	private:
+		struct SceneData {
+			glm::mat4 ViewProjectionMatrix;
+			//float time;
+		};
+		SceneData m_sceneData;
+
 		Window* m_Window = nullptr;
 		Scope<VKInstance> m_vkInstance;
 		Scope<VKSurface> m_vkSurface;

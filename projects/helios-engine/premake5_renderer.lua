@@ -23,6 +23,11 @@ function Lib_RendererVulkan()
 		filter "kind:*App"
 			libdirs "%VULKAN_SDK%/Lib"
 			links "vulkan-1"
+		filter "platforms:Windows"
+			defines {
+				-- TODO: Do we really need this?
+				"VK_USE_PLATFORM_WIN32_KHR",
+			}
 		filter {}
 	end
 end

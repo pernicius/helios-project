@@ -20,6 +20,7 @@
 //   like `BeginFrame`, `Draw`, and `EndFrame`.
 // 
 // Changelog:
+// - 2026.01: Introduced Camera to BeginFrame
 // - 2026.01: Refactored rendering loop into BeginFrame/EndFrame
 // - 2026.01: Initial version / start of version history
 //==============================================================================
@@ -27,6 +28,7 @@
 
 #include "Helios/Engine/Core/Application.h"
 #include "Helios/Engine/Renderer/Window.h"
+#include "Helios/Engine/Renderer/Camera.h"
 
 namespace Helios::Engine::Renderer {
 
@@ -42,7 +44,7 @@ namespace Helios::Engine::Renderer {
 
 		virtual void OnEvent(Event& e) = 0;
 		
-		virtual bool BeginFrame() = 0;
+		virtual bool BeginFrame(Camera& camera) = 0;
 		virtual void EndFrame() = 0;
 		virtual void DrawFrame() = 0;
 

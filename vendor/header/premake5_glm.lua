@@ -5,6 +5,10 @@
 
 function Lib_GLM()
 	includedirs "%{wks.location}/vendor/header/glm/"
+	defines {
+		"GLM_FORCE_RADIANS",
+		"GLM_FORCE_DEPTH_ZERO_TO_ONE",
+	}
 end
 
 

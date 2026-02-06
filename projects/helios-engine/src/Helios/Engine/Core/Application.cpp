@@ -16,6 +16,7 @@
 
 #include "Helios/Engine/Renderer/RendererAPI.h"
 #include "Helios/Engine/Renderer/Renderer.h"
+#include "Helios/Engine/Renderer/CameraPerspective.h" // Temporary
 
 #include <Helios/Platform/PlatformDetection.h>
 #if defined TARGET_PLATFORM_WINDOWS
@@ -223,6 +224,12 @@ namespace Helios::Engine {
 
 	void Application::Run()
 	{
+// Temporary camera for testing
+Scope<Renderer::PerspectiveCamera> m_Camera;
+m_Camera = CreateScope<Renderer::PerspectiveCamera>(45.0f, m_Window->GetAspectRatio(), 0.1f, 100.0f);
+m_Camera->SetPosition({ 0.0f, 0.0f, 3.0f });
+// Temporary camera for testing
+
 		TimerSec RunLoopTimer;
 		while (m_Running)
 		{
@@ -271,13 +278,18 @@ namespace Helios::Engine {
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate(timestep);
 
+// Rotate the camera
+static float rotationY = 0.0f;
+rotationY += glm::radians(180.0f) * timestep;
+m_Camera->SetRotation({ 0.0f, rotationY, 0.0f });
+
 			// Rendering (only if not minimized!)
 			if (!m_Window->glfwIsMinimized())
 			{
 				for (Layer* layer : m_LayerStack)
 					layer->OnRender();
 
-				m_Renderer->BeginFrame();
+				m_Renderer->BeginFrame(*m_Camera);
 				m_Renderer->DrawFrame();
 				m_Renderer->EndFrame();
 

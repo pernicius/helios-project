@@ -71,6 +71,14 @@ namespace Helios::Engine::Renderer {
 	}
 
 
+	float Window::GetAspectRatio() const
+	{
+		if (m_currentState.sizeY == 0)
+			return 1.0f;
+		return static_cast<float>(m_currentState.sizeX) / static_cast<float>(m_currentState.sizeY);
+	}
+
+
 	void Window::LoadState()
 	{
 //		std::filesystem::path filepath = Application::Get().GetAppSpec().WorkingDirectory + "/config/window_" + m_WindowName + ".ini";

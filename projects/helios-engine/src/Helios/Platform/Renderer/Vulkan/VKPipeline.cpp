@@ -209,6 +209,13 @@ namespace Helios::Engine::Renderer::Vulkan {
 	}
 
 
+	VKPipelineBuilder& VKPipelineBuilder::SetPushConstantRanges(const std::vector<vk::PushConstantRange>& pushConstantRanges)
+	{
+		m_pushConstantRanges = pushConstantRanges;
+		return *this;
+	}
+
+
 	Scope<VKPipeline> VKPipelineBuilder::Build()
 	{
 		m_vertexInputInfo = vk::PipelineVertexInputStateCreateInfo()
@@ -222,6 +229,9 @@ namespace Helios::Engine::Renderer::Vulkan {
 
 		m_dynamicState.setDynamicStateCount(static_cast<uint32_t>(m_dynamicStates.size()));
 		m_dynamicState.setPDynamicStates(m_dynamicStates.data());
+
+		m_pipelineLayoutInfo.setPushConstantRangeCount(static_cast<uint32_t>(m_pushConstantRanges.size()));
+		m_pipelineLayoutInfo.setPPushConstantRanges(m_pushConstantRanges.data());
 
 		return CreateScope<VKPipeline>(m_deviceManager, *this);
 	}
